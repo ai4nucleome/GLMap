@@ -156,9 +156,23 @@ Apache-2.0. See [LICENSE](LICENSE).
 
 ---
 
+## Acknowledgements
+
+GLMap builds on the ideas and infrastructure of several outstanding open-source
+projects, without which this work would not have been possible:
+
+- **[ModelMap](https://github.com/shimo-lab/modelmap)** 
+- **[DNA Foundation Benchmark](https://github.com/ChongWuLab/dna_foundation_benchmark)**
+
+We also thank the authors and maintainers of the 123 genomic language models
+audited in this work for releasing their weights and code publicly, making this
+kind of population-scale comparison possible at all.
+
+---
+
 ## Contact
 
-- **Yusen Hou** — Data Science and Analytics Thrust, HKUST(GZ).
+- **Yusen Hou** — &lt;yhou925@connect.hkust-gz.edu.cn&gt; Data Science and Analytics Thrust, HKUST(GZ).
 - **Corresponding author**: Yanlin Zhang &lt;yanlinzhang@hkust-gz.edu.cn&gt;.
 
 For questions about the methodology, please open an issue on this repository
