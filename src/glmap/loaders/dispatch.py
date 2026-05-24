@@ -228,11 +228,36 @@ def specs_from_audit(audit_path: Optional[Path | str] = None) -> list[ModelSpec]
 def specs_from_hf_ids(
     hf_ids: list[str],
     audit_path: Optional[Path | str] = None,
+    *,
+    strict: bool = True,
 ) -> list[ModelSpec]:
     """Build ``ModelSpec`` objects for a specific subset of HF ids.
 
-    The order in ``hf_ids`` is preserved. Ids not found in the audit, or
-    not scorable as an LM, are skipped silently.
+    The order in ``hf_ids`` is preserved.
+
+    Parameters
+    ----------
+    hf_ids
+        List of Hugging Face identifiers to look up in the audit.
+    audit_path
+        Optional explicit path to ``models.json``. If ``None``, resolved
+        via :func:`glmap._data_resolver.resolve_data_path`.
+    strict
+        If ``True`` (the default), any ``hf_id`` that is not in the
+        audit, or is in the audit but not scorable as a language model
+        (e.g. ``branch == "supervised_or_annotation"``), raises
+        :class:`ValueError` listing the offending ids. This catches
+        typos early.
+
+        If ``False``, unknown and unscorable ids are silently skipped
+        (useful when intentionally feeding a heterogeneous list).
+
+    Raises
+    ------
+    ValueError
+        Only when ``strict=True`` and at least one id is unknown or
+        unscorable. The message names the offending ids in the original
+        request order.
     """
     if audit_path is None:
         from glmap._data_resolver import resolve_data_path
@@ -243,13 +268,28 @@ def specs_from_hf_ids(
         for e in json.loads(audit_path.read_text()).get("models", [])
     }
     out: list[ModelSpec] = []
+    unknown: list[str] = []
+    unscorable: list[str] = []
     for hf_id in hf_ids:
         entry = by_id.get(hf_id)
         if entry is None:
+            unknown.append(hf_id)
             continue
         spec = audit_entry_to_spec(entry)
-        if spec is not None:
-            out.append(spec)
+        if spec is None:
+            unscorable.append(hf_id)
+            continue
+        out.append(spec)
+    if strict and (unknown or unscorable):
+        parts = []
+        if unknown:
+            parts.append(f"unknown hf_id(s): {unknown}")
+        if unscorable:
+            parts.append(f"unscorable hf_id(s): {unscorable}")
+        raise ValueError(
+            "; ".join(parts)
+            + "  (pass strict=False to skip silently)"
+        )
     return out
 
 
