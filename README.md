@@ -2,10 +2,10 @@
 
 **Profiling genomic language models as individuals in a population.**
 
-> 🚧 **Code coming soon.** The full release (`ai4nucleome-glmap >= 1.0.0`)
+> 🚧 **Code is under construction...** The full release (`ai4nucleome-glmap >= 1.0.0`)
 > accompanying the paper is in active preparation. The PyPI name has been
 > reserved at <https://pypi.org/project/ai4nucleome-glmap/>. Watch this repository
-> for updates.
+> for updates. We will release full code to reproduce our study **before May 28, 2026** 🚧.
 
 ---
 
@@ -155,7 +155,7 @@ Apache-2.0. See [LICENSE](LICENSE).
 
 ---
 
-## Acknowledgements
+## Acknowledgements ❤️
 
 GLMap builds on the ideas and infrastructure of several outstanding open-source
 projects, without which this work would not have been possible:
