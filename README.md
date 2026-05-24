@@ -68,8 +68,7 @@ choice of probes, and reflects known relationships among models.
 ## The model representation
 
 After scoring all 123 GLMs on the 10,000-probe panel, the resulting GLMap
-representation matrix *V_d* exhibits coherent block structure by model family
-(rows) and by functional element (columns), and the split-half distance
+representation matrix *V_d* exhibits coherent block structure by model family and by functional element, and the split-half distance
 geometry is stable across element-disjoint probe partitions.
 
 <p align="center">
@@ -122,7 +121,7 @@ across six tasks: Pearson *r* = 0.681, Spearman ρ = 0.705).
 
 | Component | Status |
 |---|---|
-| Paper | Submitted (target venue: *Bioinformatics* / ISMB) |
+| Paper | Coming soon... |
 | PyPI name reserved | ✅ `ai4nucleome-glmap` v0.0.1 (placeholder) |
 | Code release | 🚧 Forthcoming |
 | Panel + matrices artefacts | 🚧 Forthcoming |
@@ -164,7 +163,7 @@ projects, without which this work would not have been possible:
 - **[ModelMap](https://github.com/shimo-lab/modelmap)** 
 - **[DNA Foundation Benchmark](https://github.com/ChongWuLab/dna_foundation_benchmark)**
 
-We also thank the authors and maintainers of the 123 genomic language models
+We also thank the authors and maintainers of the **123 genomic language models**
 audited in this work for releasing their weights and code publicly, making this
 kind of population-scale comparison possible at all.
 
@@ -176,5 +175,4 @@ kind of population-scale comparison possible at all.
 - **Corresponding author**: Yanlin Zhang &lt;yanlinzhang@hkust-gz.edu.cn&gt;.
 
 For questions about the methodology, please open an issue on this repository
-(once it is public). For collaboration enquiries, contact the corresponding
-author directly.
+(once it is public). For collaboration enquiries, plz contact Yusen Hou directly.
