@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "GLMap: Profiling genomic language models as individuals in a population"
+authors:
+  - family-names: Hou
+    given-names: Yusen
+  - family-names: Long
+    given-names: Weicai
+  - family-names: Su
+    given-names: Houcheng
+  - family-names: Feng
+    given-names: Junning
+  - family-names: Zhang
+    given-names: Yanlin
+repository-code: "https://github.com/ai4nucleome/GLMap"
+url: "https://github.com/ai4nucleome/GLMap"
+version: "0.1.0"
+license: Apache-2.0
+type: software

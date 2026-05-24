@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai4nucleome-glmap"
+version = "0.1.0"
+description = "GLMap: Profiling genomic language models as individuals in a population."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Yusen Hou", email = "yuusen.hou@gmail.com" },
+    { name = "Weicai Long" },
+    { name = "Houcheng Su" },
+    { name = "Junning Feng" },
+    { name = "Yanlin Zhang", email = "yanlinzhang@hkust-gz.edu.cn" },
+]
+keywords = [
+    "genomic-language-models",
+    "dna",
+    "foundation-models",
+    "bioinformatics",
+    "population-genetics",
+    "model-comparison",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core install: analysis, matrix loading, figure generation.
+# Scoring (running GLMs to obtain raw likelihood responses) requires
+# the `scoring` extra, since torch/transformers are heavy and many
+# model families need extra family-specific dependencies described
+# in docs/env_routing.md.
+dependencies = [
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "scipy",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "umap-learn",
+    "PyYAML",
+]
+
+[project.optional-dependencies]
+scoring = [
+    "torch",
+    "transformers",
+]
+dev = [
+    "pytest",
+    "build",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://github.com/ai4nucleome/GLMap"
+Repository = "https://github.com/ai4nucleome/GLMap"
+Issues = "https://github.com/ai4nucleome/GLMap/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["models", "out_*", "data", "figures", ".git", "__pycache__"]
