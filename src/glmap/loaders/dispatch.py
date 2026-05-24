@@ -38,9 +38,13 @@ _AUDIT_BRANCH_TO_SCORE_BRANCH = {
 }
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class ModelSpec:
     """Minimal config for one scorable model.
+
+    All fields are keyword-only to prevent positional-argument confusion
+    (e.g. swapping ``branch`` and ``loader_kind`` silently).
+
 
     Attributes
     ----------
@@ -270,8 +274,13 @@ def get_loader(
     device
         Torch device string (``"cpu"`` / ``"cuda:0"`` / ``"cuda"``).
     torch_dtype
-        Optional ``torch.dtype``. Forwarded to loaders that accept it.
-        Defaults to whatever the loader picks (usually FP32 / FP16).
+        Optional ``torch.dtype``. Forwarded to every loader that accepts
+        it: ``hf``, ``botanic``, ``plantbimoe``, ``mutbert``, ``hyenadna``,
+        ``aido``, ``evo1``, ``evo2``, ``generator``, ``carbon``, ``ntv3``.
+        The three legacy ``torch.load``-style loaders (``megadna``,
+        ``plasmidgpt``, ``genslm``) do not expose a dtype knob; passing
+        ``torch_dtype`` for them is silently ignored. Defaults to
+        ``None`` (each loader picks its own dtype, usually FP32 / FP16).
     load
         If ``True`` (the default), call ``.load()`` on the returned
         loader so it is immediately ready for scoring. Pass ``load=False``
@@ -288,6 +297,9 @@ def get_loader(
     """
     kind = spec.loader_kind
 
+    # Loaders that accept ``torch_dtype`` get it forwarded; the three
+    # legacy .pt-style loaders (megadna / plasmidgpt / genslm) don't take
+    # it and are constructed without that kwarg.
     if kind == "hf" and spec.branch == "ar":
         from glmap.loaders.huggingface import HFCausalLMLoader
         loader = HFCausalLMLoader(
@@ -295,6 +307,7 @@ def get_loader(
             context_tokens=spec.context_tokens,
             device=device,
             trust_remote_code=spec.trust_remote_code,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "hf" and spec.branch == "mlm":
@@ -304,6 +317,7 @@ def get_loader(
             context_tokens=spec.context_tokens,
             device=device,
             trust_remote_code=spec.trust_remote_code,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "megadna":
@@ -321,6 +335,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "plantbimoe":
@@ -329,6 +344,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "mutbert":
@@ -337,6 +353,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "hyenadna":
@@ -345,6 +362,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "aido":
@@ -353,6 +371,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "evo1":
@@ -361,6 +380,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "evo2":
@@ -369,6 +389,7 @@ def get_loader(
             hf_id=spec.hf_id,
             context_tokens=spec.context_tokens,
             device=device,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "generator":
@@ -378,6 +399,7 @@ def get_loader(
             context_tokens=spec.context_tokens,
             device=device,
             trust_remote_code=spec.trust_remote_code,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "carbon":
@@ -387,6 +409,7 @@ def get_loader(
             context_tokens=spec.context_tokens,
             device=device,
             trust_remote_code=spec.trust_remote_code,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     elif kind == "ntv3":
@@ -402,6 +425,7 @@ def get_loader(
             length_multiple=spec.length_multiple,
             device=device,
             trust_remote_code=spec.trust_remote_code,
+            torch_dtype=torch_dtype,
             **kwargs,
         )
     else:
