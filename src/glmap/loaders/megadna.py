@@ -129,7 +129,7 @@ class MegaDNALoader:
                     f"MegaDNALoader: weight file missing at {self.weight_path}. "
                     "To fix, run one of:\n"
                     "  1. bash scripts/download_models/download_models_from_list.sh\n"
-                    "  2. bash models/setup_external_models.sh  (clones code + weights)\n"
+                    "  2. bash models/setup_external_models.sh  (clones code package)\n"
                     "  3. hf download lingxusb/megaDNA_updated megaDNA_phage_145M.pt "
                     f"--local-dir {self.weight_path.parent}\n"
                     "The original HF repo lingxusb/megaDNA is no longer public; "

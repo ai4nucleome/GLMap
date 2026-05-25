@@ -55,14 +55,20 @@ for repo_id in "${lines[@]}"; do
   # Download the weight from lingxusb/megaDNA_updated into the loader's
   # expected local path.
   if [[ "$repo_id" == "lingxusb/megaDNA" ]]; then
-    MEGA_DIR="models/modelsHFNoInfo/megaDNA"
+    REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    MEGA_DIR="$REPO_ROOT/models/modelsHFNoInfo/megaDNA"
     MEGA_PT="megaDNA_phage_145M.pt"
     if [[ -f "$MEGA_DIR/$MEGA_PT" ]]; then
       echo ">>> [$n/${#lines[@]}] SKIP $repo_id ($MEGA_DIR/$MEGA_PT already exists)"
     else
       echo ">>> [$n/${#lines[@]}] megaDNA: downloading $MEGA_PT from lingxusb/megaDNA_updated"
       mkdir -p "$MEGA_DIR"
-      hf download lingxusb/megaDNA_updated "$MEGA_PT" --local-dir "$MEGA_DIR"
+      if hf download lingxusb/megaDNA_updated "$MEGA_PT" --local-dir "$MEGA_DIR"; then
+        echo "    done: megaDNA"
+      else
+        echo "    FAILED: megaDNA (lingxusb/megaDNA_updated:$MEGA_PT)" >&2
+        failed+=("lingxusb/megaDNA_updated:$MEGA_PT")
+      fi
     fi
     continue
   fi
