@@ -359,6 +359,7 @@ def build_command(
     stride: int | None = None,
     out_dir: str | None = None,
     audit_path: str | None = None,
+    benchmark_dir: str | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     """Construct argv + env for subprocess.Popen.
 
@@ -446,6 +447,8 @@ def build_command(
         ]
         if audit_path:
             args.extend(["--audit-json", audit_path])
+        if benchmark_dir:
+            args.extend(["--benchmark-dir", benchmark_dir])
         if force:
             args.append("--force")
     else:
@@ -543,6 +546,7 @@ def run_sweep(
     embed_expected_n: dict | None = None,
     parquet_complete_fn=None,
     audit_path: str | None = None,
+    benchmark_dir: str | None = None,
 ) -> list[tuple[str, str, int, float]]:
     """Drive the parallel sweep. Returns list of (hf_id, status, rc, elapsed_sec).
 
@@ -683,7 +687,8 @@ def run_sweep(
             args, env = build_command(hf_id, route, gpus, n_probes, panel,
                                       mode=mode, force=force,
                                       stride=stride, out_dir=out_dir,
-                                      audit_path=audit_path)
+                                      audit_path=audit_path,
+                                      benchmark_dir=benchmark_dir)
             slug = hf_id.replace("/", "__")
             log_path = log_dir / f"{slug}.log"
             log_path.write_text("")  # truncate
@@ -723,6 +728,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--audit", type=Path,
                    default=REPO_ROOT / "data/audits/models.json",
                    help="Path to the models audit JSON.")
+    p.add_argument("--benchmark-dir", type=Path,
+                   default=REPO_ROOT / "data" / "dna_foundation_benchmark",
+                   help="Benchmark data root for embed mode (must contain data_processed/). "
+                        "Download from: huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset")
     p.add_argument("--stability-dir", type=Path,
                    default=REPO_ROOT / "out_phase1/stability",
                    help="Where stability JSONs live (used for --skip-done lookup).")
@@ -891,19 +900,40 @@ def main() -> None:
             parquet_complete as parquet_complete_fn,
             load_task_split,
         )
-        bench_dir = REPO_ROOT / "dna_foundation_benchmark"
+        bench_dir = args.benchmark_dir
         embed_expected_n = {}
-        try:
+
+        # Try reading expected row counts from the benchmark manifest first
+        # (avoids requiring raw CSVs just for dry-run / resume checks).
+        manifest_path = REPO_ROOT / "data" / "benchmark_manifests" / "downstream_tasks.json"
+        if manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text())
             for task in _EMBED_TASKS:
-                for split in ("train", "test"):
-                    df = load_task_split(bench_dir, task, split)
-                    embed_expected_n[(task.name, split)] = len(df)
-        except Exception as exc:
-            sys.exit(
-                f"[sweep] mode=embed needs to read task CSVs from "
-                f"{bench_dir}/data_processed/ to compute expected row counts; "
-                f"got: {exc}"
-            )
+                task_info = manifest.get("tasks", {}).get(task.rel_path)
+                if task_info:
+                    embed_expected_n[(task.name, "train")] = task_info["n_train"]
+                    embed_expected_n[(task.name, "test")] = task_info["n_test"]
+            if len(embed_expected_n) == len(_EMBED_TASKS) * 2:
+                print(f"[sweep] embed expected row counts loaded from {manifest_path.name}",
+                      flush=True)
+            else:
+                embed_expected_n = {}  # incomplete manifest, fall through
+
+        # Fallback: read from actual CSVs if manifest didn't cover all tasks.
+        if not embed_expected_n:
+            try:
+                for task in _EMBED_TASKS:
+                    for split in ("train", "test"):
+                        df = load_task_split(bench_dir, task, split)
+                        embed_expected_n[(task.name, split)] = len(df)
+            except Exception as exc:
+                sys.exit(
+                    f"[sweep] mode=embed needs task row counts. Either:\n"
+                    f"  1. Ensure data/benchmark_manifests/downstream_tasks.json exists, or\n"
+                    f"  2. Download task CSVs to {bench_dir}/data_processed/\n"
+                    f"     (see data/benchmark_manifests/README.md)\n"
+                    f"Error: {exc}"
+                )
 
     # Resume: skip work that's already done. The "done" criterion depends on
     # which sweep we're driving:
@@ -1067,6 +1097,7 @@ def main() -> None:
         embed_expected_n=embed_expected_n,
         parquet_complete_fn=parquet_complete_fn,
         audit_path=str(args.audit),
+        benchmark_dir=str(args.benchmark_dir),
     )
     total = time.time() - t0
 

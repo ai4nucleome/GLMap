@@ -229,8 +229,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--audit-json", type=Path,
                    default=REPO_ROOT / "data/audits/models.json")
     p.add_argument("--benchmark-dir", type=Path,
-                   default=REPO_ROOT / "dna_foundation_benchmark",
-                   help="Vendored eval suite root (must contain data_processed/).")
+                   default=REPO_ROOT / "data" / "dna_foundation_benchmark",
+                   help="Benchmark data root (must contain data_processed/). "
+                        "Download from: huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset")
     p.add_argument("--out", type=Path,
                    default=REPO_ROOT / "out_phase2",
                    help="Output root; embeddings under out/embeddings/.")
