@@ -51,6 +51,11 @@ This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
   committed directly in the GitHub repo. `git clone` fetches it
   automatically — no separate download step needed. The loader reads
   from the clone path (`models/modelsHFNoInfo/megaDNA/`), not HF cache.
+  Note: the original HF repo `lingxusb/megaDNA` is no longer publicly
+  accessible; the updated version is at
+  [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated).
+  The audit retains `lingxusb/megaDNA` as the canonical identifier for
+  consistency with the scoring outputs.
 - **PlasmidGPT**: The loader uses `hf_hub_download` internally, so the
   GitHub clone is for provenance / upstream code only — it is **not**
   required for scoring. HF download handles the weights.
