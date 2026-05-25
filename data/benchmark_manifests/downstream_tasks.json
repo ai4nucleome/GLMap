@@ -1,0 +1,84 @@
+{
+  "_comment": "Downstream task manifests for GLMap phenotype prediction. These 6 binary classification tasks are from the DNA Foundation Benchmark (Feng et al., 2025). Raw task CSVs should be downloaded from the upstream HuggingFace dataset.",
+  "total_samples": 48439,
+  "tasks": {
+    "EMP/Yeast_H4": {
+      "description": "Yeast histone H4 modification (binary classification)",
+      "source_benchmark": "dna_foundation_benchmark",
+      "upstream_repo": "https://github.com/ChongWuLab/dna_foundation_benchmark",
+      "upstream_dataset": "https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset",
+      "original_source": "GUE (DNABERT / DNABERT-2)",
+      "seq_length_bp": "310-500",
+      "n_train": 10220,
+      "n_test": 4381,
+      "minority_class_pct": 44.4,
+      "label_column": "Label",
+      "sequence_column": "Sequence"
+    },
+    "enhancers/enhancer": {
+      "description": "Human enhancer detection (binary classification)",
+      "source_benchmark": "dna_foundation_benchmark",
+      "upstream_repo": "https://github.com/ChongWuLab/dna_foundation_benchmark",
+      "upstream_dataset": "https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset",
+      "original_source": "Nucleotide Transformer benchmark",
+      "seq_length_bp": "199-200",
+      "n_train": 14968,
+      "n_test": 400,
+      "minority_class_pct": 50.0,
+      "label_column": "Label",
+      "sequence_column": "Sequence"
+    },
+    "iDNA_ABF/5mC": {
+      "description": "DNA 5-methylcytosine modification (binary classification)",
+      "source_benchmark": "dna_foundation_benchmark",
+      "upstream_repo": "https://github.com/ChongWuLab/dna_foundation_benchmark",
+      "upstream_dataset": "https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset",
+      "original_source": "iDNA-ABF",
+      "seq_length_bp": "41",
+      "n_train": 3281,
+      "n_test": 1407,
+      "minority_class_pct": 50.0,
+      "label_column": "Label",
+      "sequence_column": "Sequence"
+    },
+    "iPro-WAEL/Promoter_Arabidopsis_TATA": {
+      "description": "Arabidopsis thaliana TATA promoter detection (binary classification)",
+      "source_benchmark": "dna_foundation_benchmark",
+      "upstream_repo": "https://github.com/ChongWuLab/dna_foundation_benchmark",
+      "upstream_dataset": "https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset",
+      "original_source": "iPro-WAEL",
+      "seq_length_bp": "251",
+      "n_train": 3063,
+      "n_test": 1313,
+      "minority_class_pct": 34.2,
+      "label_column": "Label",
+      "sequence_column": "Sequence"
+    },
+    "mouse/mouse_TFBS_3": {
+      "description": "Mouse transcription factor binding site (binary classification)",
+      "source_benchmark": "dna_foundation_benchmark",
+      "upstream_repo": "https://github.com/ChongWuLab/dna_foundation_benchmark",
+      "upstream_dataset": "https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset",
+      "original_source": "GUE (DNABERT / DNABERT-2)",
+      "seq_length_bp": "101",
+      "n_train": 2293,
+      "n_test": 983,
+      "minority_class_pct": 50.0,
+      "label_column": "Label",
+      "sequence_column": "Sequence"
+    },
+    "prom/promoter_tata_300bps": {
+      "description": "Human TATA promoter detection (binary classification)",
+      "source_benchmark": "dna_foundation_benchmark",
+      "upstream_repo": "https://github.com/ChongWuLab/dna_foundation_benchmark",
+      "upstream_dataset": "https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset",
+      "original_source": "GUE (DNABERT / DNABERT-2)",
+      "seq_length_bp": "300",
+      "n_train": 4290,
+      "n_test": 1840,
+      "minority_class_pct": 50.0,
+      "label_column": "Label",
+      "sequence_column": "Sequence"
+    }
+  }
+}
