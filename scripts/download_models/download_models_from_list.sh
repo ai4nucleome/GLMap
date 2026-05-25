@@ -46,8 +46,12 @@ for repo_id in "${lines[@]}"; do
   n=$((n + 1))
   # Skip entries that are not real HF repo IDs (e.g. GenSLM-* are local
   # weight names handled by setup_external_models.sh + manual download).
-  if [[ "$repo_id" == GenSLM-* ]]; then
-    echo ">>> [$n/${#lines[@]}] SKIP $repo_id (not an HF repo; see models/README.md)"
+  # Skip entries whose weights come from setup_external_models.sh (GitHub
+  # clone), not from HuggingFace Hub. GenSLM-* are not real HF repo IDs;
+  # lingxusb/megaDNA weight is a 582 MB .pt committed directly in the
+  # GitHub repo, and the loader reads from the clone path, not HF cache.
+  if [[ "$repo_id" == GenSLM-* || "$repo_id" == "lingxusb/megaDNA" ]]; then
+    echo ">>> [$n/${#lines[@]}] SKIP $repo_id (weights from GitHub clone; see models/README.md)"
     continue
   fi
   echo ">>> [$n/${#lines[@]}] hf download ${repo_id} --exclude *.h5 tf_* *.joblib"

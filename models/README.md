@@ -4,7 +4,7 @@ GLMap scores 123 genomic language models. Most are loaded directly from the
 [Hugging Face Hub](https://huggingface.co/); 9 require upstream GitHub repos
 that are not standard HF checkpoints.
 
-## HuggingFace models (120 of 123)
+## HuggingFace models (119 of 123)
 
 Download all HF-hosted models listed in `download_models_list.txt`:
 
@@ -13,8 +13,9 @@ bash scripts/download_models/download_models_from_list.sh
 ```
 
 The script calls `hf download` for each model, automatically skipping
-the 3 GenSLM entries (which are not HF repos — see below). Set
-`HF_HOME` to control the download location.
+4 entries whose weights come from GitHub clones instead of HF Hub:
+3 GenSLM local names and `lingxusb/megaDNA` (see below). Set `HF_HOME`
+to control the download location.
 
 **Note**: TensorFlow (`.h5`), joblib, and other non-PyTorch formats are
 excluded. PyTorch weights (`.pt`, `.bin`, `.safetensors`) are downloaded.
@@ -44,9 +45,18 @@ bash models/setup_external_models.sh
 
 This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
 
-**GenSLM weights** require a separate manual step. After cloning the
-`genslm` repo above, download the 3 pretrained checkpoints and place
-them under `models/modelsHFNoInfo/genslm/weights/`:
+### Weight-source notes
+
+- **megaDNA**: The 582 MB weight file (`megaDNA_phage_145M.pt`) is
+  committed directly in the GitHub repo. `git clone` fetches it
+  automatically — no separate download step needed. The loader reads
+  from the clone path (`models/modelsHFNoInfo/megaDNA/`), not HF cache.
+- **PlasmidGPT**: The loader uses `hf_hub_download` internally, so the
+  GitHub clone is for provenance / upstream code only — it is **not**
+  required for scoring. HF download handles the weights.
+- **GenSLM**: Requires a separate manual step. After cloning the
+  `genslm` repo above, download the 3 pretrained checkpoints and place
+  them under `models/modelsHFNoInfo/genslm/weights/`:
 
 ```
 models/modelsHFNoInfo/genslm/weights/
@@ -67,8 +77,9 @@ table.
 
 ## Files in this directory
 
-- `download_models_list.txt` — the full 123-model scoring catalog (120 HF
-  repos + 3 GenSLM local names). Two additional bigbird-sparse models are
-  commented out (excluded due to minimum seq_len incompatibility).
+- `download_models_list.txt` — the full 123-model scoring catalog (119 HF
+  repos + 3 GenSLM local names + 1 megaDNA GitHub-only). Two additional
+  bigbird-sparse models are commented out (excluded due to minimum seq_len
+  incompatibility).
 - `fig4a-svm.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
 - `setup_external_models.sh` — clones the 9 upstream repos at pinned SHAs.
