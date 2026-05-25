@@ -46,12 +46,24 @@ for repo_id in "${lines[@]}"; do
   n=$((n + 1))
   # Skip entries that are not real HF repo IDs (e.g. GenSLM-* are local
   # weight names handled by setup_external_models.sh + manual download).
-  # Skip entries whose weights come from setup_external_models.sh (GitHub
-  # clone), not from HuggingFace Hub. GenSLM-* are not real HF repo IDs;
-  # lingxusb/megaDNA weight is a 582 MB .pt committed directly in the
-  # GitHub repo, and the loader reads from the clone path, not HF cache.
-  if [[ "$repo_id" == GenSLM-* || "$repo_id" == "lingxusb/megaDNA" ]]; then
-    echo ">>> [$n/${#lines[@]}] SKIP $repo_id (weights from GitHub clone; see models/README.md)"
+  # GenSLM-* are local weight names, not HF repos — skip.
+  if [[ "$repo_id" == GenSLM-* ]]; then
+    echo ">>> [$n/${#lines[@]}] SKIP $repo_id (not an HF repo; see models/README.md)"
+    continue
+  fi
+  # megaDNA: the original HF repo (lingxusb/megaDNA) is no longer public.
+  # Download the weight from lingxusb/megaDNA_updated into the loader's
+  # expected local path.
+  if [[ "$repo_id" == "lingxusb/megaDNA" ]]; then
+    MEGA_DIR="models/modelsHFNoInfo/megaDNA"
+    MEGA_PT="megaDNA_phage_145M.pt"
+    if [[ -f "$MEGA_DIR/$MEGA_PT" ]]; then
+      echo ">>> [$n/${#lines[@]}] SKIP $repo_id ($MEGA_DIR/$MEGA_PT already exists)"
+    else
+      echo ">>> [$n/${#lines[@]}] megaDNA: downloading $MEGA_PT from lingxusb/megaDNA_updated"
+      mkdir -p "$MEGA_DIR"
+      hf download lingxusb/megaDNA_updated "$MEGA_PT" --local-dir "$MEGA_DIR"
+    fi
     continue
   fi
   echo ">>> [$n/${#lines[@]}] hf download ${repo_id} --exclude *.h5 tf_* *.joblib"

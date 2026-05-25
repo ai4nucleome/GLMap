@@ -47,15 +47,14 @@ This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
 
 ### Weight-source notes
 
-- **megaDNA**: The 582 MB weight file (`megaDNA_phage_145M.pt`) is
-  committed directly in the GitHub repo. `git clone` fetches it
-  automatically — no separate download step needed. The loader reads
-  from the clone path (`models/modelsHFNoInfo/megaDNA/`), not HF cache.
-  Note: the original HF repo `lingxusb/megaDNA` is no longer publicly
-  accessible; the updated version is at
-  [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated).
-  The audit retains `lingxusb/megaDNA` as the canonical identifier for
-  consistency with the scoring outputs.
+- **megaDNA**: The original HF repo `lingxusb/megaDNA` is no longer
+  publicly accessible. The weight file `megaDNA_phage_145M.pt` (582 MB)
+  is available from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
+  (license: CC-BY-NC-4.0). The download script automatically fetches it
+  into `models/modelsHFNoInfo/megaDNA/`. The GitHub clone
+  (`setup_external_models.sh`) provides the code package needed by
+  `torch.load`. The audit retains `lingxusb/megaDNA` as the canonical
+  identifier for consistency with the scoring outputs.
 - **PlasmidGPT**: The loader uses `hf_hub_download` internally, so the
   GitHub clone is for provenance / upstream code only — it is **not**
   required for scoring. HF download handles the weights.
@@ -83,8 +82,15 @@ table.
 ## Files in this directory
 
 - `download_models_list.txt` — the full 123-model scoring catalog (119 HF
-  repos + 3 GenSLM local names + 1 megaDNA GitHub-only). Two additional
+  repos + 3 GenSLM local names + 1 megaDNA special-cased). Two additional
   bigbird-sparse models are commented out (excluded due to minimum seq_len
   incompatibility).
 - `fig4a-svm.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
 - `setup_external_models.sh` — clones the 9 upstream repos at pinned SHAs.
+
+## Upstream licenses
+
+The GLMap **code** is Apache-2.0. Individual model **weights** follow
+their own upstream licenses (e.g. megaDNA weights are CC-BY-NC-4.0;
+Evo-2 weights are Apache-2.0; etc.). Consult each model's HuggingFace
+or GitHub page for licensing terms before redistribution or commercial use.

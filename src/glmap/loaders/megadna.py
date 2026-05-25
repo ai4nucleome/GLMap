@@ -116,12 +116,25 @@ class MegaDNALoader:
         if self._model is not None:
             return
         if not self.weight_path.exists():
-            raise FileNotFoundError(
-                f"MegaDNALoader: weight file missing at {self.weight_path}. "
-                "Run `git clone https://huggingface.co/lingxusb/megaDNA "
-                f"{self.package_path}` and ensure megaDNA_phage_145M.pt is "
-                "downloaded."
-            )
+            try:
+                from huggingface_hub import hf_hub_download
+                downloaded = hf_hub_download(
+                    "lingxusb/megaDNA_updated",
+                    "megaDNA_phage_145M.pt",
+                    local_dir=str(self.weight_path.parent),
+                )
+                self.weight_path = Path(downloaded)
+            except Exception:
+                raise FileNotFoundError(
+                    f"MegaDNALoader: weight file missing at {self.weight_path}. "
+                    "To fix, run one of:\n"
+                    "  1. bash scripts/download_models/download_models_from_list.sh\n"
+                    "  2. bash models/setup_external_models.sh  (clones code + weights)\n"
+                    "  3. hf download lingxusb/megaDNA_updated megaDNA_phage_145M.pt "
+                    f"--local-dir {self.weight_path.parent}\n"
+                    "The original HF repo lingxusb/megaDNA is no longer public; "
+                    "use lingxusb/megaDNA_updated instead."
+                )
         _ensure_package_importable(self.package_path)
         try:
             import megaDNA.megadna  # noqa: F401  (registers MEGADNA class for unpickle)
