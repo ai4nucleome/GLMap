@@ -358,6 +358,7 @@ def build_command(
     force: bool = False,
     stride: int | None = None,
     out_dir: str | None = None,
+    audit_path: str | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     """Construct argv + env for subprocess.Popen.
 
@@ -391,6 +392,8 @@ def build_command(
             "--device", "cuda:0",                      # always cuda:0 inside the masked process
             "--n-probes", str(n_probes),
         ]
+        if audit_path:
+            args.extend(["--audit", audit_path])
         if panel:
             args.extend(["--panel", panel])
     elif mode == "scoring":
@@ -406,6 +409,8 @@ def build_command(
             "--skip-aggregate",
             "--device", "cuda:0",
         ]
+        if audit_path:
+            args.extend(["--audit-json", audit_path])
         if panel:
             args.extend(["--panel", panel])
         if force:
@@ -439,6 +444,8 @@ def build_command(
             "--hf-ids", hf_id,
             "--device", "cuda:0",
         ]
+        if audit_path:
+            args.extend(["--audit-json", audit_path])
         if force:
             args.append("--force")
     else:
@@ -535,6 +542,7 @@ def run_sweep(
     panel_ids: set[str] | None = None,
     embed_expected_n: dict | None = None,
     parquet_complete_fn=None,
+    audit_path: str | None = None,
 ) -> list[tuple[str, str, int, float]]:
     """Drive the parallel sweep. Returns list of (hf_id, status, rc, elapsed_sec).
 
@@ -674,7 +682,8 @@ def run_sweep(
                 continue
             args, env = build_command(hf_id, route, gpus, n_probes, panel,
                                       mode=mode, force=force,
-                                      stride=stride, out_dir=out_dir)
+                                      stride=stride, out_dir=out_dir,
+                                      audit_path=audit_path)
             slug = hf_id.replace("/", "__")
             log_path = log_dir / f"{slug}.log"
             log_path.write_text("")  # truncate
@@ -1057,6 +1066,7 @@ def main() -> None:
         panel_ids=panel_ids,
         embed_expected_n=embed_expected_n,
         parquet_complete_fn=parquet_complete_fn,
+        audit_path=str(args.audit),
     )
     total = time.time() - t0
 

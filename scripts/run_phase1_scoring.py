@@ -907,7 +907,7 @@ def main() -> None:
         if not args.audit_json.exists():
             raise SystemExit(f"--from-audit but audit json not found: {args.audit_json}")
         from glmap.loaders.dispatch import specs_from_audit
-        roster = specs_from_audit(audit_path=args.audit_json, strict=False)
+        roster = specs_from_audit(audit_path=args.audit_json)
         roster_name = f"audit ({args.audit_json.name})"
     else:
         roster = list(DEFAULT_MODELS)

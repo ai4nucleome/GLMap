@@ -187,7 +187,7 @@ def main() -> None:
 
     if args.hf_ids:
         hf_ids = [s.strip() for s in args.hf_ids.split(",") if s.strip()]
-        specs = specs_from_hf_ids(hf_ids, audit_path=args.audit, strict=False)
+        specs = specs_from_hf_ids(hf_ids, audit_path=args.audit)
         print(f"[rerun_stability] --hf-ids -> {len(specs)} ModelSpec",
               file=sys.stderr)
     elif args.from_audit:
