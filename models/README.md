@@ -45,11 +45,18 @@ bash models/setup_external_models.sh
 This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
 
 **GenSLM weights** require a separate manual step. After cloning the
-`genslm` repo above, download the 3 pretrained checkpoints (25M, 250M,
-2.5B) from the GenSLM release and place them under
-`models/modelsHFNoInfo/genslm/`. See the
-[GenSLM README](https://github.com/ramanathanlab/genslm) for
-download links and expected file layout.
+`genslm` repo above, download the 3 pretrained checkpoints and place
+them under `models/modelsHFNoInfo/genslm/weights/`:
+
+```
+models/modelsHFNoInfo/genslm/weights/
+├── patric_25m_epoch01-val_loss_0.57_bias_removed.pt
+├── patric_250m_epoch00_val_loss_0.48_attention_removed.pt
+└── patric_2.5b_epoch00_val_los_0.29_bias_removed.pt
+```
+
+See the [GenSLM README](https://github.com/ramanathanlab/genslm) for
+download links.
 
 ## Environment routing
 

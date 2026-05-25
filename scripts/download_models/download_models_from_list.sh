@@ -52,18 +52,18 @@ for repo_id in "${lines[@]}"; do
   fi
   echo ">>> [$n/${#lines[@]}] hf download ${repo_id} --exclude *.h5 tf_* *.joblib"
   if hf download "$repo_id" --exclude '*.h5' 'tf_*' '*.joblib'; then
-    echo "    完成: $repo_id"
+    echo "    done: $repo_id"
   else
-    echo "    失败: $repo_id" >&2
+    echo "    FAILED: $repo_id" >&2
     failed+=("$repo_id")
   fi
   echo ""
 done
 
 if [[ ${#failed[@]} -gt 0 ]]; then
-  echo "以下模型下载失败 (${#failed[@]}):" >&2
+  echo "The following models failed to download (${#failed[@]}):" >&2
   printf '  %s\n' "${failed[@]}" >&2
   exit 1
 fi
 
-echo "全部下载成功。"
+echo "All downloads completed successfully."
