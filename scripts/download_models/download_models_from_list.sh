@@ -15,7 +15,7 @@ set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIST_FILE="${1:-${SCRIPT_DIR}/../../models/download_models_list.txt}"
-HF_HOME="${HF_HOME:-/data/yusen/software/.cache/huggingface}"
+HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
 CACHE_DIR="${HF_HOME}/hub"
 
 if ! command -v hf >/dev/null 2>&1; then
@@ -43,9 +43,14 @@ failed=()
 n=0
 for repo_id in "${lines[@]}"; do
   n=$((n + 1))
-  echo ">>> [$n/${#lines[@]}] hf download ${repo_id} --exclude *.h5 tf_* *.joblib *.pt *.bin"
-  #! 修改这里
-  if hf download "$repo_id" --exclude *.h5 tf_* *.joblib *.pt *.bin; then
+  # Skip entries that are not real HF repo IDs (e.g. GenSLM-* are local
+  # weight names handled by setup_external_models.sh + manual download).
+  if [[ "$repo_id" == GenSLM-* ]]; then
+    echo ">>> [$n/${#lines[@]}] SKIP $repo_id (not an HF repo; see models/README.md)"
+    continue
+  fi
+  echo ">>> [$n/${#lines[@]}] hf download ${repo_id} --exclude *.h5 tf_* *.joblib"
+  if hf download "$repo_id" --exclude '*.h5' 'tf_*' '*.joblib'; then
     echo "    完成: $repo_id"
   else
     echo "    失败: $repo_id" >&2

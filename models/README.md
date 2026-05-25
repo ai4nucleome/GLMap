@@ -4,7 +4,7 @@ GLMap scores 123 genomic language models. Most are loaded directly from the
 [Hugging Face Hub](https://huggingface.co/); 9 require upstream GitHub repos
 that are not standard HF checkpoints.
 
-## HuggingFace models (114 of 123)
+## HuggingFace models (120 of 123)
 
 Download all HF-hosted models listed in `download_models_list.txt`:
 
@@ -12,8 +12,12 @@ Download all HF-hosted models listed in `download_models_list.txt`:
 bash scripts/download_models/download_models_from_list.sh
 ```
 
-The script calls `huggingface-cli download` for each model. Set
-`HF_HUB_CACHE` or `HF_HOME` to control the download location.
+The script calls `hf download` for each model, automatically skipping
+the 3 GenSLM entries (which are not HF repos — see below). Set
+`HF_HOME` to control the download location.
+
+**Note**: TensorFlow (`.h5`), joblib, and other non-PyTorch formats are
+excluded. PyTorch weights (`.pt`, `.bin`, `.safetensors`) are downloaded.
 
 ## External models (9 of 123)
 
@@ -40,6 +44,13 @@ bash models/setup_external_models.sh
 
 This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
 
+**GenSLM weights** require a separate manual step. After cloning the
+`genslm` repo above, download the 3 pretrained checkpoints (25M, 250M,
+2.5B) from the GenSLM release and place them under
+`models/modelsHFNoInfo/genslm/`. See the
+[GenSLM README](https://github.com/ramanathanlab/genslm) for
+download links and expected file layout.
+
 ## Environment routing
 
 Different model families require different Python environments (e.g. Evo-2
@@ -49,7 +60,8 @@ table.
 
 ## Files in this directory
 
-- `download_models_list.txt` — the HF model download manifest (123 active
-  entries + 2 commented-out sparse-bigbird).
+- `download_models_list.txt` — the full 123-model scoring catalog (120 HF
+  repos + 3 GenSLM local names). Two additional bigbird-sparse models are
+  commented out (excluded due to minimum seq_len incompatibility).
 - `fig4a-svm.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
 - `setup_external_models.sh` — clones the 9 upstream repos at pinned SHAs.
