@@ -1,0 +1,12 @@
+{
+  "hf_id": "genbio-ai/AIDO.DNA-300M",
+  "branch": "mlm",
+  "context_tokens": 4000,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "aido",
+  "length_multiple": null,
+  "slug": "genbio-ai__AIDO.DNA-300M",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

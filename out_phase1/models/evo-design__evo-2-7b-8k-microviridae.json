@@ -1,0 +1,12 @@
+{
+  "hf_id": "evo-design/evo-2-7b-8k-microviridae",
+  "branch": "ar",
+  "context_tokens": 8192,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "evo2",
+  "length_multiple": null,
+  "slug": "evo-design__evo-2-7b-8k-microviridae",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

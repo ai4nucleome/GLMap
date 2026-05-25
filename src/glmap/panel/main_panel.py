@@ -46,7 +46,7 @@ from .composition import dinuc_vec, gc_fraction, trinuc_vec
 from .readers import ReaderResult, read_dataset
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_SOURCES_YAML = REPO_ROOT / "data" / "panel_sources.yaml"
 
 

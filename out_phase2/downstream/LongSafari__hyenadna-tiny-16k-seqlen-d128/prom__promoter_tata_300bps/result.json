@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.8027959593572779,
+  "auc_cv_mean": 0.8027243929341832,
+  "auc_cv_std": 0.009623410868629542,
+  "best_C": 1.0,
+  "n_train": 4290,
+  "n_test": 1840,
+  "embed_dim": 128,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "LongSafari/hyenadna-tiny-16k-seqlen-d128",
+  "task": "prom/promoter_tata_300bps",
+  "n_train_raw": 4290,
+  "n_train_dropped": 0,
+  "n_test_raw": 1840,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

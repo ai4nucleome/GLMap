@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.6743096799472078,
+  "auc_cv_mean": 0.6905892749016689,
+  "auc_cv_std": 0.021814063345231803,
+  "best_C": 0.1,
+  "n_train": 3063,
+  "n_test": 1313,
+  "embed_dim": 8192,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "arcinstitute/evo2_40b_base",
+  "task": "iPro-WAEL/Promoter_Arabidopsis_TATA",
+  "n_train_raw": 3063,
+  "n_train_dropped": 0,
+  "n_test_raw": 1313,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

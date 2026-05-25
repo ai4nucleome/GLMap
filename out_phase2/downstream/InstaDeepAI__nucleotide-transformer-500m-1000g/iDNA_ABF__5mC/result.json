@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.7536531747058064,
+  "auc_cv_mean": 0.737671746762041,
+  "auc_cv_std": 0.01489552563681269,
+  "best_C": 0.01,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 1280,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "InstaDeepAI/nucleotide-transformer-500m-1000g",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

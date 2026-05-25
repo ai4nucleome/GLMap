@@ -1,0 +1,12 @@
+{
+  "hf_id": "InstaDeepAI/NTv3_8M_pre_8kb",
+  "branch": "mlm",
+  "context_tokens": 8192,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "ntv3",
+  "length_multiple": 128,
+  "slug": "InstaDeepAI__NTv3_8M_pre_8kb",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

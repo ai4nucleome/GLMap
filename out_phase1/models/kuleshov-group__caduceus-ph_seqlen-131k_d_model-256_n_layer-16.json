@@ -1,0 +1,12 @@
+{
+  "hf_id": "kuleshov-group/caduceus-ph_seqlen-131k_d_model-256_n_layer-16",
+  "branch": "mlm",
+  "context_tokens": 131072,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "kuleshov-group__caduceus-ph_seqlen-131k_d_model-256_n_layer-16",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

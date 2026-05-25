@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.7829249999999999,
+  "auc_cv_mean": 0.9426124373507528,
+  "auc_cv_std": 0.006713671173598932,
+  "best_C": 0.1,
+  "n_train": 14968,
+  "n_test": 400,
+  "embed_dim": 512,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "InstaDeepAI/nucleotide-transformer-v2-50m-3mer-multi-species",
+  "task": "enhancers/enhancer",
+  "n_train_raw": 14968,
+  "n_train_dropped": 0,
+  "n_test_raw": 400,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.6821745037807183,
+  "auc_cv_mean": 0.6709548415842121,
+  "auc_cv_std": 0.008615131433555669,
+  "best_C": 0.1,
+  "n_train": 4290,
+  "n_test": 1840,
+  "embed_dim": 256,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "RaphaelMourad/Mistral-DNA-v1-17M-cow-5races",
+  "task": "prom/promoter_tata_300bps",
+  "n_train_raw": 4290,
+  "n_train_dropped": 0,
+  "n_test_raw": 1840,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

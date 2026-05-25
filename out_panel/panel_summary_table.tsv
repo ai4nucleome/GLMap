@@ -1,0 +1,15 @@
+Element	Species group	Species	Source benchmark	Original task path	n	Length (bp)	Length median (IQR)	GC median (IQR)	% of panel
+promoter	Human	Homo sapiens	GUE	prom/prom_300_all, prom/prom_300_notata, prom/prom_300_tata	1400	300	300 (300–300)	0.60 (0.49–0.69)	14.0
+enhancer	Human	Homo sapiens	NT-DFB	enhancers/enhancer	1400	199–200	199 (199–200)	0.48 (0.45–0.52)	14.0
+splice_donor	Human	Homo sapiens	GUE	splice/reconstructed	600	400	400 (400–400)	0.45 (0.37–0.55)	6.0
+splice_acceptor	Human	Homo sapiens	GUE	splice/reconstructed	600	400	400 (400–400)	0.48 (0.37–0.60)	6.0
+chromatin_access	Plant	multi-species (n=7)	PGB	chromatin_access	450	1000	1000 (1000–1000)	0.49 (0.42–0.56)	4.5
+polyA	Plant	multi-species (n=6)	PGB	poly_a	350	400	400 (400–400)	0.38 (0.34–0.45)	3.5
+lncRNA	Plant	multi-species (n=6)	PGB	lncrna	300	156–1001	459 (296–704)	0.43 (0.38–0.52)	3.0
+nascent_RNA	Plant	Manihot esculenta	PGB	pro_seq	200	1000	1000 (1000–1000)	0.28 (0.24–0.34)	2.0
+splicing_plant_donor	Plant	Arabidopsis thaliana	PGB	splicing	150	398	398 (398–398)	0.39 (0.36–0.42)	1.5
+splicing_plant_acceptor	Plant	Arabidopsis thaliana	PGB	splicing	150	398	398 (398–398)	0.39 (0.36–0.42)	1.5
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	EMP/H3, EMP/H3K14ac, EMP/H3K36me3	1200	500	500 (500–500)	0.38 (0.35–0.41)	12.0
+fungi_genome	Fungi	multi-species (n=20)	GUE	fungi/species_20	1500	1024	1024 (1024–1024)	0.48 (0.41–0.52)	15.0
+virus_variants	Virus	multi-species (n=9)	GUE	virus/covid	600	999	999 (999–999)	0.38 (0.36–0.39)	6.0
+virus_species	Virus	multi-species (n=25)	GUE	virus/species_40	1100	1024	1024 (1024–1024)	0.28 (0.25–0.43)	11.0

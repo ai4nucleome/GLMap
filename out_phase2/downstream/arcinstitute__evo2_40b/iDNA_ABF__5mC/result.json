@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.6376184048881418,
+  "auc_cv_mean": 0.6656385272823926,
+  "auc_cv_std": 0.02123566933781,
+  "best_C": 0.01,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 8192,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "arcinstitute/evo2_40b",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

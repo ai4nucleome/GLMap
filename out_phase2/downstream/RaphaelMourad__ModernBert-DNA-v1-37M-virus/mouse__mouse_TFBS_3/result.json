@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.7685990098190187,
+  "auc_cv_mean": 0.7353200076607832,
+  "auc_cv_std": 0.023579388278966995,
+  "best_C": 0.1,
+  "n_train": 2293,
+  "n_test": 983,
+  "embed_dim": 768,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "RaphaelMourad/ModernBert-DNA-v1-37M-virus",
+  "task": "mouse/mouse_TFBS_3",
+  "n_train_raw": 2293,
+  "n_train_dropped": 0,
+  "n_test_raw": 983,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

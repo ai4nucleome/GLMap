@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.940188216301835,
+  "auc_cv_mean": 0.9331571427454225,
+  "auc_cv_std": 0.003265116639442797,
+  "best_C": 1.0,
+  "n_train": 10220,
+  "n_test": 4381,
+  "embed_dim": 4096,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "arcinstitute/evo2_7b_262k",
+  "task": "EMP/Yeast_H4",
+  "n_train_raw": 10220,
+  "n_train_dropped": 0,
+  "n_test_raw": 4381,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

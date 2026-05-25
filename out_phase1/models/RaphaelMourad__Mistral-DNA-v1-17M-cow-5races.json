@@ -1,0 +1,12 @@
+{
+  "hf_id": "RaphaelMourad/Mistral-DNA-v1-17M-cow-5races",
+  "branch": "ar",
+  "context_tokens": 512,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "RaphaelMourad__Mistral-DNA-v1-17M-cow-5races",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

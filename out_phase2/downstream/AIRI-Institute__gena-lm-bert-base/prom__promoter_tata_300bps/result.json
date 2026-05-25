@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.8537234168241966,
+  "auc_cv_mean": 0.8474459495438518,
+  "auc_cv_std": 0.01506760600477862,
+  "best_C": 0.01,
+  "n_train": 4290,
+  "n_test": 1840,
+  "embed_dim": 768,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "AIRI-Institute/gena-lm-bert-base",
+  "task": "prom/promoter_tata_300bps",
+  "n_train_raw": 4290,
+  "n_train_dropped": 0,
+  "n_test_raw": 1840,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

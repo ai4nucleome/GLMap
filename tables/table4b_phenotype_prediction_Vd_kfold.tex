@@ -1,0 +1,15 @@
+\begin{table}[t]
+  \centering
+  \caption{Phenotype-prediction performance using centered $V_d$ signatures under random K-fold. RidgeCV predictions are evaluated across five random seeds; values are mean $\pm$ standard deviation across seeds.}
+  \label{tab:fig4b_vd_kfold}
+  \small
+  \setlength{\tabcolsep}{4.5pt}
+  \begin{tabular}{l c c c c c c c}
+    \toprule
+    Metric & \texttt{5mC} & \texttt{enhancer} & \texttt{promoter\_tata\_300bps} & \texttt{mouse\_TFBS\_3} & \texttt{Yeast\_H4} & \texttt{promoter\_arabidopsis\_TATA} & Mean of 6 tasks \\
+    \midrule
+    Pearson $r$ & $0.682 \pm 0.025$ & $0.403 \pm 0.046$ & $0.681 \pm 0.024$ & $0.626 \pm 0.021$ & $0.534 \pm 0.051$ & $0.495 \pm 0.068$ & $0.681 \pm 0.019$ \\
+    Spearman $\rho$ & $0.667 \pm 0.020$ & $0.393 \pm 0.017$ & $0.669 \pm 0.011$ & $0.715 \pm 0.016$ & $0.716 \pm 0.007$ & $0.629 \pm 0.036$ & $0.705 \pm 0.005$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}

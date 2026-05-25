@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.9088098265593363,
+  "auc_cv_mean": 0.8979466222745327,
+  "auc_cv_std": 0.003344190552394488,
+  "best_C": 10.0,
+  "n_train": 10220,
+  "n_test": 4381,
+  "embed_dim": 4096,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "evo-design/evo-2-7b-8k-microviridae",
+  "task": "EMP/Yeast_H4",
+  "n_train_raw": 10220,
+  "n_train_dropped": 0,
+  "n_test_raw": 4381,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

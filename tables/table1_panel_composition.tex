@@ -1,0 +1,29 @@
+\begin{table}[t]
+  \centering
+  \caption{GLMap probe panel composition. The main panel contains 10,000 probes distributed across 4 biological categories (Human: 4,000; Plant: 1,600; Fungi: 2,700; Virus: 1,700) and 14 tasks.}
+  \label{tab:panel_composition}
+  \small
+  \begin{tabular}{l l c c c l}
+    \toprule
+    Category & Functional element & $N$ & Mean Length (bp) & \# Species & Source \\
+    \midrule
+Human & \texttt{promoter} & 1,400 & 300 & 1 & \texttt{GUE/prom/prom\_300\_all} \\
+ & \texttt{enhancer} & 1,400 & 199 & 1 & \texttt{NT Bench/enhancers} \\
+ & \texttt{splice\_donor} & 600 & 400 & 1 & \texttt{GUE/splice/reconstructed} \\
+ & \texttt{splice\_acceptor} & 600 & 400 & 1 & \texttt{GUE/splice/reconstructed} \\
+\midrule
+Plant & \texttt{chromatin\_access} & 450 & 1,000 & 7 & \texttt{PGB/chromatin\_access} \\
+ & \texttt{polyA} & 350 & 400 & 6 & \texttt{PGB/poly\_a} \\
+ & \texttt{lncRNA} & 300 & 501 & 6 & \texttt{PGB/lncrna} \\
+ & \texttt{nascent\_RNA} & 200 & 1,000 & 1 & \texttt{PGB/pro\_seq} \\
+ & \texttt{splicing\_plant\_donor} & 150 & 398 & 1 & \texttt{PGB/splicing} \\
+ & \texttt{splicing\_plant\_acceptor} & 150 & 398 & 1 & \texttt{PGB/splicing} \\
+\midrule
+Fungi & \texttt{fungi\_genome} & 1,500 & 1,024 & 20 & \texttt{GUE/fungi/species\_20} \\
+ & \texttt{yeast\_genome} & 1,200 & 500 & 1 & \texttt{GUE/EMP/H3} \\
+\midrule
+Virus & \texttt{virus\_species} & 1,100 & 1,024 & 25 & \texttt{GUE/virus/species\_40} \\
+ & \texttt{virus\_variants} & 600 & 999 & 9 & \texttt{GUE/virus/covid} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

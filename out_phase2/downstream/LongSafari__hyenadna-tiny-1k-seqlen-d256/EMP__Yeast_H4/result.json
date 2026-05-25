@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.9263879812425384,
+  "auc_cv_mean": 0.9242416742397314,
+  "auc_cv_std": 0.002977283071245797,
+  "best_C": 0.1,
+  "n_train": 10220,
+  "n_test": 4381,
+  "embed_dim": 256,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "LongSafari/hyenadna-tiny-1k-seqlen-d256",
+  "task": "EMP/Yeast_H4",
+  "n_train_raw": 10220,
+  "n_train_dropped": 0,
+  "n_test_raw": 4381,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

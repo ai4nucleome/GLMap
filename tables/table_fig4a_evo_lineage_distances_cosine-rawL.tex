@@ -1,0 +1,20 @@
+\begin{table}[t]
+  \centering
+  \caption{Evo lineage distances. For each partner model in \texttt{models/fig4a-svm.csv}, two complementary metrics relate it to the shared anchor \texttt{togethercomputer/evo-1-8k-base} (StripedHyena, evo1 family). \textbf{Euclidean distance} $= \| Q[\text{anchor}] - Q[\text{partner}] \|^2$ (squared Euclidean), where $Q$ is the combined-branch GLMap representation matrix (\texttt{clip(q=0.02)} + double-centering applied to the L matrix of all 123 audited models on the 10{,}000-probe panel; \texttt{src/matrices/build.py}). This is the same pipeline distance used in Figs.~2c, 5, 6, 7, and 8. \textbf{Cosine similarity (raw L)} $= L[\text{anchor}] \cdot L[\text{partner}] / (\|L[\text{anchor}]\| \, \|L[\text{partner}]\|)$ is computed on the raw pre-pipeline \texttt{sum\_log\_p} vectors and is scale-invariant. Values are uniformly close to $1$ across DNA foundation models because all \texttt{sum\_log\_p} entries are negative and dominated by per-probe baseline difficulty; the discriminative signal sits in the residual $(1-\cos)$, which shows the same order-of-magnitude separation as the Euclidean distance. The ``Derived from anchor'' column marks whether the partner is a known descendant of the anchor (\checkmark{} = direct fine-tune / weight-initialised from \texttt{evo-1-8k-base}; \(\times\) = fresh training run, e.g.\ the evo2 family).}
+  \label{tab:evo_lineage_distance_cosrawL}
+  \small
+  \begin{tabular}{l l c r r}
+    \toprule
+    Architecture & Partner model & Derived from anchor & Euclidean distance & Cosine similarity (raw L) \\
+    \midrule
+    StripedHyena 2 & \texttt{evo2\_7b\_base} & \(\times\) & $1.27\!\times\!10^{8}$ & 0.9927 \\
+     & \texttt{evo2\_7b\_262k} & \(\times\) & $1.30\!\times\!10^{8}$ & 0.9925 \\
+     & \texttt{evo2\_7b} & \(\times\) & $1.30\!\times\!10^{8}$ & 0.9925 \\
+     & \texttt{evo-2-7b-8k-microviridae} & \(\times\) & $5.68\!\times\!10^{8}$ & 0.9655 \\
+    StripedHyena & \texttt{evo-1-7b-131k-microviridae} & \checkmark & $1.39\!\times\!10^{7}$ & 0.9992 \\
+     & \texttt{evo-1.5-8k-base} & \checkmark & $2.56\!\times\!10^{7}$ & 0.9990 \\
+     & \texttt{evo-1-8k-crispr} & \checkmark & $1.76\!\times\!10^{7}$ & 0.9993 \\
+     & \texttt{evo-1-8k-transposon} & \checkmark & $1.76\!\times\!10^{7}$ & 0.9993 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

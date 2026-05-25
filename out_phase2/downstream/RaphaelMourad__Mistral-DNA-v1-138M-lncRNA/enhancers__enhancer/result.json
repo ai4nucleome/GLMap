@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.7878500000000002,
+  "auc_cv_mean": 0.8226905830374349,
+  "auc_cv_std": 0.008600359903641308,
+  "best_C": 0.01,
+  "n_train": 14968,
+  "n_test": 400,
+  "embed_dim": 768,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "RaphaelMourad/Mistral-DNA-v1-138M-lncRNA",
+  "task": "enhancers/enhancer",
+  "n_train_raw": 14968,
+  "n_train_dropped": 0,
+  "n_test_raw": 400,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

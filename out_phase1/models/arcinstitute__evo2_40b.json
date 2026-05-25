@@ -1,0 +1,12 @@
+{
+  "hf_id": "arcinstitute/evo2_40b",
+  "branch": "ar",
+  "context_tokens": 1048576,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "evo2",
+  "length_multiple": null,
+  "slug": "arcinstitute__evo2_40b",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

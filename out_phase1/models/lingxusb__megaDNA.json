@@ -1,0 +1,12 @@
+{
+  "hf_id": "lingxusb/megaDNA",
+  "branch": "ar",
+  "context_tokens": 131072,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "megadna",
+  "length_multiple": null,
+  "slug": "lingxusb__megaDNA",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

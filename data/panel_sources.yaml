@@ -1,0 +1,346 @@
+# Panel sources — Stage 2 main panel (10,000 probes) configuration.
+#
+# Single source of truth for which dataset feeds which functional element,
+# how labels are filtered, how sequences are truncated, and how many probes
+# each element gets.
+#
+# Final allocation (locked after iteration with user, 2026-05-18):
+#
+#   Human  4000  promoter 1400 + enhancer 1400 + splice (donor 600 + acceptor 600)
+#   Plant  1600  chromatin 450 + polyA 350 + lncRNA 300 + nascent 200 + splicing 300
+#   Fungi  2700  yeast_genome 1200 (S. cerevisiae, EMP × 10 pool) +
+#                fungi_genome 1500 (GenBank 20 spp, species_20 cropped 10000→1024)
+#   Virus  1700  covid 600 + species_40 1100 cropped 5000→1024
+#
+# Total: 14 element_id (donor/acceptor + yeast/fungi sub-elements split out)
+# across 4 species groups: Human, Plant, Fungi, Virus.
+
+panel:
+  total_probes: 10000
+  seed: 42
+  length_min_bp: 128
+  length_max_bp: 1024
+
+species_groups:
+  # Biological taxonomy applied: Yeast (S. cerevisiae) belongs to Fungi kingdom
+  # (Ascomycota → Saccharomycetes). The yeast_genome and fungi_genome elements
+  # are kept as two separate functional sub-elements (different data sources:
+  # Tran et al. histone-mark dataset vs GenBank reference genomes) but share
+  # the same species_group label "Fungi" for taxonomic consistency.
+  # This matches DNABERT2 paper Table 11 which lists S. cerevisiae under Fungi.
+  Human:
+    n_probes: 4000
+    species_label: "Homo sapiens"
+  Plant:
+    n_probes: 1600
+    species_label: per_dataset    # plant species set per row from filename
+  Fungi:
+    n_probes: 2700                # 1200 (yeast_genome) + 1500 (fungi_genome)
+    species_label: per_row        # S. cerevisiae + 20 fungi/species_20 species
+  Virus:
+    n_probes: 1700
+    species_label: per_row        # covid "covid_var_{label}", species_40 "virus_sp_{label}"
+
+
+elements:
+  # ───────── Human (4000) ─────────
+  promoter:
+    species_group: Human
+    species: "Homo sapiens"
+    n_probes: 1400
+    datasets:
+      - path: data/GUE/prom/prom_300_all/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: positive_only           # label == 1
+        target_n: 467
+      - path: data/GUE/prom/prom_300_notata/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: positive_only
+        target_n: 467
+      - path: data/GUE/prom/prom_300_tata/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: positive_only
+        target_n: 466
+
+  enhancer:
+    species_group: Human
+    species: "Homo sapiens"
+    n_probes: 1400
+    datasets:
+      - path: data/dna_foundation_benchmark/enhancers/enhancer/train.csv
+        format: csv
+        seq_col: Sequence            # capital S in this dataset
+        label_col: Label
+        label_policy: positive_only
+        target_n: 1400
+
+  splice_donor:
+    species_group: Human
+    species: "Homo sapiens"
+    n_probes: 600
+    datasets:
+      - path: data/GUE/splice/reconstructed/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_label
+        keep_labels: ["0"]           # SpliceFinder encoding: 0 = donor (left/5'ss)
+        target_n: 600
+
+  splice_acceptor:
+    species_group: Human
+    species: "Homo sapiens"
+    n_probes: 600
+    datasets:
+      - path: data/GUE/splice/reconstructed/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_label
+        keep_labels: ["1"]           # SpliceFinder encoding: 1 = acceptor (right/3'ss)
+        target_n: 600
+
+  # ───────── Plant (1600) ─────────
+  chromatin_access:
+    species_group: Plant
+    n_probes: 450
+    datasets:
+      - path: data/PGB/chromatin_access/arabidopis_thaliana_train.fa
+        format: fasta_pgb_chromatin
+        species: "Arabidopsis thaliana"
+        target_n: 64
+      - path: data/PGB/chromatin_access/brachypodium_distachyon_train.fa
+        format: fasta_pgb_chromatin
+        species: "Brachypodium distachyon"
+        target_n: 64
+      - path: data/PGB/chromatin_access/oryza_sativa_MH63_RS2_train.fa
+        format: fasta_pgb_chromatin
+        species: "Oryza sativa MH63"
+        target_n: 64
+      - path: data/PGB/chromatin_access/oryza_sativa_ZS97_RS2_train.fa
+        format: fasta_pgb_chromatin
+        species: "Oryza sativa ZS97"
+        target_n: 64
+      - path: data/PGB/chromatin_access/setaria_italica_train.fa
+        format: fasta_pgb_chromatin
+        species: "Setaria italica"
+        target_n: 64
+      - path: data/PGB/chromatin_access/sorghum_bicolor_train.fa
+        format: fasta_pgb_chromatin
+        species: "Sorghum bicolor"
+        target_n: 65
+      - path: data/PGB/chromatin_access/zea_mays_train.fa
+        format: fasta_pgb_chromatin
+        species: "Zea mays"
+        target_n: 65
+
+  polyA:
+    species_group: Plant
+    n_probes: 350
+    datasets:
+      - path: data/PGB/poly_a/arabidopsis_thaliana_train.fa
+        format: fasta_pgb_binary
+        species: "Arabidopsis thaliana"
+        target_n: 58
+      - path: data/PGB/poly_a/chlamydomonas_reinhardtii_train.fa
+        format: fasta_pgb_binary
+        species: "Chlamydomonas reinhardtii"
+        target_n: 58
+      - path: data/PGB/poly_a/medicago_truncatula_train.fa
+        format: fasta_pgb_binary
+        species: "Medicago truncatula"
+        target_n: 58
+      - path: data/PGB/poly_a/oryza_sativa_indica_group_train.fa
+        format: fasta_pgb_binary
+        species: "Oryza sativa indica"
+        target_n: 58
+      - path: data/PGB/poly_a/oryza_sativa_japonica_group_train.fa
+        format: fasta_pgb_binary
+        species: "Oryza sativa japonica"
+        target_n: 59
+      - path: data/PGB/poly_a/trifolium_pratense_train.fa
+        format: fasta_pgb_binary
+        species: "Trifolium pratense"
+        target_n: 59
+
+  lncRNA:
+    species_group: Plant
+    n_probes: 300
+    datasets:
+      - path: data/PGB/lncrna/g_max_train.fa
+        format: fasta_pgb_binary_lenfilter
+        species: "Glycine max"
+        target_n: 50
+      - path: data/PGB/lncrna/m_esculenta_train.fa
+        format: fasta_pgb_binary_lenfilter
+        species: "Manihot esculenta"
+        target_n: 50
+      - path: data/PGB/lncrna/s_bicolor_train.fa
+        format: fasta_pgb_binary_lenfilter
+        species: "Sorghum bicolor"
+        target_n: 50
+      - path: data/PGB/lncrna/s_lycopersicum_train.fa
+        format: fasta_pgb_binary_lenfilter
+        species: "Solanum lycopersicum"
+        target_n: 50
+      - path: data/PGB/lncrna/t_aestivum_train.fa
+        format: fasta_pgb_binary_lenfilter
+        species: "Triticum aestivum"
+        target_n: 50
+      - path: data/PGB/lncrna/z_mays_train.fa
+        format: fasta_pgb_binary_lenfilter
+        species: "Zea mays"
+        target_n: 50
+
+  nascent_RNA:
+    species_group: Plant
+    n_probes: 200
+    datasets:
+      - path: data/PGB/pro_seq/m_esculenta_train.fa
+        format: fasta_pgb_binary
+        species: "Manihot esculenta"
+        target_n: 200
+
+  splicing_plant_donor:
+    species_group: Plant
+    n_probes: 150
+    datasets:
+      - path: data/PGB/splicing/arabidopsis_thaliana_donor_train.fa
+        format: fasta_pgb_binary
+        species: "Arabidopsis thaliana"
+        target_n: 150
+
+  splicing_plant_acceptor:
+    species_group: Plant
+    n_probes: 150
+    datasets:
+      - path: data/PGB/splicing/arabidopsis_thaliana_acceptor_train.fa
+        format: fasta_pgb_binary
+        species: "Arabidopsis thaliana"
+        target_n: 150
+
+  # ───────── Fungi: S. cerevisiae sub-element (1200) ─────────
+  # Single-species deep sampling, sourced from Tran et al. nucleosome
+  # histone-mark dataset. Different data source from fungi_genome (GenBank
+  # fungi reference genomes) but same biological kingdom.
+  yeast_genome:
+    species_group: Fungi
+    species: "Saccharomyces cerevisiae"
+    n_probes: 1200
+    datasets:
+      - path: data/GUE/EMP/H3/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all       # both labels are real yeast genome regions
+        target_n: 120
+      - path: data/GUE/EMP/H3K14ac/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H3K36me3/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H3K4me1/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H3K4me2/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H3K4me3/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H3K79me3/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H3K9ac/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H4/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+      - path: data/GUE/EMP/H4ac/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: keep_all
+        target_n: 120
+
+  # ───────── Fungi: multi-species sub-element (1500) ─────────
+  # 20 fungi species from GenBank reference genomes (Benson et al. 2012),
+  # used for B4 phylogenetic recovery within the Fungi kingdom.
+  fungi_genome:
+    species_group: Fungi
+    species: per_row              # label 0-19 → "fungi_sp_{label}"
+    n_probes: 1500
+    datasets:
+      - path: data/GUE/fungi/species_20/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: multiclass_species
+        target_n: 1500
+        crop_to: 1024                # center-crop 10000 → 1024
+        crop_strategy: center
+        # 20 species × 75 each → balanced sampling
+        balance_per_label: 75
+
+  # ───────── Virus (1700) ─────────
+  virus_variants:
+    species_group: Virus
+    species: per_row             # label 0-8 → "covid_var_{label}"
+    n_probes: 600
+    datasets:
+      - path: data/GUE/virus/covid/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: multiclass_species
+        target_n: 600
+        # 9 lineages × ~67 each
+        balance_per_label: 67
+
+  virus_species:
+    species_group: Virus
+    species: per_row             # label 0-24 → "virus_sp_{label}"
+    n_probes: 1100
+    datasets:
+      - path: data/GUE/virus/species_40/train.csv
+        format: csv
+        seq_col: sequence
+        label_col: label
+        label_policy: multiclass_species
+        target_n: 1100
+        crop_to: 1024                # center-crop 5000 → 1024
+        crop_strategy: center
+        # 25 species × 44 each
+        balance_per_label: 44

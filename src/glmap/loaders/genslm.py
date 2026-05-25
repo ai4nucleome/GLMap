@@ -51,7 +51,7 @@ import torch
 
 from .base import Branch
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 GENSLM_ROOT = REPO_ROOT / "models/modelsHFNoInfo/genslm"
 GENSLM_PKG = GENSLM_ROOT / "genslm"
 GENSLM_WEIGHTS_DIR = GENSLM_ROOT / "weights"

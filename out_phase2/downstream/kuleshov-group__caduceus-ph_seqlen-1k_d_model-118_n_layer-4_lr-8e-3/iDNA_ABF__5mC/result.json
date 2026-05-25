@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.7443060584507952,
+  "auc_cv_mean": 0.7206915097034801,
+  "auc_cv_std": 0.005769135154904888,
+  "best_C": 1.0,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 118,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "kuleshov-group/caduceus-ph_seqlen-1k_d_model-118_n_layer-4_lr-8e-3",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

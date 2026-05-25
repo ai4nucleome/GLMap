@@ -1,0 +1,12 @@
+{
+  "hf_id": "Hengchang-Liu/D3LM-scratch",
+  "branch": "mlm",
+  "context_tokens": 2050,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "Hengchang-Liu__D3LM-scratch",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

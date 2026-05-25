@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.8013444814431656,
+  "auc_cv_mean": 0.8029569656124502,
+  "auc_cv_std": 0.010946007676154432,
+  "best_C": 0.1,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 2048,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "GenerTeam/GENERator-v2-prokaryote-1.2b-base",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

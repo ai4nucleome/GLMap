@@ -1,0 +1,12 @@
+{
+  "hf_id": "LongSafari/evo-1-8k-crispr",
+  "branch": "ar",
+  "context_tokens": 8192,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "evo1",
+  "length_multiple": null,
+  "slug": "LongSafari__evo-1-8k-crispr",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

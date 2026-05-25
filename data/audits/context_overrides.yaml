@@ -1,0 +1,232 @@
+# context_overrides.yaml
+#
+# Highest-priority context_tokens source for `scripts/audits/context_and_length_audit.py`.
+# Use this file for repos whose `config.json` is gated, missing, behind
+# trust_remote_code, or simply does not encode a context limit (e.g. NTv3
+# custom code, Evo 2 minimal config, MegaDNA non-HF format).
+#
+# Schema:
+#   <hf_id>:
+#     context_tokens: <positive int>
+#     source: <short tag, e.g. catalog_model_catalog.md, paper, hf_card>
+#     note: <free-text reason>
+#
+# Audit reports the chosen value as `context_limit_source = override:<source>`.
+
+# ---- MegaDNA (byte-level multiscale transformer, not transformers-loadable) ----
+# Local weights live in models/modelsHFNoInfo/megaDNA; loaded via torch.load,
+# not via HF transformers. 131K-token context per project owner.
+lingxusb/megaDNA:
+  context_tokens: 131072
+  source: user_confirmation
+  note: "MegaDNA 145M phage model; 131K-byte context (user-confirmed 2026-05-14). Local weights under models/modelsHFNoInfo/megaDNA/megaDNA_phage_145M.pt; not loadable via transformers."
+
+# ---- PlasmidGPT (GPT-2 style + Addgene BPE tokenizer) ----
+lingxusb/PlasmidGPT:
+  context_tokens: 2048
+  source: model_config_n_positions
+  note: "PlasmidGPT pretrained_model.pt loads via torch.load as a GPT2LMHeadModel with config.n_positions=2048 (verified by loading + reading config). Tokenizer is the standalone addgene_trained_dna_tokenizer.json BPE, vocab 30002, no special tokens registered (pad/eos/cls/unk/mask all None). bp:token ratio is highly sequence-dependent (32 bp/tok on poly-A but ~3.85 bp/tok on mixed ACGT) because BPE chooses long merges for low-entropy DNA."
+
+# ---- Evo 2 (StripedHyena 2 AR) ----
+# Per model_catalog.md: *_base = 8192 (8 kb), unsuffixed = 1M (1,048,576),
+# *_262k = 262,144 (already detected from name).
+arcinstitute/evo2_1b_base:
+  context_tokens: 8192
+  source: catalog_model_catalog.md
+  note: "Evo 2 base checkpoint, 8 kb context per catalog."
+arcinstitute/evo2_7b_base:
+  context_tokens: 8192
+  source: catalog_model_catalog.md
+  note: "Evo 2 7B base, 8 kb context per catalog."
+arcinstitute/evo2_7b:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "Evo 2 7B full, 1M-token context (all domains of life)."
+arcinstitute/evo2_20b:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "Evo 2 20B, 1M-token context."
+arcinstitute/evo2_40b_base:
+  context_tokens: 8192
+  source: catalog_model_catalog.md
+  note: "Evo 2 40B base, 8 kb context per catalog."
+arcinstitute/evo2_40b:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "Evo 2 40B full, 1M-token context."
+
+# ---- NTv3 (InstaDeep U-Net Transformer; trust_remote_code) ----
+# Per model_catalog.md: variants without an explicit kb suffix carry the
+# "up to 1 Mb family claim" context; explicit *_8kb and *_131kb variants are
+# already recovered from name heuristics.
+InstaDeepAI/NTv3_8M_pre:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 family 1 Mb claim; pre-trained exploration checkpoint."
+InstaDeepAI/NTv3_100M_pre:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 family 1 Mb claim."
+InstaDeepAI/NTv3_650M_pre:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 family 1 Mb claim."
+InstaDeepAI/NTv3_100M_post:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 post-trained, 1 Mb family claim."
+InstaDeepAI/NTv3_650M_post:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 post-trained, 1 Mb family claim."
+InstaDeepAI/NTv3_5downsample_pre:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 5-downsample ablation; not recommended for main results."
+InstaDeepAI/NTv3_5downsample_post:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 5-downsample ablation, post-trained; not recommended for main results."
+InstaDeepAI/ntv3_base_model:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 base model utility checkpoint; 1 Mb family claim assumed."
+InstaDeepAI/NTv3_generative:
+  context_tokens: 1048576
+  source: catalog_model_catalog.md
+  note: "NTv3 generative variant. Config.json's `max_length: 20` is the GenerationConfig default and not the model's input capacity — override here with the NTv3 family 1 Mb claim."
+
+# ---- DNABERT-S (BERT-style embedding model) ----
+zhihan1996/DNABERT-S:
+  context_tokens: 512
+  source: paper_DNABERT-S
+  note: "DNABERT-S inherits BERT 512-token limit. Note: scoring protocol is embedding_or_mlm_manual; PLL eligibility still requires manual verification."
+
+# ---- PlantCAD2 (BiMamba long-context encoder) ----
+kuleshov-group/PlantCAD2-Small-l24-d0768:
+  context_tokens: 8192
+  source: caduceus_family_default_verify
+  note: "PlantCAD2 inherits Mamba2 architecture (8192 bp)."
+kuleshov-group/PlantCAD2-Medium-l48-d1024:
+  context_tokens: 8192
+  source: caduceus_family_default_verify
+  note: "PlantCAD2 inherits Mamba2 architecture (8192 bp)."
+kuleshov-group/PlantCAD2-Large-l48-d1536:
+  context_tokens: 8192
+  source: caduceus_family_default_verify
+  note: "PlantCAD2 inherits Mamba2 architecture (8192 bp)."
+
+# ---- GenomeOcean (JGI Mistral-style BPE, sliding-window inference) ----
+# config.json reports max_position_embeddings: 32768 across all sizes, but the
+# upstream inference recipe at https://github.com/jgi-genomeocean/genomeocean
+# pins the practical / single-pass context lower: 1024 tokens for the small
+# and v1.2 checkpoints, 10240 tokens for the 4B-class checkpoints (including
+# 4B-bgcFM and 4B-Artificial-Detector). The 32768 number is the RoPE max,
+# not the practical inference window.
+DOEJGI/GenomeOcean-100M:
+  context_tokens: 1024
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean small checkpoint, single-pass 1024-token inference."
+DOEJGI/GenomeOcean-100M-v1.2:
+  context_tokens: 1024
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean small checkpoint, single-pass 1024-token inference."
+DOEJGI/GenomeOcean-500M:
+  context_tokens: 1024
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean 500M checkpoint, single-pass 1024-token inference."
+DOEJGI/GenomeOcean-500M-v1.2:
+  context_tokens: 1024
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean 500M v1.2 checkpoint, single-pass 1024-token inference."
+DOEJGI/GenomeOcean-4B:
+  context_tokens: 10240
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean 4B, single-pass 10240-token inference."
+DOEJGI/GenomeOcean-4B-bgcFM:
+  context_tokens: 10240
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean 4B BGC-finetuned, inherits the 10240-token window."
+DOEJGI/GenomeOcean-4B-Artificial-Detector:
+  context_tokens: 10240
+  source: github_jgi_genomeocean_README
+  note: "GenomeOcean 4B supervised head, inherits the 10240-token window of the AR base."
+
+# ---- PlantBiMoE (BiMamba + SparseMoE plant MLM) ----
+plant-llms/PlantBiMoE:
+  context_tokens: 32678
+  source: hf_card_2026_05_17
+  note: "PlantBiMoE per HF card: BiMamba + SparseMoE, MLM, 64M active params, single-base tokenizer, 42 plant species. Context value 32678 is literal from the HF card; likely a typo for the power-of-two 32768 (2^15) — verify against model.config.model_max_length on first real load and correct here if needed."
+
+# ---- GenSLM (GPT-NeoX codon language model, PATRIC bacterial genomes) ----
+# Bare-name IDs (no org/repo); local weights symlinked under
+# models/modelsHFNoInfo/genslm/weights/. Source/loader code under
+# models/modelsHFNoInfo/genslm/ with MODELS dict in genslm/inference.py
+# pinning all three variants at seq_length=2048 codon tokens
+# (= 6144 bp because tokenizer is codon_wordlevel_69vocab.json, 1 token = 3 bp).
+# Single-matrix protocol (commit 5e59154 retired the codon-NaN three-matrix
+# split): GenSLM enters L on the full panel like any other AR model; the
+# codon-vs-nucleotide systematic offset on noncoding probes is absorbed by
+# ModelMap double-centering (row + col mean subtraction).
+GenSLM-25M:
+  context_tokens: 2048
+  source: genslm_inference_MODELS_dict
+  note: "GPT-NeoX 25M, codon tokenizer (69 vocab incl. specials), seq_length=2048 codon tokens (= 6144 bp). Weights: patric_25m_epoch01-val_loss_0.57_bias_removed.pt"
+GenSLM-250M:
+  context_tokens: 2048
+  source: genslm_inference_MODELS_dict
+  note: "GPT-NeoX 244M, codon tokenizer, seq_length=2048 codon tokens. Weights: patric_250m_epoch00_val_loss_0.48_attention_removed.pt"
+GenSLM-2.5B:
+  context_tokens: 2048
+  source: genslm_inference_MODELS_dict
+  note: "GPT-NeoX 2.5B, codon tokenizer, seq_length=2048 codon tokens. Weights: patric_2.5b_epoch00_val_los_0.29_bias_removed.pt"
+
+# ---- Mistral-DNA-v1-138M-noncoding (the ONE MoE variant in the Mistral-DNA family) ----
+# This override exists for documentation, not to change context_tokens (the
+# config.json correctly reports 512). It pins down the two facts that the
+# generic audit cannot infer from config.json + readme heuristics, and that
+# explain the model's anomalous phase 1 scoring behaviour
+# (panel-wide ell/bp ≈ -6.74 vs sibling Mistral-DNA-* at ≈ -1.4):
+#   1. ARCHITECTURE: 17.31M params × 8 experts = 138.5M total params (MoE
+#      top-k routing). Every other Mistral-DNA-* variant in the audit is a
+#      dense ~138M model. The MoE structure is invisible to the audit's
+#      `architecture: transformer_decoder` / `param_count: 138474240`.
+#   2. TRAINING DATA: ~1,940,736 non-coding RNAs from Rfam, each split into
+#      100 bp segments (NB: DNA sequence, not RNA). Total ~194 Mb — orders
+#      of magnitude smaller and far more narrowly distributed than sibling
+#      variants' whole-genome corpora (hg38 3.1 Gb, fungal/bacterial multi-Gb).
+# Stage 2 panel contains 14 functional elements, almost all of which are
+# OOD for an Rfam-only model (promoter, enhancer, splice_*, chromatin_access,
+# polyA, fungi_genome, virus_*, yeast_genome are not small ncRNAs). MoE top-k
+# routing degrades further on OOD inputs.
+# Phase 1 keep / phase 2 flag: stability gate passes (Pearson r = 1.0,
+# max_diff = 0), so it is a real upstream model + training-corpus artefact,
+# not a numerical bug. ModelMap clip(q=0.02) + double-centering absorbs the
+# model-level bias from the matrix; the residual cross-probe variability
+# (per-element std ≈ 0.36–0.73 vs sibling ≈ 0.06, an order of magnitude
+# larger) is genuine MoE-on-OOD routing signal worth flagging in the phase
+# 1 + phase 2 reports.
+RaphaelMourad/Mistral-DNA-v1-138M-noncoding:
+  context_tokens: 512
+  source: hf_readme_2026_05_20
+  note: "MoE: 17.31M params * 8 experts (top-k routing). Training corpus: ~1.94M Rfam non-coding RNAs split into 100 bp DNA-sequence segments (~194 Mb total). Panel-wide ell/bp ~ -6.74 vs sibling Mistral-DNA-* ~ -1.4 is upstream model + corpus narrowness, not pipeline bug. context_tokens=512 matches config.json; this entry exists as audit-side documentation of the MoE + Rfam-only facts that cannot be inferred from config.json."
+
+# ---- MutBERT (RoPE-BERT trained at base 512; extend to 1024 via NTK-aware scaling) ----
+# Base training context is 512 tokens (max_position_embeddings=512); to cover
+# the Stage 2 panel (up to 1024 bp), MutBERTLoader auto-derives rope_scaling
+# factor = context_tokens / 512. Override context_tokens to 1024 so the
+# loader applies factor=2 (~99% accuracy retention, NTK-aware dynamic).
+# Without this override 3977/10000 panel probes (L>512) would exceed positional
+# embedding limits and either truncate or error.
+JadenLong/MutBERT:
+  context_tokens: 1024
+  source: panel_coverage_requirement
+  note: "Base 512 + NTK-aware RoPE scaling factor=2 → effective 1024. Stage 2 panel has 3977/10000 probes with L>512; without override these exceed positional embeddings."
+JadenLong/MutBERT-Multi:
+  context_tokens: 1024
+  source: panel_coverage_requirement
+  note: "Base 512 + NTK-aware RoPE scaling factor=2 → effective 1024 (see MutBERT entry)."
+JadenLong/MutBERT-Human-Ref:
+  context_tokens: 1024
+  source: panel_coverage_requirement
+  note: "Base 512 + NTK-aware RoPE scaling factor=2 → effective 1024 (see MutBERT entry)."

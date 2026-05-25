@@ -1,0 +1,12 @@
+{
+  "hf_id": "AIRI-Institute/moderngena-base",
+  "branch": "mlm",
+  "context_tokens": 1024,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "AIRI-Institute__moderngena-base",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

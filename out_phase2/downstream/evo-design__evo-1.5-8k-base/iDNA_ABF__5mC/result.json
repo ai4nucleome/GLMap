@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.5655833764386397,
+  "auc_cv_mean": 0.6002771397742335,
+  "auc_cv_std": 0.008302579931862852,
+  "best_C": 0.01,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 4096,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "evo-design/evo-1.5-8k-base",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.9727300379444033,
+  "auc_cv_mean": 0.9691095322334711,
+  "auc_cv_std": 0.004632940844593067,
+  "best_C": 0.1,
+  "n_train": 3063,
+  "n_test": 1313,
+  "embed_dim": 1280,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "GenerTeam/GENERanno-prokaryote-0.5b-base",
+  "task": "iPro-WAEL/Promoter_Arabidopsis_TATA",
+  "n_train_raw": 3063,
+  "n_train_dropped": 0,
+  "n_test_raw": 1313,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

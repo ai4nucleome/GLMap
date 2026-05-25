@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.568867556710775,
+  "auc_cv_mean": 0.5615879070424524,
+  "auc_cv_std": 0.010669666792021302,
+  "best_C": 0.1,
+  "n_train": 4290,
+  "n_test": 1840,
+  "embed_dim": 768,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "RaphaelMourad/Mistral-DNA-v1-138M-virus",
+  "task": "prom/promoter_tata_300bps",
+  "n_train_raw": 4290,
+  "n_train_dropped": 0,
+  "n_test_raw": 1840,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

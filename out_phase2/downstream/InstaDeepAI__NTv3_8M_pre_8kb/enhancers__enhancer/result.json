@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.7706749999999999,
+  "auc_cv_mean": 0.9547531092892475,
+  "auc_cv_std": 0.005292411861031988,
+  "best_C": 100.0,
+  "n_train": 14968,
+  "n_test": 400,
+  "embed_dim": 256,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "InstaDeepAI/NTv3_8M_pre_8kb",
+  "task": "enhancers/enhancer",
+  "n_train_raw": 14968,
+  "n_train_dropped": 0,
+  "n_test_raw": 400,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

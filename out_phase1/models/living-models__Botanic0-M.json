@@ -1,0 +1,12 @@
+{
+  "hf_id": "living-models/Botanic0-M",
+  "branch": "mlm",
+  "context_tokens": 1026,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "botanic",
+  "length_multiple": null,
+  "slug": "living-models__Botanic0-M",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

@@ -1,0 +1,42 @@
+Element	Species group	Species	Source benchmark	Source file (relative to data/)	n	Length median	GC median
+promoter	Human	Homo sapiens	GUE	GUE/prom/prom_300_all/train.csv	467	300	0.623
+promoter	Human	Homo sapiens	GUE	GUE/prom/prom_300_notata/train.csv	467	300	0.633
+promoter	Human	Homo sapiens	GUE	GUE/prom/prom_300_tata/train.csv	466	300	0.533
+enhancer	Human	Homo sapiens	NT-DFB	dna_foundation_benchmark/enhancers/enhancer/train.csv	1400	199	0.477
+splice_donor	Human	Homo sapiens	GUE	GUE/splice/reconstructed/train.csv	600	400	0.449
+splice_acceptor	Human	Homo sapiens	GUE	GUE/splice/reconstructed/train.csv	600	400	0.484
+chromatin_access	Plant	Sorghum bicolor	PGB	PGB/chromatin_access/sorghum_bicolor_train.fa	65	1000	0.539
+chromatin_access	Plant	Zea mays	PGB	PGB/chromatin_access/zea_mays_train.fa	65	1000	0.505
+chromatin_access	Plant	Arabidopsis thaliana	PGB	PGB/chromatin_access/arabidopis_thaliana_train.fa	64	1000	0.350
+chromatin_access	Plant	Brachypodium distachyon	PGB	PGB/chromatin_access/brachypodium_distachyon_train.fa	64	1000	0.522
+chromatin_access	Plant	Oryza sativa MH63	PGB	PGB/chromatin_access/oryza_sativa_MH63_RS2_train.fa	64	1000	0.461
+chromatin_access	Plant	Oryza sativa ZS97	PGB	PGB/chromatin_access/oryza_sativa_ZS97_RS2_train.fa	64	1000	0.470
+chromatin_access	Plant	Setaria italica	PGB	PGB/chromatin_access/setaria_italica_train.fa	64	1000	0.535
+polyA	Plant	Oryza sativa japonica	PGB	PGB/poly_a/oryza_sativa_japonica_group_train.fa	59	400	0.398
+polyA	Plant	Trifolium pratense	PGB	PGB/poly_a/trifolium_pratense_train.fa	59	400	0.335
+polyA	Plant	Arabidopsis thaliana	PGB	PGB/poly_a/arabidopsis_thaliana_train.fa	58	400	0.364
+polyA	Plant	Chlamydomonas reinhardtii	PGB	PGB/poly_a/chlamydomonas_reinhardtii_train.fa	58	400	0.583
+polyA	Plant	Medicago truncatula	PGB	PGB/poly_a/medicago_truncatula_train.fa	58	400	0.330
+polyA	Plant	Oryza sativa indica	PGB	PGB/poly_a/oryza_sativa_indica_group_train.fa	58	400	0.409
+lncRNA	Plant	Glycine max	PGB	PGB/lncrna/g_max_train.fa	50	589	0.373
+lncRNA	Plant	Manihot esculenta	PGB	PGB/lncrna/m_esculenta_train.fa	50	493	0.384
+lncRNA	Plant	Sorghum bicolor	PGB	PGB/lncrna/s_bicolor_train.fa	50	610	0.478
+lncRNA	Plant	Solanum lycopersicum	PGB	PGB/lncrna/s_lycopersicum_train.fa	50	327	0.387
+lncRNA	Plant	Triticum aestivum	PGB	PGB/lncrna/t_aestivum_train.fa	50	295	0.558
+lncRNA	Plant	Zea mays	PGB	PGB/lncrna/z_mays_train.fa	50	498	0.541
+nascent_RNA	Plant	Manihot esculenta	PGB	PGB/pro_seq/m_esculenta_train.fa	200	1000	0.282
+splicing_plant_donor	Plant	Arabidopsis thaliana	PGB	PGB/splicing/arabidopsis_thaliana_donor_train.fa	150	398	0.391
+splicing_plant_acceptor	Plant	Arabidopsis thaliana	PGB	PGB/splicing/arabidopsis_thaliana_acceptor_train.fa	150	398	0.389
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3/train.csv	120	500	0.378
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K14ac/train.csv	120	500	0.372
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K36me3/train.csv	120	500	0.386
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K4me1/train.csv	120	500	0.374
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K4me2/train.csv	120	500	0.373
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K4me3/train.csv	120	500	0.378
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K79me3/train.csv	120	500	0.381
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H3K9ac/train.csv	120	500	0.379
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H4/train.csv	120	500	0.388
+yeast_genome	Fungi	Saccharomyces cerevisiae	GUE	GUE/EMP/H4ac/train.csv	120	500	0.382
+fungi_genome	Fungi	multi-species (n=20)	GUE	GUE/fungi/species_20/train.csv	1500	1024	0.479
+virus_variants	Virus	multi-species (n=9)	GUE	GUE/virus/covid/train.csv	600	999	0.378
+virus_species	Virus	multi-species (n=25)	GUE	GUE/virus/species_40/train.csv	1100	1024	0.284

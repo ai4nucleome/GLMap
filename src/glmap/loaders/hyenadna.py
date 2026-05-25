@@ -31,7 +31,7 @@ from typing import Any
 import torch
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 _HYENADNA_SRC = REPO_ROOT / "models" / "modelsHFNoInfo" / "hyena-dna"
 
 

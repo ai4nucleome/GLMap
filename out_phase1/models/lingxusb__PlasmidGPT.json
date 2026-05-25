@@ -1,0 +1,12 @@
+{
+  "hf_id": "lingxusb/PlasmidGPT",
+  "branch": "ar",
+  "context_tokens": 2048,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "plasmidgpt",
+  "length_multiple": null,
+  "slug": "lingxusb__PlasmidGPT",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

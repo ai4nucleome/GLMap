@@ -1,0 +1,30 @@
+{
+  "seed": 42,
+  "perplexity": 10.0,
+  "early_exaggeration": 12.0,
+  "tsne_metric": "euclidean",
+  "tsne_init": "pca",
+  "tsne_learning_rate": "auto",
+  "tsne_iter": 2000,
+  "mds_iter": 600,
+  "n_models": 123,
+  "n_probes": 10000,
+  "task_ids": [
+    "EMP/Yeast_H4",
+    "enhancers/enhancer",
+    "iDNA_ABF/5mC",
+    "iPro-WAEL/Promoter_Arabidopsis_TATA",
+    "mouse/mouse_TFBS_3",
+    "prom/promoter_tata_300bps"
+  ],
+  "family_canonicalization": {
+    "GenomeOceanV1.2": "GenomeOcean",
+    "GENERatorv2": "GENERator",
+    "Genosv2": "Genos"
+  },
+  "outputs": [
+    "fig3_embedding_V_tsne.csv",
+    "fig3_embedding_Vd_tsne.csv",
+    "fig3_embedding_D_mds.csv"
+  ]
+}

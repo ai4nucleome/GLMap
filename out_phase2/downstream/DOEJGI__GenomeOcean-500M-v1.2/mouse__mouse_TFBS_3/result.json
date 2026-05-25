@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.944794926564337,
+  "auc_cv_mean": 0.922444403358474,
+  "auc_cv_std": 0.007220687543669509,
+  "best_C": 0.01,
+  "n_train": 2293,
+  "n_test": 983,
+  "embed_dim": 1536,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "DOEJGI/GenomeOcean-500M-v1.2",
+  "task": "mouse/mouse_TFBS_3",
+  "n_train_raw": 2293,
+  "n_train_dropped": 0,
+  "n_test_raw": 983,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

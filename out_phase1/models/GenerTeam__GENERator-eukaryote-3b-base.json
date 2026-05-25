@@ -1,0 +1,12 @@
+{
+  "hf_id": "GenerTeam/GENERator-eukaryote-3b-base",
+  "branch": "ar",
+  "context_tokens": 16384,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "generator",
+  "length_multiple": null,
+  "slug": "GenerTeam__GENERator-eukaryote-3b-base",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

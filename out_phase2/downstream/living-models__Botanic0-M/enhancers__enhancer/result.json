@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.78695,
+  "auc_cv_mean": 0.9677209038190047,
+  "auc_cv_std": 0.002069732493315242,
+  "best_C": 0.01,
+  "n_train": 14968,
+  "n_test": 400,
+  "embed_dim": 1500,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "living-models/Botanic0-M",
+  "task": "enhancers/enhancer",
+  "n_train_raw": 14968,
+  "n_train_dropped": 0,
+  "n_test_raw": 400,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

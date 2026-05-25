@@ -1,0 +1,12 @@
+{
+  "hf_id": "kuleshov-group/PlantCAD2-Large-l48-d1536",
+  "branch": "mlm",
+  "context_tokens": 8192,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "kuleshov-group__PlantCAD2-Large-l48-d1536",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

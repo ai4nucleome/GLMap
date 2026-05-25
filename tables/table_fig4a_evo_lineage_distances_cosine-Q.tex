@@ -1,0 +1,20 @@
+\begin{table}[t]
+  \centering
+  \caption{Evo lineage distances. For each partner model in \texttt{models/fig4a-svm.csv}, two complementary metrics relate it to the shared anchor \texttt{togethercomputer/evo-1-8k-base} (StripedHyena, evo1 family). \textbf{Euclidean distance} $= \| Q[\text{anchor}] - Q[\text{partner}] \|^2$ (squared Euclidean), where $Q$ is the combined-branch GLMap representation matrix (\texttt{clip(q=0.02)} + double-centering applied to the L matrix of all 123 audited models on the 10{,}000-probe panel; \texttt{src/matrices/build.py}). This is the same pipeline distance used in Figs.~2c, 5, 6, 7, and 8. \textbf{Cosine similarity (Q)} $= Q[\text{anchor}] \cdot Q[\text{partner}] / (\|Q[\text{anchor}]\| \, \|Q[\text{partner}]\|)$ is computed on the GLMap representation $Q$ (post clip + double-centering). After centering, $Q$ vectors live in a high-dimensional residual space where the cosine of any two rows is typically small; values here range from $\sim\!0.4$ (derived) down to $\sim\!-0.3$ (unrelated). The sign and magnitude difference reflects whether the partner's centered response pattern co-varies with the anchor's (positive) or systematically diverges from it (negative). The ``Derived from anchor'' column marks whether the partner is a known descendant of the anchor (\checkmark{} = direct fine-tune / weight-initialised from \texttt{evo-1-8k-base}; \(\times\) = fresh training run, e.g.\ the evo2 family).}
+  \label{tab:evo_lineage_distance_cosQ}
+  \small
+  \begin{tabular}{l l c r r}
+    \toprule
+    Architecture & Partner model & Derived from anchor & Euclidean distance & Cosine similarity (Q) \\
+    \midrule
+    StripedHyena 2 & \texttt{evo2\_7b\_base} & \(\times\) & $1.27\!\times\!10^{8}$ & -0.1256 \\
+     & \texttt{evo2\_7b\_262k} & \(\times\) & $1.30\!\times\!10^{8}$ & -0.1205 \\
+     & \texttt{evo2\_7b} & \(\times\) & $1.30\!\times\!10^{8}$ & -0.1173 \\
+     & \texttt{evo-2-7b-8k-microviridae} & \(\times\) & $5.68\!\times\!10^{8}$ & -0.2567 \\
+    StripedHyena & \texttt{evo-1-7b-131k-microviridae} & \checkmark & $1.39\!\times\!10^{7}$ & 0.2489 \\
+     & \texttt{evo-1.5-8k-base} & \checkmark & $2.56\!\times\!10^{7}$ & 0.2329 \\
+     & \texttt{evo-1-8k-crispr} & \checkmark & $1.76\!\times\!10^{7}$ & 0.3825 \\
+     & \texttt{evo-1-8k-transposon} & \checkmark & $1.76\!\times\!10^{7}$ & 0.3825 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.826739026046065,
+  "auc_cv_mean": 0.8278498983951323,
+  "auc_cv_std": 0.015152725303590934,
+  "best_C": 1.0,
+  "n_train": 2293,
+  "n_test": 983,
+  "embed_dim": 4096,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "evo-design/evo-2-7b-8k-microviridae",
+  "task": "mouse/mouse_TFBS_3",
+  "n_train_raw": 2293,
+  "n_train_dropped": 0,
+  "n_test_raw": 983,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

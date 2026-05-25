@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.8262127835538753,
+  "auc_cv_mean": 0.8164267744687326,
+  "auc_cv_std": 0.012995713296258602,
+  "best_C": 0.1,
+  "n_train": 4290,
+  "n_test": 1840,
+  "embed_dim": 512,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "RaphaelMourad/Jamba-DNA-v1-114M-hg38",
+  "task": "prom/promoter_tata_300bps",
+  "n_train_raw": 4290,
+  "n_train_dropped": 0,
+  "n_test_raw": 1840,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

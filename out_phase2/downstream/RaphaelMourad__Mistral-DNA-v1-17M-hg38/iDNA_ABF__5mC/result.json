@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.6746957034785982,
+  "auc_cv_mean": 0.6637389555446263,
+  "auc_cv_std": 0.017680318888046075,
+  "best_C": 0.01,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 256,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "RaphaelMourad/Mistral-DNA-v1-17M-hg38",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

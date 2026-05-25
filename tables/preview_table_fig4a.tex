@@ -1,0 +1,29 @@
+% Standalone preview wrapper for the Fig 4a replacement tables.
+% Compiles both cosine variants (raw L + Q) into a single 2-page PDF.
+%
+% Compile:
+%   cd tables
+%   pdflatex preview_table_fig4a.tex
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath, amssymb}     % for \checkmark and \times
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\section*{Variant 1 --- Cosine similarity on raw L}
+\input{table_fig4a_evo_lineage_distances_cosine-rawL.tex}
+
+\clearpage
+
+\section*{Variant 2 --- Cosine similarity on Q}
+\input{table_fig4a_evo_lineage_distances_cosine-Q.tex}
+
+\end{document}

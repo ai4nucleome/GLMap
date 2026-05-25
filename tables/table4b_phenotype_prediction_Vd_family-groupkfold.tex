@@ -1,0 +1,15 @@
+\begin{table}[t]
+  \centering
+  \caption{Phenotype-prediction performance using centered $V_d$ signatures under family GroupKFold. RidgeCV predictions are evaluated across five random seeds; values are mean $\pm$ standard deviation across seeds.}
+  \label{tab:fig4b_vd_family_groupkfold}
+  \small
+  \setlength{\tabcolsep}{4.5pt}
+  \begin{tabular}{l c c c c c c c}
+    \toprule
+    Metric & \texttt{5mC} & \texttt{enhancer} & \texttt{promoter\_tata\_300bps} & \texttt{mouse\_TFBS\_3} & \texttt{Yeast\_H4} & \texttt{promoter\_arabidopsis\_TATA} & Mean of 6 tasks \\
+    \midrule
+    Pearson $r$ & $0.413 \pm 0.065$ & $0.268 \pm 0.028$ & $0.539 \pm 0.017$ & $0.432 \pm 0.028$ & $0.360 \pm 0.043$ & $0.351 \pm 0.061$ & $0.501 \pm 0.028$ \\
+    Spearman $\rho$ & $0.434 \pm 0.064$ & $0.296 \pm 0.033$ & $0.548 \pm 0.015$ & $0.540 \pm 0.054$ & $0.594 \pm 0.055$ & $0.482 \pm 0.054$ & $0.565 \pm 0.032$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}

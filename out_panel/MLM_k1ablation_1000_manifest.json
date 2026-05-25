@@ -1,0 +1,96 @@
+{
+  "ablation_purpose": "MLM stride-PLL k=1 vs k=6 stability ablation; per-model Pearson r between k=1 and k=6 sum_log_p vectors on this stratified 1000-probe subset (paper.md Fig S2a).",
+  "branch": "mlm_or_encoder",
+  "source_panel": "out_panel/main_panel.parquet",
+  "source_panel_n_probes": 10000,
+  "subset_n_probes_target": 1000,
+  "subset_n_probes_actual": 1000,
+  "seed": 42,
+  "per_element": {
+    "chromatin_access": {
+      "full_count": 450,
+      "subset_count": 45,
+      "fraction_full": 0.045,
+      "fraction_subset": 0.045
+    },
+    "enhancer": {
+      "full_count": 1400,
+      "subset_count": 140,
+      "fraction_full": 0.14,
+      "fraction_subset": 0.14
+    },
+    "fungi_genome": {
+      "full_count": 1500,
+      "subset_count": 150,
+      "fraction_full": 0.15,
+      "fraction_subset": 0.15
+    },
+    "lncRNA": {
+      "full_count": 300,
+      "subset_count": 30,
+      "fraction_full": 0.03,
+      "fraction_subset": 0.03
+    },
+    "nascent_RNA": {
+      "full_count": 200,
+      "subset_count": 20,
+      "fraction_full": 0.02,
+      "fraction_subset": 0.02
+    },
+    "polyA": {
+      "full_count": 350,
+      "subset_count": 35,
+      "fraction_full": 0.035,
+      "fraction_subset": 0.035
+    },
+    "promoter": {
+      "full_count": 1400,
+      "subset_count": 140,
+      "fraction_full": 0.14,
+      "fraction_subset": 0.14
+    },
+    "splice_acceptor": {
+      "full_count": 600,
+      "subset_count": 60,
+      "fraction_full": 0.06,
+      "fraction_subset": 0.06
+    },
+    "splice_donor": {
+      "full_count": 600,
+      "subset_count": 60,
+      "fraction_full": 0.06,
+      "fraction_subset": 0.06
+    },
+    "splicing_plant_acceptor": {
+      "full_count": 150,
+      "subset_count": 15,
+      "fraction_full": 0.015,
+      "fraction_subset": 0.015
+    },
+    "splicing_plant_donor": {
+      "full_count": 150,
+      "subset_count": 15,
+      "fraction_full": 0.015,
+      "fraction_subset": 0.015
+    },
+    "virus_species": {
+      "full_count": 1100,
+      "subset_count": 110,
+      "fraction_full": 0.11,
+      "fraction_subset": 0.11
+    },
+    "virus_variants": {
+      "full_count": 600,
+      "subset_count": 60,
+      "fraction_full": 0.06,
+      "fraction_subset": 0.06
+    },
+    "yeast_genome": {
+      "full_count": 1200,
+      "subset_count": 120,
+      "fraction_full": 0.12,
+      "fraction_subset": 0.12
+    }
+  },
+  "generated_at_utc": "2026-05-21T01:40:55.761270+00:00"
+}

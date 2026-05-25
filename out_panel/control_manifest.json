@@ -1,0 +1,73 @@
+{
+  "seed": 42,
+  "total_probes": 10000,
+  "subsets": {
+    "ctrl_random_ACGT": 3500,
+    "ctrl_dinuc_shuffled": 3500,
+    "ctrl_motif_spiked": 3000
+  },
+  "length_distribution": {
+    "ctrl_dinuc_shuffled": {
+      "count": 3500.0,
+      "mean": 610.27,
+      "std": 311.78,
+      "min": 171.0,
+      "25%": 398.0,
+      "50%": 400.0,
+      "75%": 1000.0,
+      "max": 1024.0
+    },
+    "ctrl_motif_spiked": {
+      "count": 3000.0,
+      "mean": 500.0,
+      "std": 308.27,
+      "min": 200.0,
+      "25%": 275.0,
+      "50%": 400.0,
+      "75%": 625.0,
+      "max": 1000.0
+    },
+    "ctrl_random_ACGT": {
+      "count": 3500.0,
+      "mean": 500.0,
+      "std": 308.26,
+      "min": 200.0,
+      "25%": 275.0,
+      "50%": 400.0,
+      "75%": 625.0,
+      "max": 1000.0
+    }
+  },
+  "gc_by_subset": {
+    "ctrl_dinuc_shuffled": {
+      "count": 3500.0,
+      "mean": 0.429,
+      "std": 0.117,
+      "min": 0.128,
+      "25%": 0.354,
+      "50%": 0.405,
+      "75%": 0.503,
+      "max": 0.838
+    },
+    "ctrl_motif_spiked": {
+      "count": 3000.0,
+      "mean": 0.501,
+      "std": 0.027,
+      "min": 0.38,
+      "25%": 0.485,
+      "50%": 0.5,
+      "75%": 0.517,
+      "max": 0.62
+    },
+    "ctrl_random_ACGT": {
+      "count": 3500.0,
+      "mean": 0.5,
+      "std": 0.201,
+      "min": 0.13,
+      "25%": 0.314,
+      "50%": 0.5,
+      "75%": 0.684,
+      "max": 0.88
+    }
+  }
+}

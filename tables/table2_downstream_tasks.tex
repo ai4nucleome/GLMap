@@ -1,0 +1,18 @@
+\begin{table}[t]
+  \centering
+  \caption{Downstream task summary. The phase 2 evaluation uses 6 binary classification tasks selected from \texttt{data/dna\_foundation\_benchmark/}, spanning histone modification, enhancer detection, DNA methylation, promoter detection, and TF binding. Sequence lengths, train/test sizes, and label balance are computed directly from each task's curated \texttt{train.csv} and \texttt{test.csv} files. Minority class is shown as percentage of pooled train + test labels. Total samples: 38,115 train + 10,324 test = 48,439.}
+  \label{tab:downstream_tasks}
+  \small
+  \begin{tabular}{l c r r r}
+    \toprule
+    Tasks & Seq.\ length (bp) & $N_{\mathrm{train}}$ & $N_{\mathrm{test}}$ & Minority class (\%) \\
+    \midrule
+    \texttt{EMP/Yeast\_H4} & 310--500 & 10,220 & 4,381 & 44.4\% \\
+    \texttt{enhancers/enhancer} & 199--200 & 14,968 & 400 & 50.0\% \\
+    \texttt{iDNA\_ABF/5mC} & 41 & 3,281 & 1,407 & 50.0\% \\
+    \texttt{iPro-WAEL/Promoter\_Arabidopsis\_TATA} & 251 & 3,063 & 1,313 & 34.2\% \\
+    \texttt{mouse/mouse\_TFBS\_3} & 101 & 2,293 & 983 & 50.0\% \\
+    \texttt{prom/promoter\_tata\_300bps} & 300 & 4,290 & 1,840 & 50.0\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.8442728024574668,
+  "auc_cv_mean": 0.8521905444982367,
+  "auc_cv_std": 0.014631868435520088,
+  "best_C": 0.01,
+  "n_train": 4290,
+  "n_test": 1840,
+  "embed_dim": 4096,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "ZhejiangLab/Genos-10B-v2",
+  "task": "prom/promoter_tata_300bps",
+  "n_train_raw": 4290,
+  "n_train_dropped": 0,
+  "n_test_raw": 1840,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

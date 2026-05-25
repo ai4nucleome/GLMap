@@ -1,0 +1,12 @@
+{
+  "hf_id": "LongSafari/hyenadna-tiny-1k-seqlen-d256",
+  "branch": "ar",
+  "context_tokens": 1024,
+  "trust_remote_code": false,
+  "is_codon": false,
+  "loader_kind": "hyenadna",
+  "length_multiple": null,
+  "slug": "LongSafari__hyenadna-tiny-1k-seqlen-d256",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

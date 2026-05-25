@@ -1,0 +1,12 @@
+{
+  "hf_id": "zhihan1996/DNABERT-2-117M",
+  "branch": "mlm",
+  "context_tokens": 512,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "zhihan1996__DNABERT-2-117M",
+  "stride_primary": 6,
+  "scoring_protocol": "MLM stride pseudo-log-likelihood, k=6 (raw nats, no length norm, no sign flip)"
+}

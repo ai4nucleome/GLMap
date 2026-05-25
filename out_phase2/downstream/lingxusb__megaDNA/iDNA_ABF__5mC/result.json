@@ -1,0 +1,30 @@
+{
+  "auc_test": 0.9305027964567438,
+  "auc_cv_mean": 0.9085690078998425,
+  "auc_cv_std": 0.00601126938653313,
+  "best_C": 10.0,
+  "n_train": 3281,
+  "n_test": 1407,
+  "embed_dim": 964,
+  "n_classes": 2,
+  "multiclass": false,
+  "classifier": "l2_logistic",
+  "auc_average": "binary",
+  "model": "lingxusb/megaDNA",
+  "task": "iDNA_ABF/5mC",
+  "n_train_raw": 3281,
+  "n_train_dropped": 0,
+  "n_test_raw": 1407,
+  "n_test_dropped": 0,
+  "fit_params": {
+    "c_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "n_cv": 5,
+    "seed": 42
+  }
+}

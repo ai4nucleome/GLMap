@@ -47,7 +47,7 @@ import torch
 
 from .base import Branch
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_WEIGHT_PATH = REPO_ROOT / "models/modelsHFNoInfo/megaDNA/megaDNA_phage_145M.pt"
 DEFAULT_PACKAGE_PATH = REPO_ROOT / "models/modelsHFNoInfo/megaDNA"
 

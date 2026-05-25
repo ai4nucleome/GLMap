@@ -1,0 +1,12 @@
+{
+  "hf_id": "DOEJGI/GenomeOcean-4B-bgcFM",
+  "branch": "ar",
+  "context_tokens": 10240,
+  "trust_remote_code": true,
+  "is_codon": false,
+  "loader_kind": "hf",
+  "length_multiple": null,
+  "slug": "DOEJGI__GenomeOcean-4B-bgcFM",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

@@ -1,0 +1,12 @@
+{
+  "hf_id": "GenSLM-25M",
+  "branch": "ar",
+  "context_tokens": 2048,
+  "trust_remote_code": false,
+  "is_codon": true,
+  "loader_kind": "genslm",
+  "length_multiple": null,
+  "slug": "GenSLM-25M",
+  "stride_primary": null,
+  "scoring_protocol": "AR forward sum_log_p (raw nats, no length norm, no sign flip; ModelMap convention)"
+}

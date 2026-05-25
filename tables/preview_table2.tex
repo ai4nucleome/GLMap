@@ -1,0 +1,23 @@
+% Standalone preview wrapper for Table 2 (downstream tasks).
+% Compile:
+%   cd tables && pdflatex preview_table2.tex
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,landscape,margin=2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+% Make \citep work in this standalone preview.
+\newcommand{\citep}[1]{[#1]}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\input{table2_downstream_tasks.tex}
+
+\end{document}
