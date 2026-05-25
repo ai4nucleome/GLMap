@@ -22,13 +22,27 @@ mkdir -p "$DEST"
 
 clone_at() {
     local name="$1" url="$2" sha="$3"
-    if [ -d "$DEST/$name" ]; then
-        echo "[skip] $name already exists"
+    if [ -d "$DEST/$name/.git" ]; then
+        echo "[skip] $name already cloned"
         return
     fi
-    echo "[clone] $name from $url @ $sha"
-    git clone --quiet "$url" "$DEST/$name"
-    git -C "$DEST/$name" checkout --quiet "$sha"
+    # Directory may exist with only weight files (e.g. megaDNA weight
+    # downloaded before code clone). Clone into a temp dir then merge.
+    if [ -d "$DEST/$name" ]; then
+        echo "[clone] $name from $url @ $sha (merging into existing dir)"
+        local tmpdir
+        tmpdir=$(mktemp -d)
+        git clone --quiet "$url" "$tmpdir/$name"
+        git -C "$tmpdir/$name" checkout --quiet "$sha"
+        # Move .git and code into existing dir, preserving existing files
+        cp -rn "$tmpdir/$name/." "$DEST/$name/"
+        mv "$tmpdir/$name/.git" "$DEST/$name/.git"
+        rm -rf "$tmpdir"
+    else
+        echo "[clone] $name from $url @ $sha"
+        git clone --quiet "$url" "$DEST/$name"
+        git -C "$DEST/$name" checkout --quiet "$sha"
+    fi
     echo "[done] $name"
 }
 
