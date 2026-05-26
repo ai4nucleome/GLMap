@@ -143,7 +143,7 @@ HuggingFaceBio/Carbon-*                     -> carbon        -> carbon.CarbonCau
 * (anything else, branch=mlm_or_encoder)    -> hf            -> HFMaskedLMLoader                    see env table above
 ```
 
-The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, which is the source-of-truth Python expression of the table above. The sweep script orchestrates 122 models across the 8 envs onto an N-GPU pool, dispatches each as a subprocess with the right `python` / `CUDA_VISIBLE_DEVICES` / `LD_LIBRARY_PATH` / `HF_HUB_OFFLINE`, and is resume-safe (stability JSON for `--mode stability`; full-panel `probes.parquet` for `--mode scoring`). See "Operations: full-roster sweep" below for invocation patterns; the routing table above stays in sync with `route_model` by hand (when you add a model family that needs a non-default env, edit both).
+The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, which is the source-of-truth Python expression of the table above. The sweep script orchestrates 123 models across the 8 envs onto an N-GPU pool, dispatches each as a subprocess with the right `python` / `CUDA_VISIBLE_DEVICES` / `LD_LIBRARY_PATH` / `HF_HUB_OFFLINE`, and is resume-safe (stability JSON for `--mode stability`; full-panel `probes.parquet` for `--mode scoring`). See "Operations: full-roster sweep" below for invocation patterns; the routing table above stays in sync with `route_model` by hand (when you add a model family that needs a non-default env, edit both).
 
 ## Adding a new model
 
@@ -230,7 +230,7 @@ small ones backfilling their idle slots).
 ## Rebuild checklist
 
 If an env, the HF cache, or the repo's `models/modelsHFNoInfo/` tree is
-wiped and you want to re-reach the the initial scoring sweep `123-model PASS` state, the
+wiped and you want to re-reach the initial scoring sweep `123-model PASS` state, the
 steps below need to be redone. Grouped by what they live in so each
 section can be redone independently.
 

@@ -45,7 +45,7 @@ pip install ai4nucleome-glmap[scoring]   # + torch/transformers
 ## Quickstart: use precomputed GLMap artefacts
 
 All precomputed artefacts for the paper's 123 models are included in
-this repository. No GPU, no model download, no scoring required.
+the source repository. No GPU, no model download, no scoring required.
 
 ```python
 import glmap
@@ -77,10 +77,10 @@ Reproducing the full pipeline from scratch requires GPUs, model weights,
 and benchmark data. See the sections below for setup.
 
 ```bash
-# 1. Score all 123 models on the 10,000-probe panel
+# 1. Score all 123 models on the 10,000-probe panel (includes V/Vd/D aggregate)
 python scripts/run_phase1_scoring.py --from-audit --device cuda:0
 
-# 2. Build V/Vd/D matrices from scores
+# 2. (Optional) Run downstream diagnostics / PCA / GC-axis reports
 python scripts/run_phase1_analysis.py
 
 # 3. Extract downstream embeddings (requires benchmark CSVs)
@@ -98,7 +98,13 @@ python scripts/figures/fig3a_model_map_family.py
 For the full 123-model parallel sweep across multiple environments:
 
 ```bash
+# Parallel scoring (each worker uses --skip-aggregate)
 python scripts/run_sweep.py --mode scoring --audit data/audits/models.json
+
+# Final aggregate pass to build V/Vd/D matrices (CPU, after all workers finish)
+python scripts/run_phase1_scoring.py --from-audit --strict-aggregate
+
+# Parallel downstream embedding extraction
 python scripts/run_sweep.py --mode embed --audit data/audits/models.json
 ```
 

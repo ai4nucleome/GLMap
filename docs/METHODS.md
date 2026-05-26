@@ -45,7 +45,7 @@ The panel covers **14 functional elements** across 4 biological categories:
 | Fungi (2,700) | fungi genome (20 species), yeast genome | 1,500 + 1,200 |
 | Virus (1,700) | virus species (25 species), virus variants (9 COVID lineages) | 1,100 + 600 |
 
-Probe lengths range from ~200 to 1,024 bp. Sampling is stratified by
+Probe lengths range from 156 to 1,024 bp. Sampling is stratified by
 functional element with a fixed random seed (42) for reproducibility.
 
 The panel construction spec is in `data/panel_sources.yaml`. The prebuilt
