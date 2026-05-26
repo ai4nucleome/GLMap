@@ -1,13 +1,13 @@
-# Env routing for phase 1 scoring
+# Environment routing for GLMap scoring
 
 This file records which micromamba env to use for each model family in
 the phase 1 rerun-stability / matrix-scoring pipeline. Built up
-empirically during Stage 1 to reach 122/122 PASS on the rerun gate;
+empirically during the initial scoring sweep to reach 123-model PASS on the rerun gate;
 keep it next to the loader/runner code so future scoring sweeps don't
 re-derive these mappings.
 
 Single source of truth for runtime selection — when adding a new model,
-update both this file and `scripts/run_rerun_stability.py:_audit_entry_to_spec`
+update both this file and `glmap.loaders.dispatch.audit_entry_to_spec`
 if the model family needs a non-default env or loader.
 
 ## Why multiple envs
@@ -25,18 +25,18 @@ let the runner dispatch.
 
 | Env | mamba_ssm | causal_conv1d | flash_attn | transformers | torch | Used for |
 |---|---|---|---|---|---|---|
-| `base` | — | — | — | latest | latest | NT v1/v2 standard, DNABERT 3-6, Botanic0, AIDO.DNA, GenSLM, megaDNA, PlasmidGPT, Mistral-DNA, ModernBERT-DNA, GROVER, ModernGENA, GENA-LM, Genos, AgroNT, NTv3 `_pre*`, **HuggingFaceBio/Carbon-500M/3B/8B** (Llama + HybridDNATokenizer, bf16, prepends `<dna>` and A-pads to 6 — `src/loaders/carbon.py`; tokenizer fetches `Qwen/Qwen3-4B-Base` tokenizer files at first load), …  (~80 models) |
+| `base` | — | — | — | latest | latest | NT v1/v2 standard, DNABERT 3-6, Botanic0, AIDO.DNA, GenSLM, megaDNA, PlasmidGPT, Mistral-DNA, ModernBERT-DNA, GROVER, ModernGENA, GENA-LM, Genos, AgroNT, NTv3 `_pre*`, **HuggingFaceBio/Carbon-500M/3B/8B** (Llama + HybridDNATokenizer, bf16, prepends `<dna>` and A-pads to 6 — `glmap/loaders/carbon.py`; tokenizer fetches `Qwen/Qwen3-4B-Base` tokenizer files at first load), …  (~80 models) |
 | `caduceus` | 1.2.0 | 1.2.0 | 2.5.6 | 4.38 | 2.2 (py 3.8) | original `kuleshov-group/caduceus-*` 6 models |
 | `PlantCAD` | 2.2.4 | 1.5.0.post8 | — | 4.49 | 2.5 | PlantCAD2 × 3, HybriDNA × 3, PlantBiMoE, **Jamba-DNA** (mamba_ssm 2.x + causal_conv1d are the only stack with both Mamba 2 and a recent transformers) |
 | `dnabert2` | — | — | — | 4.29.2 | 1.13 | DNABERT-2-117M, DNABERT-S. **Intentionally has neither `triton` nor `flash_attn`** so `bert_layers.py`'s `from .flash_attn_triton import flash_attn_qkvpacked_func` raises at import time → its own try/except sets the symbol to `None` → PyTorch fallback path is taken with no monkey-patching from our side. |
 | `gf` | — | — | 2.7.2 | 4.49 (upgraded from 4.29) | 2.1 | GenomeOcean × 4, NT-v2-50m-3mer. Needed transformers >= 4.36 for `cache_utils`; `pip install pyarrow` and `pip install 'transformers>=4.40,<4.50'` were the only setup steps. |
-| `evo` | — | — | 2.7.4.post1 (cu12torch2.6, cxx11abiFALSE) | 5.8 | 2.6.0 + cu124 | Evo 1.x via `evo.Evo(model_name, device)` from the `evo-model` package (the old HF AutoModel path stopped working in transformers 5.x — dynamic-module loader can't resolve `PreTrainedModel` out of the cached `modeling_hyena.py`). See `src/loaders/evo1_loader.py`. Routes 5 models: `togethercomputer/evo-1-{8k,131k}-base`, `LongSafari/evo-1-8k-{crispr,transposon}`, `evo-design/evo-1.5-8k-base`. **Setup**: `pip install --force-reinstall --no-deps https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1%2Bcu12torch2.6cxx11abiFALSE-cp311-cp311-linux_x86_64.whl`. |
+| `evo` | — | — | 2.7.4.post1 (cu12torch2.6, cxx11abiFALSE) | 5.8 | 2.6.0 + cu124 | Evo 1.x via `evo.Evo(model_name, device)` from the `evo-model` package (the old HF AutoModel path stopped working in transformers 5.x — dynamic-module loader can't resolve `PreTrainedModel` out of the cached `modeling_hyena.py`). See `glmap/loaders/evo1_loader.py`. Routes 5 models: `togethercomputer/evo-1-{8k,131k}-base`, `LongSafari/evo-1-8k-{crispr,transposon}`, `evo-design/evo-1.5-8k-base`. **Setup**: `pip install --force-reinstall --no-deps https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1%2Bcu12torch2.6cxx11abiFALSE-cp311-cp311-linux_x86_64.whl`. |
 | `evo2` | — | — | 2.7.4.post1 (cu12torch2.6, cxx11abiFALSE) | 5.8.1 | 2.6.0 + cu124 | Evo 2.x via `evo2.Evo2(model_name)` (Vortex / StripedHyena 2). Routes 8 models: 7B series + 1B + 20B + 40B/40B_base + microviridae. **Setup**: `pip install --force-reinstall --no-deps https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1%2Bcu12torch2.6cxx11abiFALSE-cp312-cp312-linux_x86_64.whl`. **Two quirks at runtime**: (1) LD_LIBRARY_PATH must include torch/lib (not just env/lib) so flash_attn_2_cuda's c10 symbols resolve — see "Extended LD_LIBRARY_PATH for evo2" below. (2) The shipped `configs/evo2-*.yml` have `use_fp8_input_projections: True`; on this hardware FP8 needs a `transformer_engine` build with matching torch ABI which we don't have, so all configs must be patched to `False` (see "evo2 FP8 patch" below). 40B / 40B_base also need `CUDA_VISIBLE_DEVICES=0,1,...,7` and the StripedHyena shard merger has to complete (~80GB; do not kill mid-merge — see "evo2 40B merge" below). |
 | `hyena-dna` | — | — | 1.0.7 | 4.57 | 2.7 | LongSafari/hyenadna-* × 7. Drives the standalone `HyenaDNAModel` from `models/modelsHFNoInfo/hyena-dna/standalone_hyenadna.py`; transformers is only used for the `PreTrainedTokenizer` base class. |
 | `plantbimoe` | 1.2.0 | — | — | 4.38 | 2.2 (py 3.8) | An installed env supplied for PlantBiMoE; in practice we route PlantBiMoE through `PlantCAD` env because its loader needs only `mamba_ssm` (no causal_conv1d). Leaving the entry here for completeness; the routing table doesn't currently dispatch to it. |
 | `gf_dnabert2` | 2.2.2 | — | 2.7.2 | 4.49 (upgraded) | 2.1 | Reserved for any future model that wants mamba_ssm 2.x without the full PlantCAD stack. **Not currently dispatched to** — Jamba moved to PlantCAD env after we found `causal_conv1d` wheel build fails here. Kept installed because Jamba's first working route was found here before. |
 
-Absolute python paths are under `/nvme-data3/yusen/micomamba/envs/<env>/bin/python`.
+Absolute python paths are under `<CONDA_PREFIX>/envs/<env>/bin/python`.
 
 ## Runtime knobs
 
@@ -55,7 +55,7 @@ Jamba — none of which work with `--device cuda:N` directly.
 `scripts/run_sweep.py --gpu-ids ...` performs this remap per subprocess
 while still passing `--device cuda:0` to the worker.
 
-### `LD_LIBRARY_PATH=/nvme-data3/yusen/micomamba/envs/PlantCAD/lib`
+### `LD_LIBRARY_PATH=<CONDA_PREFIX>/envs/PlantCAD/lib`
 
 **Required for PlantCAD env.** Micromamba activation isn't a real shell
 activation, so when we invoke the env's python directly, the dynamic
@@ -68,8 +68,8 @@ which requires GLIBCXX_3.4.29+. Setting `LD_LIBRARY_PATH` to the env's
 ### Extended LD_LIBRARY_PATH for evo2
 
 ```bash
-TORCH_LIB=/nvme-data3/yusen/micomamba/envs/evo2/lib/python3.12/site-packages/torch/lib
-LD_LIBRARY_PATH=/nvme-data3/yusen/micomamba/envs/evo2/lib:$TORCH_LIB
+TORCH_LIB=<CONDA_PREFIX>/envs/evo2/lib/python3.12/site-packages/torch/lib
+LD_LIBRARY_PATH=<CONDA_PREFIX>/envs/evo2/lib:$TORCH_LIB
 ```
 
 flash_attn_2_cuda.so was built referencing c10 symbols (`_ZN3c105ErrorC2...`) defined in torch's `libc10.so` and `libtorch_cpu.so`. Those .so files live under `<env>/lib/python3.12/site-packages/torch/lib/`, **not** `<env>/lib/`. Without the torch lib dir on LD_LIBRARY_PATH the dynamic linker can't resolve them and you get `ImportError: ... undefined symbol: _ZN3c105ErrorC2...`. `import torch` from Python doesn't fix this — by the time vortex.ops loads flash_attn_2_cuda the resolution path is already fixed.
@@ -81,7 +81,7 @@ The runner now hard-codes this prefix when launching the evo2 env; if you launch
 The evo2 package's stock `configs/evo2-*.yml` set `use_fp8_input_projections: True` for every variant. On L20 + `transformer_engine 2.3.0`, the TE wheel was built against cxx11abi=TRUE torch but the installed `torch==2.6.0+cu124` is cxx11abi=FALSE — `import transformer_engine.pytorch` fails with `undefined symbol: _ZN3c106detail14torchCheckFailEPKcS2_jRKNSt7__cxx11...`. Until that's resolved, fall back to bf16 by patching all seven configs:
 
 ```bash
-for cfg in /nvme-data3/yusen/micomamba/envs/evo2/lib/python3.12/site-packages/evo2/configs/evo2-*.yml; do
+for cfg in <CONDA_PREFIX>/envs/evo2/lib/python3.12/site-packages/evo2/configs/evo2-*.yml; do
     sed -i 's/use_fp8_input_projections: True/use_fp8_input_projections: False/' "$cfg"
 done
 ```
@@ -90,7 +90,7 @@ This is a checkpoint-side patch (lives in the env's site-packages, not the repo)
 
 ### evo2 40B merge
 
-`arcinstitute/evo2_40b*` ship weights as `.pt.part0` + `.pt.part1` (two ~40GB shards) plus a fix-up script that streams them into one `<HF_HOME>/evo2_40b.pt` file on first load. The merge takes ~5 min per shard on local disk. **Do not kill the loader mid-merge** — the partial file looks complete to subsequent runs but fails with `PytorchStreamReader failed reading zip archive: failed finding central directory`. Recovery: delete the half-merged file at `/data/yusen/software/.cache/huggingface/evo2_40b{,_base}.pt` and rerun (parts are preserved by default).
+`arcinstitute/evo2_40b*` ship weights as `.pt.part0` + `.pt.part1` (two ~40GB shards) plus a fix-up script that streams them into one `<HF_HOME>/evo2_40b.pt` file on first load. The merge takes ~5 min per shard on local disk. **Do not kill the loader mid-merge** — the partial file looks complete to subsequent runs but fails with `PytorchStreamReader failed reading zip archive: failed finding central directory`. Recovery: delete the half-merged file at `$HF_HOME/hub/evo2_40b{,_base}.pt` and rerun (parts are preserved by default).
 
 ### `HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1`
 
@@ -121,13 +121,13 @@ spread across.
 
 ## How dispatch works
 
-`scripts/run_rerun_stability.py:_audit_entry_to_spec` maps each
+`glmap.loaders.dispatch.audit_entry_to_spec` maps each
 audit-listed hf_id to a `ModelSpec` with a `loader_kind`. Dispatch
 chain in `scripts/run_phase1_scoring.py:_score_model` is:
 
 ```
 hf_id                                       -> loader_kind   -> loader class                        in env
-lingxusb/megaDNA                            -> megadna       -> src.loaders.megadna.MegaDNALoader   base
+lingxusb/megaDNA                            -> megadna       -> glmap.loaders.megadna.MegaDNALoader   base
 lingxusb/PlasmidGPT                         -> plasmidgpt    -> ...PlasmidGPTLoader                 base
 GenSLM-*                                    -> genslm        -> ...GenSLMLoader                     base
 living-models/Botanic0-*                    -> botanic       -> custom_mlm.BotanicLoader            base
@@ -150,13 +150,13 @@ The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, whi
 1. Drop it into `models/download_models_list.txt`.
 2. Rerun `scripts/audits/models.py` to refresh `data/audits/models.json`.
 3. Try the standard path first: `base` env, `loader_kind="hf"` (no
-   change to `_audit_entry_to_spec` needed).
+   change to `glmap.loaders.dispatch.audit_entry_to_spec()` needed).
 4. If load fails on a missing extension / version mismatch / Triton
    compile error, look at this table — the family probably already has
    an env. Add an alias if needed.
 5. If forward needs special args (species_ids, condition_ids, …), add
-   a custom loader under `src/loaders/` and a dispatch rule in
-   `_audit_entry_to_spec`. Mirror the pattern from
+   a custom loader under `glmap/loaders/` and a dispatch rule in
+   `glmap.loaders.dispatch.audit_entry_to_spec()`. Mirror the pattern from
    `custom_mlm.BotanicLoader` (minimal wrapper using AutoModel +
    stride_pll_forward) or `evo1_loader._load_microviridae` (build a
    PreTrainedModel-style class by hand around a non-AutoModel
@@ -184,7 +184,7 @@ python scripts/run_sweep.py --force --only "PlantCAD2,HybriDNA,Jamba"
 # See what would be launched without launching anything
 python scripts/run_sweep.py --force --dry-run
 
-# Stability sweep (Stage 1; lightweight, ~3 probes per model)
+# Stability sweep (the initial scoring sweep; lightweight, ~3 probes per model)
 python scripts/run_sweep.py                       # default --mode stability
 python scripts/run_sweep.py --n-probes 10
 
@@ -230,7 +230,7 @@ small ones backfilling their idle slots).
 ## Rebuild checklist
 
 If an env, the HF cache, or the repo's `models/modelsHFNoInfo/` tree is
-wiped and you want to re-reach the Stage 1 `122/122 PASS` state, the
+wiped and you want to re-reach the the initial scoring sweep `123-model PASS` state, the
 steps below need to be redone. Grouped by what they live in so each
 section can be redone independently.
 
@@ -238,18 +238,18 @@ section can be redone independently.
 
 ```bash
 # evo2 env (py3.12) — base packages for the evo2 inference path
-/nvme-data3/yusen/micomamba/envs/evo2/bin/pip install transformers pyarrow sentencepiece
+<CONDA_PREFIX>/envs/evo2/bin/pip install transformers pyarrow sentencepiece
 
 # evo env (py3.11) — extras the new evo-model package needs
-/nvme-data3/yusen/micomamba/envs/evo/bin/pip install pyarrow protobuf sentencepiece
+<CONDA_PREFIX>/envs/evo/bin/pip install pyarrow protobuf sentencepiece
 
 # gf env — upgrade transformers to one with cache_utils (>= 4.36) and add pyarrow.
 # Needed for GenomeOcean × 4 + NT-v2-50m-3mer.
-/nvme-data3/yusen/micomamba/envs/gf/bin/pip install pyarrow 'transformers>=4.40,<4.50'
+<CONDA_PREFIX>/envs/gf/bin/pip install pyarrow 'transformers>=4.40,<4.50'
 
 # gf_dnabert2 env — same upgrade; reserved env, not currently dispatched to,
 # but if you reach for it for a new mamba2 model the upgrade is the entry fee.
-/nvme-data3/yusen/micomamba/envs/gf_dnabert2/bin/pip install pyarrow 'transformers>=4.40,<4.50'
+<CONDA_PREFIX>/envs/gf_dnabert2/bin/pip install pyarrow 'transformers>=4.40,<4.50'
 ```
 
 ### B. `flash_attn` wheels for evo / evo2 envs
@@ -263,11 +263,11 @@ For the current torch 2.6.0+cu124 install in both evo and evo2:
 
 ```bash
 # evo env (cp311)
-/nvme-data3/yusen/micomamba/envs/evo/bin/pip install --force-reinstall --no-deps \
+<CONDA_PREFIX>/envs/evo/bin/pip install --force-reinstall --no-deps \
     "https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1%2Bcu12torch2.6cxx11abiFALSE-cp311-cp311-linux_x86_64.whl"
 
 # evo2 env (cp312)
-/nvme-data3/yusen/micomamba/envs/evo2/bin/pip install --force-reinstall --no-deps \
+<CONDA_PREFIX>/envs/evo2/bin/pip install --force-reinstall --no-deps \
     "https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1%2Bcu12torch2.6cxx11abiFALSE-cp312-cp312-linux_x86_64.whl"
 ```
 
@@ -289,16 +289,16 @@ evo2 inference must take the bf16 fallback path, which means every
 `evo2-*.yml` config has to flip `use_fp8_input_projections` to False:
 
 ```bash
-for cfg in /nvme-data3/yusen/micomamba/envs/evo2/lib/python3.12/site-packages/evo2/configs/evo2-*.yml; do
+for cfg in <CONDA_PREFIX>/envs/evo2/lib/python3.12/site-packages/evo2/configs/evo2-*.yml; do
     sed -i 's/use_fp8_input_projections: True/use_fp8_input_projections: False/' "$cfg"
 done
 ```
 
-See `phase_1.md` § "Evo2 推理精度: bf16 fallback" for the methodology disclosure this patch entails.
+See the paper supplementary for the methodology disclosure regarding this precision patch.
 
 ### D. HF cache patches (env-independent)
 
-These live under `/data/yusen/software/.cache/huggingface/hub/` and
+These live under `$HF_HOME/hub/hub/` and
 are needed because the model authors uploaded incomplete repos
 (missing tokenizer files, missing shard index variants, etc.).
 
@@ -311,7 +311,7 @@ canonical source is `togethercomputer/evo-1-131k-base`. Copy all .py
 files from that snapshot into the dependent snapshots:
 
 ```bash
-SRC=/data/yusen/software/.cache/huggingface/hub/models--togethercomputer--evo-1-131k-base/snapshots/78c715ab81852e02ec3b1c7e795dc7250d8c7625
+SRC=$HF_HOME/hub/hub/models--togethercomputer--evo-1-131k-base/snapshots/78c715ab81852e02ec3b1c7e795dc7250d8c7625
 for repo in \
     models--evo-design--evo-1.5-8k-base \
     models--evo-design--evo-1-7b-131k-microviridae \
@@ -319,7 +319,7 @@ for repo in \
     models--LongSafari--evo-1-8k-transposon \
     models--togethercomputer--evo-1-8k-base \
 ; do
-    for snap in /data/yusen/software/.cache/huggingface/hub/${repo}/snapshots/*/; do
+    for snap in $HF_HOME/hub/hub/${repo}/snapshots/*/; do
         for py in "$SRC"/*.py; do
             name=$(basename "$py")
             [ -e "${snap}${name}" ] || cp "$py" "${snap}${name}"
@@ -334,13 +334,13 @@ weights are pytorch_model.bin, no safetensors; we only need these
 side-car files):
 
 ```bash
-DST=$(echo /data/yusen/software/.cache/huggingface/hub/models--evo-design--evo-1-7b-131k-microviridae/snapshots/*/)
+DST=$(echo $HF_HOME/hub/hub/models--evo-design--evo-1-7b-131k-microviridae/snapshots/*/)
 for f in tokenizer_config.json special_tokens_map.json generation_config.json; do
     [ -e "${DST}${f}" ] || cp "${SRC}/${f}" "${DST}${f}"
 done
 ```
 
-(The actual loader for microviridae — `src/loaders/evo1_loader.py:_load_microviridae` — no longer uses any of the cached .py files; it builds StripedHyena from the evo package directly. The copies above are still needed for the togethercomputer / LongSafari Evo1 models that DO go through evo.Evo()'s loader.)
+(The actual loader for microviridae — `glmap/loaders/evo1_loader.py:_load_microviridae` — no longer uses any of the cached .py files; it builds StripedHyena from the evo package directly. The copies above are still needed for the togethercomputer / LongSafari Evo1 models that DO go through evo.Evo()'s loader.)
 
 #### D.2 togethercomputer/evo-1-8k-base — symlink shards from main → 1.1_fix
 
@@ -351,8 +351,8 @@ identical between revisions, only the snapshot dir is partially
 populated):
 
 ```bash
-MAIN=/data/yusen/software/.cache/huggingface/hub/models--togethercomputer--evo-1-8k-base/snapshots/a9be7b66485080893399ade87c7d34f81ad3e249
-FIX=/data/yusen/software/.cache/huggingface/hub/models--togethercomputer--evo-1-8k-base/snapshots/6d7baa4482172f2c451ca4b36c87d50c8359a134
+MAIN=$HF_HOME/hub/hub/models--togethercomputer--evo-1-8k-base/snapshots/a9be7b66485080893399ade87c7d34f81ad3e249
+FIX=$HF_HOME/hub/hub/models--togethercomputer--evo-1-8k-base/snapshots/6d7baa4482172f2c451ca4b36c87d50c8359a134
 for shard in model-00001-of-00003.safetensors model-00002-of-00003.safetensors; do
     if [ -L "$MAIN/$shard" ] && [ ! -e "$FIX/$shard" ]; then
         ln -s "$(readlink "$MAIN/$shard")" "$FIX/$shard"
@@ -373,7 +373,7 @@ above are pinned because that's what `evo.Evo` checks.)
 prefix). Flatten:
 
 ```bash
-SNAP=$(echo /data/yusen/software/.cache/huggingface/hub/models--plant-llms--PlantBiMoE/snapshots/*/)
+SNAP=$(echo $HF_HOME/hub/hub/models--plant-llms--PlantBiMoE/snapshots/*/)
 for f in configuration_plantbimoe.py modeling_plantbimoe.py tokenization_plantbimoe.py; do
     [ -e "${SNAP}${f}" ] || cp "${SNAP}plantbimoe/${f}" "${SNAP}${f}"
 done
@@ -390,9 +390,9 @@ present in each AIDO.DNA snapshot so `RNABertTokenizer(vocab_file=...)`
 can find it:
 
 ```bash
-SRC=/nvme-data3/yusen/worksapce/glm_mapping/genome_model_population_genetics/models/modelsHFNoInfo/ModelGenerator/modelgenerator/huggingface_models/rnabert/vocab.txt
+SRC=models/modelsHFNoInfo/ModelGenerator/modelgenerator/huggingface_models/rnabert/vocab.txt
 for repo in models--genbio-ai--AIDO.DNA-300M models--genbio-ai--AIDO.DNA-7B; do
-    for snap in /data/yusen/software/.cache/huggingface/hub/${repo}/snapshots/*/; do
+    for snap in $HF_HOME/hub/hub/${repo}/snapshots/*/; do
         [ -e "${snap}vocab.txt" ] || cp "$SRC" "${snap}vocab.txt"
     done
 done
@@ -406,8 +406,8 @@ points at the actual `.safetensors` shards, and drop the two tied keys
 safetensors files because they're tied to the embeddings at runtime:
 
 ```bash
-SNAP=$(echo /data/yusen/software/.cache/huggingface/hub/models--genbio-ai--AIDO.DNA-7B/snapshots/*/)
-/nvme-data3/yusen/micomamba/bin/python <<PY
+SNAP=$(echo $HF_HOME/hub/hub/models--genbio-ai--AIDO.DNA-7B/snapshots/*/)
+<CONDA_PREFIX>/bin/python <<PY
 import json
 from safetensors.torch import safe_open
 SNAP = "$SNAP"
