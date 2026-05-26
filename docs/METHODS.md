@@ -61,8 +61,11 @@ For each model and each probe sequence, we compute a single scalar score.
 **AR models**: the sequence log-likelihood, computed in a single forward pass:
 
 ```
-ℓ_AR(x) = Σ_{i=1}^{T} log p(t_i | t_{<i})
+ℓ_AR(x) = Σ_{i=2}^{T} log p(t_i | t_{<i})
 ```
+
+The sum runs over predictable positions only (i = 2 … T); the first
+token has no left context and is excluded.
 
 **MLM models**: the stride pseudo-log-likelihood (PLL), following
 Salazar et al. (2020). Tokens are partitioned into *k* equally spaced
@@ -70,8 +73,11 @@ subsets; each subset is masked and scored together, covering all tokens
 in *k* forward passes:
 
 ```
-PLL(x) ≈ Σ_{i=1}^{T} log p(t_i | t_{\i})    [estimated with stride k]
+PLL(x) ≈ Σ_{i=1}^{T} log p(t_i | t_{\setminus i})    [estimated with stride k]
 ```
+
+Each token t_i is scored conditioned on the full sequence with position
+i masked.
 
 The primary stride is **k = 6**. We validated this choice against the
 exact per-token PLL (k = 1) on 51 of the 59 MLM models scored over a
@@ -203,7 +209,8 @@ across 51 of the 59 MLM models on a stratified 1,000-probe subset:
 - Pooled across 51,000 model–probe pairs: Pearson *r* = 0.995.
 
 This analysis validates the stride approximation and confirms that it
-does not distort the representation. The 1,000-probe subset was sampled
+supports the stride approximation for the downstream GLMap analyses
+reported in the paper. The 1,000-probe subset was sampled
 to match the per-element composition of the full panel (seed = 42).
 
 Results: `out_phase1/figS3_per_model_r.json`.

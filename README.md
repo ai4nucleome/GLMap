@@ -76,36 +76,36 @@ specs = glmap.specs_from_audit() # list of 123 ModelSpec objects
 Reproducing the full pipeline from scratch requires GPUs, model weights,
 and benchmark data. See the sections below for setup.
 
-```bash
-# 1. Score all 123 models on the 10,000-probe panel (includes V/Vd/D aggregate)
-python scripts/run_phase1_scoring.py --from-audit --device cuda:0
+**Quick example** (single model, single GPU):
 
-# 2. (Optional) Run downstream diagnostics / PCA / GC-axis reports
+```bash
+python scripts/run_phase1_scoring.py --from-audit \
+    --hf-ids zhihan1996/DNABERT-2-117M --device cuda:0
+```
+
+**Full 123-model reproduction** (requires multiple environments + GPUs;
+see [docs/env_routing.md](docs/env_routing.md)):
+
+```bash
+# 1. Parallel scoring across 123 models (workers use --skip-aggregate)
+python scripts/run_sweep.py --mode scoring --audit data/audits/models.json
+
+# 2. Build V/Vd/D matrices (CPU, after all scoring workers finish)
+python scripts/run_phase1_scoring.py --from-audit --strict-aggregate
+
+# 3. (Optional) Downstream diagnostics / PCA / GC-axis reports
 python scripts/run_phase1_analysis.py
 
-# 3. Extract downstream embeddings (requires benchmark CSVs)
-python scripts/run_downstream_embed.py --from-audit --device cuda:0
+# 4. Parallel downstream embedding extraction (requires benchmark CSVs)
+python scripts/run_sweep.py --mode embed --audit data/audits/models.json
 
-# 4. Train linear probes and compute AUCs
+# 5. Train linear probes and compute AUCs
 python scripts/run_downstream_classify.py
 
-# 5. Generate paper figures
+# 6. Generate paper figures
 python scripts/figures/fig2c_split_half_consistency.py --seed 123
 python scripts/figures/fig3a_model_map_family.py
 # ... (see scripts/figures/ for all figure scripts)
-```
-
-For the full 123-model parallel sweep across multiple environments:
-
-```bash
-# Parallel scoring (each worker uses --skip-aggregate)
-python scripts/run_sweep.py --mode scoring --audit data/audits/models.json
-
-# Final aggregate pass to build V/Vd/D matrices (CPU, after all workers finish)
-python scripts/run_phase1_scoring.py --from-audit --strict-aggregate
-
-# Parallel downstream embedding extraction
-python scripts/run_sweep.py --mode embed --audit data/audits/models.json
 ```
 
 See [docs/env_routing.md](docs/env_routing.md) for per-family environment
