@@ -208,9 +208,8 @@ across 51 of the 59 MLM models on a stratified 1,000-probe subset:
 - Per-model Pearson *r*: median 0.999, mean 0.998, range [0.985, 1.000].
 - Pooled across 51,000 model–probe pairs: Pearson *r* = 0.995.
 
-This analysis validates the stride approximation and confirms that it
-supports the stride approximation for the downstream GLMap analyses
-reported in the paper. The 1,000-probe subset was sampled
+This supports using the stride approximation for the downstream GLMap
+analyses reported in the paper. The 1,000-probe subset was sampled
 to match the per-element composition of the full panel (seed = 42).
 
 Results: `out_phase1/figS3_per_model_r.json`.

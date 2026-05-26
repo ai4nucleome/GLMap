@@ -188,7 +188,7 @@ python scripts/run_sweep.py --force --dry-run
 python scripts/run_sweep.py                       # default --mode stability
 python scripts/run_sweep.py --n-probes 10
 
-# Full 10,000-probe scoring sweep on the frozen Stage 2 panel (Stage 4 entry).
+# Full 10,000-probe scoring sweep on the canonical panel.
 # Each subprocess writes its own probes.parquet under out_phase1/scores/;
 # the final aggregate step (no --skip-aggregate) builds the matrices on cpu.
 # --strict-aggregate makes the aggregate fail-fast on any missing/partial model.
