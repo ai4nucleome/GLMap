@@ -35,6 +35,12 @@ pip install ai4nucleome-glmap            # core
 pip install ai4nucleome-glmap[scoring]   # + torch/transformers
 ```
 
+> **PyPI package note**: The PyPI distribution contains the `glmap` library
+> code only. Precomputed artefacts (panel, matrices, scores, figures) are
+> included in the **source repository**, not in the PyPI wheel. To use
+> `glmap.load_panel()` etc. after `pip install`, either clone this repo or
+> set `GLMAP_DATA_DIR` to a directory containing the artefacts.
+
 > **Note**: `import glmap` does not trigger `import torch` or
 > `import transformers`. Heavy dependencies are loaded on demand inside
 > `get_loader()`, so the core install is usable for analysis and figures
