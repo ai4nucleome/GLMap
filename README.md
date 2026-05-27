@@ -1,18 +1,11 @@
-# GLMap
-
-**Profiling genomic language models as individuals in a population.**
+# 🧬 🗺️ GLMap
+# Profiling genomic language models as individuals in a population
 
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
 </p>
 
-GLMap is a training-free, architecture-agnostic framework for representing
-and comparing genomic language models (GLMs) by their likelihood responses
-over a fixed panel of DNA sequences. Applied to **123 publicly available
-GLMs** scored on a panel of **10,000 DNA probes**, GLMap places autoregressive
-(AR) and masked-language (MLM) models in a common space, yields model
-distances that are stable to the choice of probes, and reflects known
-relationships among models.
+GLMap is a training-free, architecture-agnostic framework for representing and comparing genomic language models (GLMs) by their likelihood responses over a fixed panel of DNA sequences. Applied to **123 publicly available GLMs** scored on a panel of **10,000 DNA probes**, GLMap places autoregressive (AR) and masked-language (MLM) models in a common space, yields model distances that are stable to the choice of probes, and reflects known relationships among models.
 
 ---
 

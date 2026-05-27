@@ -1,19 +1,16 @@
-# Panel sources — Stage 2 main panel (10,000 probes) configuration.
+# Panel sources — (10,000 probes) configuration.
 #
 # Single source of truth for which dataset feeds which functional element,
 # how labels are filtered, how sequences are truncated, and how many probes
 # each element gets.
 #
-# Final allocation (locked after iteration with user, 2026-05-18):
-#
 #   Human  4000  promoter 1400 + enhancer 1400 + splice (donor 600 + acceptor 600)
 #   Plant  1600  chromatin 450 + polyA 350 + lncRNA 300 + nascent 200 + splicing 300
-#   Fungi  2700  yeast_genome 1200 (S. cerevisiae, EMP × 10 pool) +
-#                fungi_genome 1500 (GenBank 20 spp, species_20 cropped 10000→1024)
-#   Virus  1700  covid 600 + species_40 1100 cropped 5000→1024
+#   Fungi  2700  yeast_genome 1200 + fungi_genome 1500 (GenBank 20 spp, species_20 cropped 10000→1024)
+#   Virus  1700  covid 600 + species_40 1100 (cropped 5000→1024)
 #
 # Total: 14 element_id (donor/acceptor + yeast/fungi sub-elements split out)
-# across 4 species groups: Human, Plant, Fungi, Virus.
+# across 4 groups: Human, Plant, Fungi, Virus.
 
 panel:
   total_probes: 10000
@@ -22,12 +19,6 @@ panel:
   length_max_bp: 1024
 
 species_groups:
-  # Biological taxonomy applied: Yeast (S. cerevisiae) belongs to Fungi kingdom
-  # (Ascomycota → Saccharomycetes). The yeast_genome and fungi_genome elements
-  # are kept as two separate functional sub-elements (different data sources:
-  # Tran et al. histone-mark dataset vs GenBank reference genomes) but share
-  # the same species_group label "Fungi" for taxonomic consistency.
-  # This matches DNABERT2 paper Table 11 which lists S. cerevisiae under Fungi.
   Human:
     n_probes: 4000
     species_label: "Homo sapiens"
@@ -53,7 +44,7 @@ elements:
         format: csv
         seq_col: sequence
         label_col: label
-        label_policy: positive_only           # label == 1
+        label_policy: positive_only
         target_n: 467
       - path: data/GUE/prom/prom_300_notata/train.csv
         format: csv
