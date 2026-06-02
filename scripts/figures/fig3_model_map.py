@@ -77,13 +77,13 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--coords", type=Path,
-                   default=REPO_ROOT / "out_phase2/model_map/fig3_embedding_Vd_tsne.csv")
+                   default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_Vd_tsne.csv")
     p.add_argument("--coords-v", type=Path,
-                   default=REPO_ROOT / "out_phase2/model_map/fig3_embedding_V_tsne.csv")
+                   default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_V_tsne.csv")
     p.add_argument("--coords-vd", type=Path,
-                   default=REPO_ROOT / "out_phase2/model_map/fig3_embedding_Vd_tsne.csv")
+                   default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_Vd_tsne.csv")
     p.add_argument("--coords-d", type=Path,
-                   default=REPO_ROOT / "out_phase2/model_map/fig3_embedding_D_mds.csv")
+                   default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_D_mds.csv")
     p.add_argument("--out", type=Path,
                    default=REPO_ROOT / "figures/Fig3-model_map.pdf")
     p.add_argument("--preview-out", type=Path,

@@ -87,7 +87,7 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--coords", type=Path,
-                   default=REPO_ROOT / "out_phase2/model_map/fig3_embedding_Vd_tsne.csv")
+                   default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_Vd_tsne.csv")
     p.add_argument("--out", type=Path,
                    default=REPO_ROOT / "figures/Fig3a-model_map_family.pdf")
     p.add_argument("--family-min-count", type=int, default=4)

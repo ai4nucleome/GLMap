@@ -11,7 +11,7 @@ representation.
 
 Inputs
 ------
-  out_phase1/scores/<slug>/probes.parquet  — per-model sum_log_p
+  results/scores/AR_MLM_scores/<slug>/probes.parquet  — per-model sum_log_p
   data/audits/models.json                  — branches + families
 
 Outputs (standalone PDFs under figures/)

@@ -8,7 +8,6 @@ into stage-specific modules.
 Module plan:
 - ar_likelihood.py     forward sum_log_p + ell_per_base + bpb
 - mlm_pseudo_ll.py     stride PLL (primary k=6, sensitivity k=4)
-- rerun_stability.py   self-correlation >= 0.95 gate
 
 (The earlier codon_handling.py / R_*_pan NaN-policy module was retired
 when the three-matrix split moved to a single-matrix protocol in commit

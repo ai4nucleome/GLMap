@@ -18,12 +18,12 @@ Panels:
 Output:
   figures/phase1_main.{pdf,png}
   These files are NOT tracked in git — they are regenerated locally from
-  out_phase1/ when this script is run. The earlier tracked artefact was
+  results/scores/ when this script is run. The earlier tracked artefact was
   removed in commit 90091bd because it carried the pre-Stage-2-rebuild
   pilot's stale labels.
 
 Usage:
-  python scripts/figures/phase1_main_figure.py [--in out_phase1] [--out figures]
+  python scripts/figures/phase1_main_figure.py [--in results/scores] [--out figures]
 """
 
 from __future__ import annotations
@@ -250,7 +250,7 @@ def panel_b(ax, in_dir: Path) -> None:
 def panel_c(ax, in_dir: Path) -> None:
     Q_ar = np.load(in_dir / "matrices" / "Q_AR.npy")
     Q_mlm = np.load(in_dir / "matrices" / "Q_MLM.npy")
-    panel = pd.read_parquet(in_dir / "probes" / "main_panel.parquet")
+    panel = pd.read_parquet(REPO_ROOT / "data/panels" / "main_panel.parquet")
     cross = json.loads((in_dir / "analysis" / "cross_branch" / "spearman.json").read_text())
 
     n_ar = Q_ar.shape[0]
@@ -310,7 +310,7 @@ def _compute_gc_abs_r(in_dir: Path, matrix: str) -> np.ndarray:
         (in_dir / "analysis" / "pca" / matrix / "explained_variance.json").read_text()
     )
     n_probes = meta["col_probe_ids_count"]
-    panel = pd.read_parquet(in_dir / "probes" / "main_panel.parquet")
+    panel = pd.read_parquet(REPO_ROOT / "data/panels" / "main_panel.parquet")
     gc = panel["GC_content"].to_numpy()[:V_T.shape[1]]
     rep = gc_axis_diagnostic(V_T, gc, threshold=0.7)
     return rep.abs_r_per_pc
@@ -354,7 +354,7 @@ def panel_d(ax, in_dir: Path) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--in-dir", type=Path, default=REPO_ROOT / "out_phase1")
+    p.add_argument("--in-dir", type=Path, default=REPO_ROOT / "results/scores")
     p.add_argument("--out-dir", type=Path, default=REPO_ROOT / "figures")
     p.add_argument("--basename", type=str, default="phase1_main")
     args = p.parse_args()

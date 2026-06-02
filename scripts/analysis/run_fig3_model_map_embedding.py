@@ -7,17 +7,17 @@ rerunning t-SNE / MDS.
 
 Inputs
 ------
-  out_phase1/scores/                         per-model probe scores
-  out_phase2/matrices/auc_matrix.npy         downstream AUC matrix
-  out_phase2/matrices/auc_matrix_meta.json   AUC row / column metadata
+  results/scores/AR_MLM_scores/                         per-model probe scores
+  results/analysis/matrices/auc_matrix.npy         downstream AUC matrix
+  results/analysis/matrices/auc_matrix_meta.json   AUC row / column metadata
   data/audits/models.json                    model metadata
 
 Outputs
 -------
-  out_phase2/model_map/fig3_embedding_V_tsne.csv
-  out_phase2/model_map/fig3_embedding_Vd_tsne.csv
-  out_phase2/model_map/fig3_embedding_D_mds.csv
-  out_phase2/model_map/fig3_embedding_config.json
+  results/analysis/model_map/fig3_embedding_V_tsne.csv
+  results/analysis/model_map/fig3_embedding_Vd_tsne.csv
+  results/analysis/model_map/fig3_embedding_D_mds.csv
+  results/analysis/model_map/fig3_embedding_config.json
 
 Usage
 -----
@@ -60,13 +60,13 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--auc-matrix", type=Path,
-                   default=REPO_ROOT / "out_phase2/matrices/auc_matrix.npy")
+                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix.npy")
     p.add_argument("--auc-meta", type=Path,
-                   default=REPO_ROOT / "out_phase2/matrices/auc_matrix_meta.json")
+                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix_meta.json")
     p.add_argument("--audit", type=Path,
                    default=REPO_ROOT / "data/audits/models.json")
     p.add_argument("--out-dir", type=Path,
-                   default=REPO_ROOT / "out_phase2/model_map")
+                   default=REPO_ROOT / "results/analysis/model_map")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--perplexity", type=float, default=10.0)
     p.add_argument("--early-exaggeration", type=float, default=12.0)

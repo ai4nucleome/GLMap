@@ -16,28 +16,11 @@ from scripts.run_sweep import GPUPool, RouteSpec, build_command, resolve_pool_gp
 
 # ─────────────────────── build_command ───────────────────────
 
-def test_stability_mode_dispatches_to_rerun_stability() -> None:
-    route = RouteSpec(env="base", gpus_needed=1)
-    args, _env = build_command(
-        "lingxusb/megaDNA", route, gpus=[0], n_probes=3, panel=None,
-        mode="stability",
-    )
-    assert args[1].endswith("run_rerun_stability.py")
-    assert "--hf-ids" in args
-    assert "lingxusb/megaDNA" in args
-    assert "--n-probes" in args
-    assert "3" in args
-    # No --from-audit / --only / --skip-aggregate in stability mode
-    assert "--from-audit" not in args
-    assert "--only" not in args
-    assert "--skip-aggregate" not in args
-
-
 def test_scoring_mode_dispatches_to_phase1_scoring_from_audit() -> None:
     route = RouteSpec(env="evo2", gpus_needed=4)
     args, env = build_command(
         "arcinstitute/evo2_7b", route, gpus=[0, 1, 2, 3],
-        n_probes=10000, panel=None, mode="scoring",
+        panel=None, mode="scoring",
     )
     assert args[1].endswith("run_phase1_scoring.py")
     assert "--from-audit" in args
@@ -57,7 +40,7 @@ def test_scoring_mode_uses_physical_gpu_ids() -> None:
     route = RouteSpec(env="evo2", gpus_needed=4)
     args, env = build_command(
         "arcinstitute/evo2_20b", route, gpus=[0, 5, 6, 7],
-        n_probes=10000, panel=None, mode="scoring",
+        panel=None, mode="scoring",
     )
     assert args[1].endswith("run_phase1_scoring.py")
     assert env["CUDA_VISIBLE_DEVICES"] == "0,5,6,7"
@@ -97,7 +80,7 @@ def test_scoring_mode_passes_panel_override() -> None:
     route = RouteSpec(env="base", gpus_needed=1)
     args, _env = build_command(
         "lingxusb/megaDNA", route, gpus=[0],
-        n_probes=10000, panel="/tmp/custom_panel.parquet", mode="scoring",
+        panel="/tmp/custom_panel.parquet", mode="scoring",
     )
     assert "--panel" in args
     panel_idx = args.index("--panel")
@@ -107,22 +90,19 @@ def test_scoring_mode_passes_panel_override() -> None:
 def test_unknown_mode_raises() -> None:
     route = RouteSpec(env="base", gpus_needed=1)
     with pytest.raises(ValueError, match="unknown mode"):
-        build_command("lingxusb/megaDNA", route, [0], 3, None, mode="nonsense")
+        build_command("lingxusb/megaDNA", route, [0], None, mode="nonsense")
 
 
 def test_classify_log_scoring_success_does_not_report_as_unknown(tmp_path) -> None:
-    """The scoring worker emits '[done] --skip-aggregate; ...' on success,
-    not 'PASS:'. classify_log in scoring mode must recognize this; the
-    stability classifier would label it '?'."""
+    """The scoring worker emits '[done] --skip-aggregate; ...' on success.
+    classify_log in scoring mode must recognize this as DONE."""
     from scripts.run_sweep import classify_log
 
     log = tmp_path / "ok.log"
     log.write_text("[ar] loading lingxusb/megaDNA\n"
                    "[ar] lingxusb__megaDNA wrote scores -> ...\n"
-                   "[done] --skip-aggregate; skipping matrix build + report.\n")
+                   "[done] --skip-aggregate; skipping matrix build.\n")
 
-    # Stability mode (legacy) — no PASS: tag → '?'
-    assert classify_log(log, rc=0, mode="stability") == "?"
     # Scoring mode — recognized as DONE
     assert classify_log(log, rc=0, mode="scoring") == "DONE"
 
@@ -146,23 +126,13 @@ def test_scoring_mode_propagates_force_to_child() -> None:
     otherwise the child would no-op on its own existing parquet."""
     route = RouteSpec(env="base", gpus_needed=1)
     args_noforce, _ = build_command(
-        "lingxusb/megaDNA", route, [0], 10000, None, mode="scoring", force=False,
+        "lingxusb/megaDNA", route, [0], None, mode="scoring", force=False,
     )
     args_force, _ = build_command(
-        "lingxusb/megaDNA", route, [0], 10000, None, mode="scoring", force=True,
+        "lingxusb/megaDNA", route, [0], None, mode="scoring", force=True,
     )
     assert "--force" not in args_noforce
     assert "--force" in args_force
-
-
-def test_scoring_mode_stability_is_unaffected_by_force() -> None:
-    """Stability mode does not propagate --force (the worker re-runs
-    unconditionally already)."""
-    route = RouteSpec(env="base", gpus_needed=1)
-    args_force, _ = build_command(
-        "lingxusb/megaDNA", route, [0], 3, None, mode="stability", force=True,
-    )
-    assert "--force" not in args_force
 
 
 def test_parquet_covers_panel_rejects_nan_rows(tmp_path) -> None:
@@ -247,7 +217,7 @@ def test_scoring_mode_uses_exact_match_to_avoid_substring_collisions() -> None:
     route = RouteSpec(env="evo2", gpus_needed=4)
     args, _env = build_command(
         "arcinstitute/evo2_7b", route, gpus=[0, 1, 2, 3],
-        n_probes=10000, panel=None, mode="scoring",
+        panel=None, mode="scoring",
     )
     assert "--hf-ids" in args
     assert "--only" not in args
@@ -269,7 +239,7 @@ def test_run_sweep_scoring_demotes_done_when_parquet_has_nan_rows(tmp_path, monk
     hf_id = "fake/model-with-nan-rows"
     slug = hf_id.replace("/", "__")
 
-    scores_dir = tmp_path / "out_phase1" / "scores" / slug
+    scores_dir = tmp_path / "results/scores" / "AR_MLM_scores" / slug
     scores_dir.mkdir(parents=True)
     df_nan = pd.DataFrame({
         "probe_id": sorted(panel_ids),
@@ -301,7 +271,6 @@ def test_run_sweep_scoring_demotes_done_when_parquet_has_nan_rows(tmp_path, monk
     results = run_sweep(
         tasks=[(hf_id, RouteSpec(env="base", gpus_needed=1))],
         pool=pool,
-        n_probes=5,
         panel=None,
         log_dir=log_dir,
         poll_interval=0.01,
@@ -344,7 +313,7 @@ def test_run_sweep_unschedulable_task_exits_with_clear_error(tmp_path) -> None:
          "--n-gpus", "4",
          "--dry-run",
          "--force",
-         "--mode", "stability"],
+         "--mode", "scoring"],
         capture_output=True, text=True, cwd=str(REPO_ROOT),
     )
     # Must exit non-zero with the offending hf_id named
@@ -379,7 +348,7 @@ def test_max_gpus_per_model_filters_out_large_models(tmp_path) -> None:
          "--n-gpus", "1",
          "--dry-run",
          "--force",
-         "--mode", "stability",
+         "--mode", "scoring",
          "--max-gpus-per-model", "1"],
         capture_output=True, text=True, cwd=str(REPO_ROOT),
     )
@@ -394,8 +363,8 @@ def test_max_gpus_per_model_filters_out_large_models(tmp_path) -> None:
 # ─────────────────────── --from-audit roster ───────────────────────
 
 def test_phase1_scoring_from_audit_picks_up_full_roster() -> None:
-    """run_phase1_scoring.py --from-audit must load the same specs that
-    run_rerun_stability.py _specs_from_audit produces, so a Stage 4 sweep
+    """run_phase1_scoring.py --from-audit must load the full roster that
+    glmap.loaders.dispatch.specs_from_audit produces, so a Stage 4 sweep
     sees the full 123-model audit set (122 original + 3 HuggingFaceBio/
     Carbon − 2 gena-lm-bigbird-base-sparse{,t2t} excluded as their
     block-sparse attention requires seq_len ≥ 704 tokens, incompatible

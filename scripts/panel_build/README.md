@@ -118,7 +118,7 @@ PGB (CC-BY-NC-SA-4.0), the panel parquet itself is licensed under
 **CC-BY-NC-SA-4.0** (the most restrictive upstream license, via
 ShareAlike). The GLMap **code** in this repository remains under
 Apache-2.0; only the data artefacts in `data/panels/` and downstream
-matrices in `out_phase1/matrices/` are CC-BY-NC-SA-4.0. See
+matrices in `results/scores/matrices/` are CC-BY-NC-SA-4.0. See
 [`LICENSE-DATA`](../../LICENSE-DATA) at the repo root.
 
 When citing the panel or any derived matrix, please cite all three

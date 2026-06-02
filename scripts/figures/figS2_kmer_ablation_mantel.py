@@ -21,12 +21,12 @@ by the surrounding (un-ablated) AR rows in the global matrix.
 Two ablation experiments, two pipeline modes → 4 single-panel PDFs:
 
   Experiment A : 56 MLM models × 1000-probe stratified subset
-    out: out_phase1/MLM_k1ablation_1000_scores/scores/<slug>/probes.parquet
-    k=6 reference subset extracted from out_phase1/scores/<slug>/probes.parquet
+    out: results/scores/MLM_k1ablation_1000_scores/AR_MLM_scores/<slug>/probes.parquet
+    k=6 reference subset extracted from results/scores/AR_MLM_scores/<slug>/probes.parquet
     C(56, 2) = 1540 model pairs.
 
   Experiment B : 10 representative MLM models × full 10000-probe panel
-    out: out_phase1/MLM_k1_ablation_full_scores/scores/<slug>/probes.parquet
+    out: results/scores/MLM_k1_ablation_full_scores/AR_MLM_scores/<slug>/probes.parquet
     C(10, 2) = 45 model pairs.
 
 Mode --no-pipeline switches off clip + double-center and computes the
@@ -72,8 +72,8 @@ from glmap.matrices.build import (  # noqa: E402
 EXPERIMENTS = {
     "A": {
         "tag": "ExpA-56MLM-1000probes",
-        "k1_dir": REPO_ROOT / "out_phase1/MLM_k1ablation_1000_scores/scores",
-        "k6_dir": REPO_ROOT / "out_phase1/scores",
+        "k1_dir": REPO_ROOT / "results/scores/MLM_k1ablation_1000_scores/AR_MLM_scores",
+        "k6_dir": REPO_ROOT / "results/scores/AR_MLM_scores",
         "probe_filter_parquet": (
             REPO_ROOT / "data/panels/MLM_k1ablation_1000_main_panel.parquet"
         ),
@@ -82,8 +82,8 @@ EXPERIMENTS = {
     },
     "B": {
         "tag": "ExpB-10MLM-10000probes",
-        "k1_dir": REPO_ROOT / "out_phase1/MLM_k1_ablation_full_scores/scores",
-        "k6_dir": REPO_ROOT / "out_phase1/scores",
+        "k1_dir": REPO_ROOT / "results/scores/MLM_k1_ablation_full_scores/AR_MLM_scores",
+        "k6_dir": REPO_ROOT / "results/scores/AR_MLM_scores",
         "probe_filter_parquet": None,    # full panel
         "expected_models": 10,
         "headline": "10 representative MLM × full 10000-probe panel",

@@ -3,7 +3,7 @@
 # Fan out run_phase1_scoring.py across multiple GPUs, one model per GPU.
 #
 # Each model runs with --skip-aggregate so the per-model probes.parquet
-# checkpoints are written but no two jobs race on out_phase1/matrices/.
+# checkpoints are written but no two jobs race on results/scores/matrices/.
 # After all parallel jobs finish, a single aggregate pass on cpu re-reads
 # every parquet and writes the matrices + report.
 #
@@ -100,4 +100,4 @@ echo ""
 echo "[aggregate] all per-model scoring done; running matrix build + report"
 "${PY}" scripts/run_phase1_scoring.py --device cpu 2>&1 | tail -20
 echo ""
-echo "[done] parallel phase-1 scoring complete; outputs in out_phase1/"
+echo "[done] parallel phase-1 scoring complete; outputs in results/scores/"

@@ -1,6 +1,6 @@
 """Shared loader for the combined-branch GLMap representation matrix.
 
-The canonical strict-aggregate output (`out_phase1/matrices/`) writes
+The canonical strict-aggregate output (`results/scores/matrices/`) writes
 L_AR / L_MLM / Q_AR / Q_MLM / D_AR / D_MLM as PER-BRANCH matrices, per
 the phase_1.md single-matrix protocol. For figures that adopt the
 "combined GLMap" presentation (Option B in the Fig 2d / 2e design
@@ -83,7 +83,7 @@ class CombinedGLMap:
 
 def load_combined_glmap(
     audit_path: Path = REPO_ROOT / "data/audits/models.json",
-    scores_dir: Path = REPO_ROOT / "out_phase1/scores",
+    scores_dir: Path = REPO_ROOT / "results/scores/AR_MLM_scores",
     panel_path: Path = REPO_ROOT / "data/panels/main_panel.parquet",
     clip_q: float = 0.02,
 ) -> CombinedGLMap:

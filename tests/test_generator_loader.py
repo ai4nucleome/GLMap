@@ -92,7 +92,7 @@ def test_loader_inherits_hf_causal_lm_loader_attrs() -> None:
 # ─────────────────────── dispatch ───────────────────────
 
 def test_dispatch_routes_generator_to_generator_loader() -> None:
-    """audit-entry → ModelSpec dispatch in scripts/run_rerun_stability.py
+    """audit-entry → ModelSpec dispatch in glmap.loaders.dispatch
     must produce loader_kind='generator' for GENERator-* hf_ids."""
     from glmap.loaders.dispatch import audit_entry_to_spec
 

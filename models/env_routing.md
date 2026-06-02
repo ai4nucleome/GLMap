@@ -1,10 +1,10 @@
 # Environment routing for GLMap scoring
 
 This file records which micromamba env to use for each model family in
-the phase 1 rerun-stability / matrix-scoring pipeline. Built up
-empirically during the initial scoring sweep to reach 123-model PASS on the rerun gate;
-keep it next to the loader/runner code so future scoring sweeps don't
-re-derive these mappings.
+the phase 1 matrix-scoring pipeline. Built up empirically during the
+initial scoring sweep across all 123 models; keep it next to the
+loader/runner code so future scoring sweeps don't re-derive these
+mappings.
 
 Single source of truth for runtime selection — when adding a new model,
 update both this file and `glmap.loaders.dispatch.audit_entry_to_spec`
@@ -143,7 +143,7 @@ HuggingFaceBio/Carbon-*                     -> carbon        -> carbon.CarbonCau
 * (anything else, branch=mlm_or_encoder)    -> hf            -> HFMaskedLMLoader                    see env table above
 ```
 
-The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, which is the source-of-truth Python expression of the table above. The sweep script orchestrates 123 models across the 8 envs onto an N-GPU pool, dispatches each as a subprocess with the right `python` / `CUDA_VISIBLE_DEVICES` / `LD_LIBRARY_PATH` / `HF_HUB_OFFLINE`, and is resume-safe (stability JSON for `--mode stability`; full-panel `probes.parquet` for `--mode scoring`). See "Operations: full-roster sweep" below for invocation patterns; the routing table above stays in sync with `route_model` by hand (when you add a model family that needs a non-default env, edit both).
+The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, which is the source-of-truth Python expression of the table above. The sweep script orchestrates 123 models across the 8 envs onto an N-GPU pool, dispatches each as a subprocess with the right `python` / `CUDA_VISIBLE_DEVICES` / `LD_LIBRARY_PATH` / `HF_HUB_OFFLINE`, and is resume-safe (skips a model when its full-panel `probes.parquet` is already complete). See "Operations: full-roster sweep" below for invocation patterns; the routing table above stays in sync with `route_model` by hand (when you add a model family that needs a non-default env, edit both).
 
 ## Adding a new model
 
@@ -161,35 +161,29 @@ The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, whi
    stride_pll_forward) or `evo1_loader._load_microviridae` (build a
    PreTrainedModel-style class by hand around a non-AutoModel
    checkpoint) depending on what's actually missing.
-6. **Verify by running the rerun-stability runner with `--n-probes 5`
-   on the new model and confirming `r=1.0 max_diff=0`** before adding
-   it to any production sweep. Triton/CUDA kernels are silent failures
-   waiting to happen — the gate is what catches "loaded but emits
-   NaN/error on every probe" cases.
+6. **Verify by scoring a few probes on the new model**
+   (`python scripts/run_phase1_scoring.py --hf-ids "<id>" --max-probes 5`)
+   and confirming the written `probes.parquet` has finite `sum_log_p`
+   before adding it to any production sweep. Triton/CUDA kernels are
+   silent failures waiting to happen — a quick smoke catches "loaded but
+   emits NaN/error on every probe" cases.
 
 ## Operations: full-roster sweep
 
 `scripts/run_sweep.py` is the orchestrator. It reads the audit, routes
 each model to its env via `route_model`, schedules onto a GPU pool
-respecting per-task `gpus_needed`, launches `scripts/run_rerun_stability.py`
+respecting per-task `gpus_needed`, launches `scripts/run_phase1_scoring.py`
 as a subprocess per model, aggregates results, and is resume-safe.
 
 ```bash
-# Daily quick check that the current state still passes (skip already-PASS)
-python scripts/run_sweep.py --n-probes 3
-
 # Force-rerun a single family (or any substring match — comma-separated)
 python scripts/run_sweep.py --force --only "PlantCAD2,HybriDNA,Jamba"
 
 # See what would be launched without launching anything
 python scripts/run_sweep.py --force --dry-run
 
-# Stability sweep (the initial scoring sweep; lightweight, ~3 probes per model)
-python scripts/run_sweep.py                       # default --mode stability
-python scripts/run_sweep.py --n-probes 10
-
 # Full 10,000-probe scoring sweep on the canonical panel.
-# Each subprocess writes its own probes.parquet under out_phase1/scores/;
+# Each subprocess writes its own probes.parquet under results/scores/AR_MLM_scores/;
 # the final aggregate step (no --skip-aggregate) builds the matrices on cpu.
 # --strict-aggregate makes the aggregate fail-fast on any missing/partial model.
 python scripts/run_sweep.py --mode scoring
@@ -213,9 +207,10 @@ python scripts/run_sweep.py --mode scoring --gpu-ids 0,5,6,7 --max-gpus-per-mode
 ```
 
 Each subprocess's stdout+stderr lands in `--log-dir` (default
-`/tmp/sweep_logs/<slug>.log`). The stability JSONs land in
-`out_phase1/stability/` per the worker's own contract; resume is
-keyed on `passes_gate == True` in those JSONs.
+`/tmp/sweep_logs/<slug>.log`). Each scoring worker writes its
+`results/scores/AR_MLM_scores/<slug>/probes.parquet`; resume skips a model when
+that parquet already covers the full panel with finite `sum_log_p` in
+every row.
 
 The scheduler defaults to **single-GPU tasks first** (`--order
 small-first`): all 118 1-GPU models go into the pool 8-way parallel
@@ -430,9 +425,10 @@ PY
 ### E. Verify
 
 After redoing whichever sections above apply, smoke-test by running
-`scripts/run_rerun_stability.py --hf-ids "<canonical_id>" --device cuda:0 --n-probes 3`
-through the appropriate env's python, and confirm `r=1.0 max_diff=0`.
-One canary per family is enough to catch most regressions:
+`scripts/run_phase1_scoring.py --hf-ids "<canonical_id>" --device cuda:0 --max-probes 5`
+through the appropriate env's python, and confirm the written
+`probes.parquet` has finite `sum_log_p`. One canary per family is enough
+to catch most regressions:
 
 ```bash
 # canaries (run via the env each one belongs to per the routing table)

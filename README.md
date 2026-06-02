@@ -144,13 +144,14 @@ GLMap/
 │   ├── audits/             123-model audit (models.json)
 │   ├── downstream_tasks/   Downstream task metadata
 │   └── panels/             Prebuilt probe panel parquets
-├── out_phase1/
-│   ├── matrices/           V/Vd/D for AR and MLM branches
-│   └── scores/             Per-model likelihood responses (slimmed)
-├── out_phase2/
-│   ├── downstream/         Per-model per-task AUC results
-│   ├── phenotype_prediction/ RidgeCV prediction outputs
-│   └── model_map/          t-SNE embeddings for Fig 3
+├── results/
+│   ├── scores/             Scoring outputs
+│   │   ├── matrices/       V/Vd/D for AR and MLM branches
+│   │   └── scores/         Per-model likelihood responses (slimmed)
+│   └── analysis/           Downstream analysis outputs
+│       ├── downstream/     Per-model per-task AUC results
+│       ├── phenotype_prediction/ RidgeCV prediction outputs
+│       └── model_map/      t-SNE embeddings for Fig 3
 ├── figures/                Paper figure PDFs
 ├── tables/                 Paper table LaTeX sources
 └── models/                 Model download manifest, setup scripts,
@@ -265,8 +266,8 @@ This repository uses **two licenses**:
 
 - **Source code** (everything under `src/`, `scripts/`, `tests/`,
   `scripts/panel_build/`, etc.): [Apache-2.0](LICENSE).
-- **Data artefacts** (`data/panels/`, `out_phase1/matrices/`,
-  `out_phase1/scores/`, `out_phase2/`): [CC-BY-NC-SA-4.0](LICENSE-DATA).
+- **Data artefacts** (`data/panels/`, `results/scores/matrices/`,
+  `results/scores/AR_MLM_scores/`, `results/analysis/`): [CC-BY-NC-SA-4.0](LICENSE-DATA).
   These artefacts inherit the upstream Plant Genomic Benchmark license
   (1,600 probes drawn from PGB; CC-BY-NC-SA-4.0 via ShareAlike). They
   are usable for non-commercial research with attribution; commercial

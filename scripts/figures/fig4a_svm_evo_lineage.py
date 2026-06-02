@@ -23,7 +23,7 @@ Inputs
   models/evo-family-relationship.csv   CSV of (anchor, partner, label) rows. In the
                           current panel of 8 rows the anchor is fixed
                           to togethercomputer/evo-1-8k-base.
-  out_phase1/scores/<slug>/probes.parquet   per-probe sum_log_p vectors
+  results/scores/AR_MLM_scores/<slug>/probes.parquet   per-probe sum_log_p vectors
                           (panel size 10,000) for anchor + every partner.
 
 Pipeline
@@ -485,7 +485,7 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "models/evo-family-relationship.csv",
                    help="CSV file with two columns: hf_id, lineage_label (0/1).")
     p.add_argument("--scores-dir", type=Path,
-                   default=REPO_ROOT / "out_phase1/scores",
+                   default=REPO_ROOT / "results/scores/AR_MLM_scores",
                    help="Directory containing <slug>/probes.parquet.")
     p.add_argument("--out", dest="out_dir", type=Path,
                    default=REPO_ROOT / "figures",

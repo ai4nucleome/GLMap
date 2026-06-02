@@ -8,7 +8,7 @@ extracts a pooled embedding per sequence via
 `src.scoring.embeddings.compute_pooled_embedding`, and writes the
 embeddings to:
 
-    out_phase2/embeddings/<model_slug>/<task_name>/{train,test}.parquet
+    results/analysis/embeddings/<model_slug>/<task_name>/{train,test}.parquet
 
 Each parquet has columns:
     embed_0, embed_1, ..., embed_{D-1}, label
@@ -233,7 +233,7 @@ def parse_args() -> argparse.Namespace:
                    help="Benchmark data root (must contain data_processed/). "
                         "Download from: huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset")
     p.add_argument("--out", type=Path,
-                   default=REPO_ROOT / "out_phase2",
+                   default=REPO_ROOT / "results/analysis",
                    help="Output root; embeddings under out/embeddings/.")
     p.add_argument("--only", type=str, default=None,
                    help="Comma-separated substring filter on hf_id.")

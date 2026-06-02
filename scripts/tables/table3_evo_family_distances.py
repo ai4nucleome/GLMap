@@ -6,7 +6,7 @@ compute the GLMap pipeline distance between the partner model and the
 shared anchor (``togethercomputer/evo-1-8k-base``):
 
   1. Load the AR-branch L matrix (all 67 AR models' per-probe sum_log_p
-     sorted by probe_id) from ``out_phase1/scores/<slug>/probes.parquet``.
+     sorted by probe_id) from ``results/scores/AR_MLM_scores/<slug>/probes.parquet``.
   2. Apply the ModelMap pipeline ``clip(q=0.02) + double_center`` →
      Q_AR ∈ R^{67 × 10000}. This is the same Q matrix that drives every
      other GLMap distance in the paper (Fig 4b, 5, 6, 7, etc.) — using
@@ -50,7 +50,7 @@ from glmap.matrices.build import clip_lower, double_center  # noqa: E402
 
 CSV_PATH = REPO_ROOT / "models" / "evo-family-relationship.csv"
 AUDIT_PATH = REPO_ROOT / "data" / "audits" / "models.json"
-SCORES_DIR = REPO_ROOT / "out_phase1" / "scores"
+SCORES_DIR = REPO_ROOT / "results/scores" / "AR_MLM_scores"
 # Single LaTeX output: Euclidean distance + cosine similarity on V_d.
 TEX_OUT_Q = REPO_ROOT / "tables" / "table3_evo_family_distances-V_d.tex"
 
@@ -117,7 +117,7 @@ def _load_all_L():
         hf_ids.append(m["hf_id"])
         branches.append(m["branch"])
     if not L_rows:
-        sys.exit("no models loaded — does out_phase1/scores/ exist?")
+        sys.exit("no models loaded — does results/scores/AR_MLM_scores/ exist?")
     return np.stack(L_rows, axis=0), hf_ids, branches
 
 

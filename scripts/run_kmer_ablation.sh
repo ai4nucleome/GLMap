@@ -4,10 +4,10 @@
 #
 # Two experiments, separately launched:
 #   A. ALL 56 MLM models × 1000-probe stratified subset × k=1
-#      → out_phase1/MLM_k1ablation_1000_scores/<slug>/probes.parquet
+#      → results/scores/MLM_k1ablation_1000_scores/<slug>/probes.parquet
 #      → ~5-7 h on 8 GPUs
 #   B. 10 representative MLM models × full 10000-probe panel × k=1
-#      → out_phase1/MLM_k1_ablation_full_scores/<slug>/probes.parquet
+#      → results/scores/MLM_k1_ablation_full_scores/<slug>/probes.parquet
 #      → ~16-30 h on 8 GPUs
 #
 # Both experiments share the same down-the-line analysis (per-model
@@ -93,7 +93,7 @@ run_A() {
     echo "===================================================================="
     echo "Experiment A — 56 MLM × 1000 probes × stride=${STRIDE}"
     echo "  Panel : ${SUBSET_PANEL#${REPO_ROOT}/}"
-    echo "  Output: out_phase1/MLM_k1ablation_1000_scores/"
+    echo "  Output: results/scores/MLM_k1ablation_1000_scores/"
     echo "  Logs  : ${log_dir}"
     echo "  GPUs  : ${GPU_IDS}"
     echo "  Dry   : ${DRY_RUN_ARGS[*]:-(actual run)}"
@@ -103,7 +103,7 @@ run_A() {
         --branch mlm \
         --panel "${SUBSET_PANEL}" \
         --stride "${STRIDE}" \
-        --out out_phase1/MLM_k1ablation_1000_scores \
+        --out results/scores/MLM_k1ablation_1000_scores \
         --gpu-ids "${GPU_IDS}" \
         --log-dir "${log_dir}" \
         "${DRY_RUN_ARGS[@]}"
@@ -117,7 +117,7 @@ run_B() {
     echo "===================================================================="
     echo "Experiment B — 10 representative MLM × full 10000 panel × stride=${STRIDE}"
     echo "  Panel : data/panels/main_panel.parquet (default)"
-    echo "  Output: out_phase1/MLM_k1_ablation_full_scores/"
+    echo "  Output: results/scores/MLM_k1_ablation_full_scores/"
     echo "  Logs  : ${log_dir}"
     echo "  GPUs  : ${GPU_IDS}"
     echo "  Models:"
@@ -128,7 +128,7 @@ run_B() {
         --mode scoring \
         --hf-ids "${EXP_B_IDS_CSV}" \
         --stride "${STRIDE}" \
-        --out out_phase1/MLM_k1_ablation_full_scores \
+        --out results/scores/MLM_k1_ablation_full_scores \
         --gpu-ids "${GPU_IDS}" \
         --log-dir "${log_dir}" \
         "${DRY_RUN_ARGS[@]}"

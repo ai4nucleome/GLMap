@@ -122,8 +122,8 @@ fi
 
 echo ""
 echo "[parallel-classify] summary"
-echo "  result.json files now : $(find out_phase2/downstream -name 'result.json' 2>/dev/null | wc -l)"
-echo "  auc_matrix.npy        : $(ls -la out_phase2/matrices/auc_matrix.npy 2>/dev/null || echo MISSING)"
+echo "  result.json files now : $(find results/analysis/downstream -name 'result.json' 2>/dev/null | wc -l)"
+echo "  auc_matrix.npy        : $(ls -la results/analysis/matrices/auc_matrix.npy 2>/dev/null || echo MISSING)"
 echo "  log dir               : ${LOG_DIR}"
 
 exit ${fail}

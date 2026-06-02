@@ -1,5 +1,5 @@
 """Tests for src.loaders.ntv3.NTv3MaskedLMLoader and its audit-dispatch
-wiring through scripts/run_rerun_stability.py::_audit_entry_to_spec.
+wiring through glmap.loaders.dispatch.audit_entry_to_spec.
 
 Heavy real-model smoke tests are excluded from the default suite — they
 require downloading 8M+ NTv3 weights and a GPU. The bookkeeping invariants

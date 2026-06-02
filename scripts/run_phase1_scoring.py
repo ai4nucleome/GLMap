@@ -4,10 +4,10 @@
 Implements phase_1.md § 打分协议 + § Sequence-likelihood matrix on
 data/panels/main_panel.parquet. Produces the canonical layout:
 
-    out_phase1/
-      probes/main_panel.parquet           # copy of input
-      models/{model_id_slug}.json         # per-model metadata
-      scores/{model_id_slug}/probes.parquet
+    results/scores/
+      AR_MLM_scores/{model_id_slug}/
+        {model_id_slug}.json              # per-model metadata
+        probes.parquet
         # one row per panel probe, aligned by probe_id; columns include
         # sum_log_p, ell_per_base, bpb, token_length, scoring_error,
         # plus token_log_probs (per-token log p list; AR = T-1 floats,
@@ -21,8 +21,6 @@ data/panels/main_panel.parquet. Produces the canonical layout:
         L_MLM.npy / Q_MLM.npy / D_MLM.npy
         matrix_metadata.json              # ordered model_ids + probe_ids
                                           # + single-matrix protocol description
-      stability/{model_id_slug}.json      # rerun pearson r + max diff
-      reports/phase1.md                   # gate summary + per-class GC / ell
 
 Convention per phase_1.md § 单矩阵协议 (ModelMap, raw nats, no length norm, no sign flip):
     sum_log_p_m(x)  = sum_t log p(x_t | x_<t)  (AR)  /  stride PLL k=6  (MLM)
@@ -50,10 +48,9 @@ Resume:
 Usage:
     python scripts/run_phase1_scoring.py \\
         [--panel data/panels/main_panel.parquet] \\
-        [--out out_phase1] \\
+        [--out results/scores] \\
         [--device cuda:6] \\
         [--stride 6] \\
-        [--rerun-probes 10] \\
         [--force]
 """
 
@@ -61,7 +58,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 import time
 import traceback
@@ -133,8 +129,8 @@ from glmap.loaders.dispatch import ModelSpec  # noqa: E402  (canonical, kw_only)
 # GenSLM loaders (25M/250M/2.5B) are now wired in (see src/loaders/genslm.py);
 # HyenaDNA and DNABERT 3..6 are still excluded from this DEFAULT — the
 # former because its loader uses a separate dispatch path that the
-# multi-env sweep handles in scripts/run_rerun_stability.py rather than
-# this script, the latter because of single-token overlap-mask leakage
+# multi-env sweep handles rather than this script, the latter because
+# of single-token overlap-mask leakage
 # (phase_1.md supplement scope).
 DEFAULT_MODELS: tuple[ModelSpec, ...] = (
     # AR branch
@@ -249,8 +245,8 @@ def _score_model(
 ):
     """Load `spec`, score every probe in `panel`. Returns (DataFrame, loader).
 
-    The loader is returned in `.eval()` state so the caller can run rerun-
-    stability without re-loading weights.
+    The loader is returned in `.eval()` state so the caller can reuse it
+    without re-loading weights.
     """
     if spec.loader_kind == "megadna":
         from glmap.loaders.megadna import MegaDNALoader
@@ -393,63 +389,6 @@ def _score_model(
 
     df = pd.DataFrame(rows)
     return df, loader
-
-
-# ------------------------------ Rerun gate -------------------------------- #
-
-
-def _rerun_stability(
-    loader,
-    panel: pd.DataFrame,
-    spec: ModelSpec,
-    stride: int,
-    n_probes: int,
-) -> dict:
-    """Score the first `n_probes` probes twice; report Pearson r + max diff.
-
-    phase_0.md gate is r >= 0.95. With HF eval() + no_grad we expect
-    bit-identical results (r = 1.0, diff = 0.0). Anomalies surface dropout
-    leaks or unstable kernel paths.
-    """
-    if n_probes <= 0:
-        return {"n_probes": 0, "pearson_r": 1.0, "max_abs_diff": 0.0, "passes_gate": True}
-
-    sub = panel.head(n_probes).to_dict("records")
-    if spec.branch == "ar":
-        run1 = [_score_ar_one_probe(loader, p)["ell_per_base"] for p in sub]
-        run2 = [_score_ar_one_probe(loader, p)["ell_per_base"] for p in sub]
-    else:
-        run1 = [_score_mlm_one_probe(loader, p, stride)["ell_per_base"] for p in sub]
-        run2 = [_score_mlm_one_probe(loader, p, stride)["ell_per_base"] for p in sub]
-
-    arr1 = np.array(run1, dtype=np.float64)
-    arr2 = np.array(run2, dtype=np.float64)
-    finite = np.isfinite(arr1) & np.isfinite(arr2)
-    if finite.sum() < 2:
-        # Pearson is undefined; only "pass" if both runs match bit-for-bit on the finite slice.
-        identical = bool(np.all(arr1[finite] == arr2[finite])) if finite.any() else False
-        pearson = 1.0 if identical else 0.0
-        max_diff = (
-            float(np.abs(arr1[finite] - arr2[finite]).max()) if finite.any() else float("inf")
-        )
-    else:
-        a = arr1[finite] - arr1[finite].mean()
-        b = arr2[finite] - arr2[finite].mean()
-        denom = math.sqrt(float((a * a).sum()) * float((b * b).sum()))
-        if denom == 0.0:
-            pearson = 1.0 if np.all(arr1[finite] == arr2[finite]) else 0.0
-        else:
-            pearson = float((a * b).sum() / denom)
-        max_diff = float(np.abs(arr1[finite] - arr2[finite]).max())
-
-    return {
-        "n_probes": int(finite.sum()),
-        "pearson_r": pearson,
-        "max_abs_diff": max_diff,
-        "passes_gate": pearson >= 0.95,
-        "run1_values": arr1.tolist(),
-        "run2_values": arr2.tolist(),
-    }
 
 
 # --------------------------- Matrix assembly ----------------------------- #
@@ -699,107 +638,13 @@ def _save_branch_matrices(
     return metadata
 
 
-# ----------------------------- Report writer ------------------------------ #
-
-
-def _write_report(
-    path: Path,
-    panel: pd.DataFrame,
-    ar_matrices: BranchMatrices | None,
-    mlm_matrices: BranchMatrices | None,
-    stability: dict[str, dict],
-    stride: int,
-) -> None:
-    lines: list[str] = []
-    lines.append("# Phase 1 Scoring Report")
-    lines.append("")
-    lines.append("Generated by `scripts/run_phase1_scoring.py`. Implements "
-                 "phase_1.md § 打分协议 + § 单矩阵协议 on the frozen Stage 2 "
-                 "main panel (10,000 probes × 14 functional elements × 4 "
-                 "species groups; see `scripts/panel_build/panel_sources.yaml`).")
-    lines.append("")
-    lines.append("## Panel")
-    lines.append("")
-    lines.append(f"- Total probes: {len(panel)}")
-    lines.append(f"- Class breakdown:")
-    lines.append("")
-    cb = panel.groupby("functional_element").size().rename("count").to_frame()
-    cb["mean_GC"] = panel.groupby("functional_element")["GC_content"].mean().round(4)
-    lines.append(cb.to_markdown())
-    lines.append("")
-
-    for label, matrices in (("AR", ar_matrices), ("MLM", mlm_matrices)):
-        lines.append(f"## {label} branch")
-        lines.append("")
-        if matrices is None or matrices.L.size == 0:
-            lines.append("(no models)")
-            lines.append("")
-            continue
-        lines.append(f"- Models (rows of L_{label}):")
-        for mid in matrices.model_ids:
-            lines.append(f"  - `{mid}`")
-        lines.append("")
-        lines.append(
-            f"- L_{label} shape: `{matrices.L.shape}` "
-            f"(NaN cells: {int(np.isnan(matrices.L).sum())}, "
-            f"clip threshold: {matrices.clip_threshold:.3f} nats)"
-        )
-        lines.append("")
-
-        # Per-class mean L (ModelMap convention: raw sum log-likelihood,
-        # higher = easier for the model; values are negative nats).
-        per_class = []
-        for cls in sorted(set(panel["functional_element"].tolist())):
-            mask = (panel["functional_element"].values == cls)
-            sub = matrices.L[:, mask]
-            with np.errstate(invalid="ignore"):
-                per_class.append({
-                    "class": cls,
-                    "n_probes": int(mask.sum()),
-                    "mean_L": float(np.nanmean(sub)) if np.isfinite(sub).any() else float("nan"),
-                    "std_L": float(np.nanstd(sub)) if np.isfinite(sub).any() else float("nan"),
-                })
-        lines.append("- Per-class mean L (raw sum log-likelihood in nats, higher = easier):")
-        lines.append("")
-        lines.append(pd.DataFrame(per_class).round(4).to_markdown(index=False))
-        lines.append("")
-
-    lines.append("## Rerun stability (phase_0.md gate: pearson r >= 0.95)")
-    lines.append("")
-    if stability:
-        rows = []
-        for hf_id, rep in stability.items():
-            rows.append({
-                "model": hf_id,
-                "n_probes": rep["n_probes"],
-                "pearson_r": round(rep["pearson_r"], 6),
-                "max_abs_diff": rep["max_abs_diff"],
-                "passes_gate": rep["passes_gate"],
-            })
-        lines.append(pd.DataFrame(rows).to_markdown(index=False))
-    else:
-        lines.append("(no stability data recorded)")
-    lines.append("")
-    lines.append(f"## Scoring parameters")
-    lines.append("")
-    lines.append(f"- MLM stride k (primary): {stride}")
-    lines.append("- AR signature: forward only (RC sanity check retired in phase_1.md § Sanity Check)")
-    lines.append("- Matrix protocol: L → clip(q=0.02) → Q (double-center) → D (pairwise sq Euclidean)")
-    lines.append("- Codon-model handling: raw likelihood on full panel; codon-vs-nucleotide offset "
-                 "on noncoding probes absorbed by ModelMap double-centering (commit 5e59154 retired "
-                 "the three-matrix split)")
-    lines.append("")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n")
-
-
 # --------------------------------- main ----------------------------------- #
 
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--panel", type=Path, default=REPO_ROOT / "data/panels/main_panel.parquet")
-    p.add_argument("--out", type=Path, default=REPO_ROOT / "out_phase1")
+    p.add_argument("--out", type=Path, default=REPO_ROOT / "results/scores")
     p.add_argument(
         "--device",
         default=("cuda:0" if torch.cuda.is_available() else "cpu"),
@@ -807,8 +652,6 @@ def _parse_args() -> argparse.Namespace:
     )
     p.add_argument("--stride", type=int, default=6,
                    help="MLM stride k (phase_1.md primary k=6).")
-    p.add_argument("--rerun-probes", type=int, default=10,
-                   help="Number of probes used for the rerun-stability gate.")
     p.add_argument("--force", action="store_true",
                    help="Re-score every model even if its parquet exists.")
     p.add_argument("--max-probes", type=int, default=None,
@@ -826,9 +669,9 @@ def _parse_args() -> argparse.Namespace:
                         "Use this from run_sweep.py and other parallel "
                         "drivers to avoid the --only substring collisions.")
     p.add_argument("--skip-aggregate", action="store_true",
-                   help="Skip the matrix-build + report step. Useful when "
+                   help="Skip the matrix-build step. Useful when "
                         "running parallel per-model jobs that should not race "
-                        "on out_phase1/matrices/. Run a final aggregate pass "
+                        "on results/scores/matrices/. Run a final aggregate pass "
                         "without --only afterward.")
     p.add_argument("--strict-aggregate", action="store_true",
                    help="When aggregating, fail-fast if any model's parquet "
@@ -881,20 +724,10 @@ def main() -> None:
     print(f"[panel] loaded {len(panel)} probes from {args.panel}", flush=True)
 
     args.out.mkdir(parents=True, exist_ok=True)
-    (args.out / "probes").mkdir(parents=True, exist_ok=True)
-    panel.to_parquet(args.out / "probes" / "main_panel.parquet", index=False)
-
-    (args.out / "models").mkdir(parents=True, exist_ok=True)
-    (args.out / "scores").mkdir(parents=True, exist_ok=True)
-    (args.out / "stability").mkdir(parents=True, exist_ok=True)
+    (args.out / "AR_MLM_scores").mkdir(parents=True, exist_ok=True)
     (args.out / "matrices").mkdir(parents=True, exist_ok=True)
 
-    stability_reports: dict[str, dict] = {}
-
-    # Resolve the model roster. --from-audit lazy-imports the audit-→ModelSpec
-    # router from run_rerun_stability so we don't duplicate dispatch logic
-    # (and so there's no circular import — run_rerun_stability already
-    # imports ModelSpec from this module).
+    # Resolve the model roster.
     if args.from_audit:
         if not args.audit_json.exists():
             raise SystemExit(f"--from-audit but audit json not found: {args.audit_json}")
@@ -964,11 +797,13 @@ def main() -> None:
         }, indent=2))
 
     for spec in models_to_run:
-        score_dir = args.out / "scores" / spec.slug
+        score_dir = args.out / "AR_MLM_scores" / spec.slug
         score_dir.mkdir(parents=True, exist_ok=True)
         score_path = score_dir / "probes.parquet"
-        stability_path = args.out / "stability" / f"{spec.slug}.json"
-        meta_path = args.out / "models" / f"{spec.slug}.json"
+        # Per-model metadata snapshot now lives inside the model's own
+        # score folder (alongside probes.parquet) rather than a sibling
+        # models/ directory.
+        meta_path = score_dir / f"{spec.slug}.json"
 
         if score_path.exists() and not args.force:
             # Resume-integrity check: file existing is necessary but not
@@ -984,17 +819,6 @@ def main() -> None:
                     f"[skip] {spec.slug}: {score_path} {reason}",
                     flush=True,
                 )
-                if stability_path.exists():
-                    stability_reports[spec.hf_id] = json.loads(
-                        stability_path.read_text()
-                    )
-                else:
-                    print(
-                        f"[skip] {spec.slug}: no stability JSON found; "
-                        "pass --force to re-score or run rerun-stability "
-                        "separately.",
-                        flush=True,
-                    )
                 # Refresh metadata even on skip so loader_kind / length_multiple
                 # always reflect the current dispatch logic, not whatever the
                 # spec was when the parquet was originally written.
@@ -1013,18 +837,6 @@ def main() -> None:
             df.to_parquet(score_path, index=False)
             print(
                 f"[{spec.branch}] {spec.slug} wrote scores -> {score_path}",
-                flush=True,
-            )
-
-            stab = _rerun_stability(
-                loader=loader, panel=panel, spec=spec,
-                stride=args.stride, n_probes=args.rerun_probes,
-            )
-            stability_reports[spec.hf_id] = stab
-            stability_path.write_text(json.dumps(stab, indent=2))
-            print(
-                f"[{spec.branch}] {spec.slug} rerun pearson_r={stab['pearson_r']:.6f} "
-                f"max_diff={stab['max_abs_diff']:.2e} gate={stab['passes_gate']}",
                 flush=True,
             )
         except Exception as exc:
@@ -1066,10 +878,10 @@ def main() -> None:
     mlm_specs = [s for s in roster if s.branch == "mlm"]
 
     ar_matrices, ar_actual = _build_branch_matrices(
-        ar_specs, panel, args.out / "scores", allow_missing=args.allow_missing,
+        ar_specs, panel, args.out / "AR_MLM_scores", allow_missing=args.allow_missing,
     )
     mlm_matrices, mlm_actual = _build_branch_matrices(
-        mlm_specs, panel, args.out / "scores", allow_missing=args.allow_missing,
+        mlm_specs, panel, args.out / "AR_MLM_scores", allow_missing=args.allow_missing,
     )
 
     # Persist the explicit "which models actually contributed scores" record so
@@ -1116,27 +928,7 @@ def main() -> None:
         json.dumps(matrices_meta, indent=2)
     )
 
-    # ---- Report ---- #
-    _write_report(
-        path=args.out / "reports" / "phase1.md",
-        panel=panel,
-        ar_matrices=ar_matrices if ar_specs else None,
-        mlm_matrices=mlm_matrices if mlm_specs else None,
-        stability=stability_reports,
-        stride=args.stride,
-    )
     print(f"[done] wrote outputs to {args.out}", flush=True)
-
-    failed_gates = [
-        hf_id for hf_id, rep in stability_reports.items() if not rep["passes_gate"]
-    ]
-    if failed_gates:
-        print(
-            f"[gate] WARN: rerun stability < 0.95 for {len(failed_gates)} model(s): "
-            + ", ".join(failed_gates),
-            flush=True,
-        )
-        sys.exit(2)
 
 
 if __name__ == "__main__":

@@ -3,12 +3,12 @@
 single-matrix protocol outputs from scripts/run_phase1_scoring.py.
 
 Consumes:
-    out_phase1/matrices/{Q_AR,Q_MLM}.npy
-    out_phase1/matrices/matrix_metadata.json  (ordered model_ids + probe_ids)
-    out_phase1/probes/main_panel.parquet      (probe_id, functional_element, GC_content)
+    results/scores/matrices/{Q_AR,Q_MLM}.npy
+    results/scores/matrices/matrix_metadata.json  (ordered model_ids + probe_ids)
+    data/panels/main_panel.parquet                (probe_id, functional_element, GC_content)
 
 Emits:
-    out_phase1/analysis/
+    results/scores/analysis/
       pca/{matrix_name}/Z.npy V_T.npy sigma.json explained_variance.json
       diagnostics/heterozygosity_{matrix_name}.parquet
       diagnostics/gc_axis.json
@@ -39,7 +39,7 @@ per branch with non-degenerate axis splits; AR (8 models) clears that bar,
 MLM (5 models) does not.
 
 Usage:
-    python scripts/run_phase1_analysis.py [--in out_phase1] [--out out_phase1/analysis]
+    python scripts/run_phase1_analysis.py [--in results/scores] [--out results/scores/analysis]
 """
 
 from __future__ import annotations
@@ -203,8 +203,11 @@ def analyze_matrix(
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--in-dir", type=Path,
-                   default=REPO_ROOT / "out_phase1",
-                   help="Phase 1 scoring root (contains matrices/, probes/, ...)")
+                   default=REPO_ROOT / "results/scores",
+                   help="Phase 1 scoring root (contains matrices/, ...)")
+    p.add_argument("--panel", type=Path,
+                   default=REPO_ROOT / "data/panels" / "main_panel.parquet",
+                   help="Panel parquet (probe_id, functional_element, GC_content).")
     p.add_argument("--out", type=Path, default=None,
                    help="Output dir; default <in-dir>/analysis")
     return p.parse_args()
@@ -218,7 +221,7 @@ def main() -> None:
     if not (in_dir / "matrices" / "matrix_metadata.json").exists():
         raise SystemExit(f"matrix_metadata.json not found under {in_dir / 'matrices'}")
     metadata = json.loads((in_dir / "matrices" / "matrix_metadata.json").read_text())
-    panel = pd.read_parquet(in_dir / "probes" / "main_panel.parquet")
+    panel = pd.read_parquet(args.panel)
     print(f"[input] panel {len(panel)} probes; matrix_metadata covers "
           f"{sum(1 for k in metadata if k.startswith('Q_'))} Q matrices")
 
@@ -476,7 +479,7 @@ def _write_report(
     )
     lines.append(
         "- Phase 1 model selection is intentionally narrow: HyenaDNA is "
-        "scored via the multi-env sweep (scripts/run_rerun_stability.py) "
+        "scored via the multi-env sweep (scripts/run_sweep.py) "
         "rather than this script's DEFAULT_MODELS; DNABERT k=3..6 are "
         "excluded due to single-token overlap-mask leakage (phase_1.md "
         "supplement scope). The 123-model expanded set is the Stage 4 / "

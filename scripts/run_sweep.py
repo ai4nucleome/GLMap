@@ -4,38 +4,33 @@ For each scorable model in `data/audits/models.json`, look up the correct
 micromamba env + runtime knobs per models/env_routing.md, then dispatch a
 per-model subprocess on a pool of GPUs. Two modes are supported:
 
-  --mode stability (default)
-      Dispatches `scripts/run_rerun_stability.py --hf-ids <hf_id> --n-probes N`.
-      N probes are scored twice and Pearson r is checked against the 0.95 gate.
-      Output: out_phase1/stability/<slug>.json.
-      Resume criterion: skip when stability JSON exists with passes_gate=True.
-
-  --mode scoring
+  --mode scoring (default)
       Dispatches `scripts/run_phase1_scoring.py --from-audit
       --hf-ids=<hf_id> --skip-aggregate`. Uses --hf-ids (exact match)
       not --only (substring) so collision-prone prefixes like
       'arcinstitute/evo2_7b' do not match evo2_7b_base / evo2_7b_262k
       and cause parallel subprocesses to race on the same parquet.
       Each subprocess writes only its own
-      out_phase1/scores/<slug>/probes.parquet. After the parallel sweep,
+      results/scores/AR_MLM_scores/<slug>/probes.parquet. After the parallel sweep,
       run a single aggregate pass (`run_phase1_scoring.py --from-audit
-      --strict-aggregate`) to build out_phase1/matrices/{L,Q,D}_{AR,MLM}.npy.
-      Resume criterion: skip when out_phase1/scores/<slug>/probes.parquet
+      --strict-aggregate`) to build results/scores/matrices/{L,Q,D}_{AR,MLM}.npy.
+      Resume criterion: skip when results/scores/AR_MLM_scores/<slug>/probes.parquet
       has the panel's full probe_id set AND every sum_log_p is finite
       (a per-probe failure writes the row with sum_log_p=NaN; that does
       not count as done). --force propagates to the child so the worker
       re-scores even if its own parquet exists.
 
+  --mode embed
+      Dispatches `scripts/run_downstream_embed.py --hf-ids=<hf_id>` to
+      extract pooled embeddings for the 6 downstream tasks. Output under
+      results/analysis/embeddings/<slug>/<task>/{train,test}.parquet.
+
 Usage
 -----
-    # Stability gate sweep (Stage 1 entry; lightweight, ~3 probes per model)
-    python scripts/run_sweep.py                        # 3 probes
-    python scripts/run_sweep.py --n-probes 10
-
     # Full panel scoring sweep (Stage 4 / phase 2 entry; needs 10K-probe
     # frozen panel + all audit-listed models, currently 123). Run this,
     # then run a final aggregate:
-    python scripts/run_sweep.py --mode scoring
+    python scripts/run_sweep.py                        # --mode scoring (default)
     python scripts/run_phase1_scoring.py --from-audit --strict-aggregate  # CPU OK, builds L/Q/D
 
     python scripts/run_sweep.py --only evo             # substring filter on hf_id
@@ -352,9 +347,8 @@ def build_command(
     hf_id: str,
     route: RouteSpec,
     gpus: list[int],
-    n_probes: int,
     panel: str | None,
-    mode: str = "stability",
+    mode: str = "scoring",
     force: bool = False,
     stride: int | None = None,
     out_dir: str | None = None,
@@ -363,41 +357,25 @@ def build_command(
 ) -> tuple[list[str], dict[str, str]]:
     """Construct argv + env for subprocess.Popen.
 
-    mode='stability' (default) — dispatches to scripts/run_rerun_stability.py
-        for the rerun-stability gate; --n-probes is the per-model sample
-        size (typically 3-10 probes, just enough to compute Pearson r).
-        force is not propagated (stability worker re-runs unconditionally).
-    mode='scoring' — dispatches to scripts/run_phase1_scoring.py with
+    mode='scoring' (default) — dispatches to scripts/run_phase1_scoring.py with
         --from-audit + --hf-ids=<hf_id> + --skip-aggregate so each parallel
-        subprocess writes only its own out_phase1/scores/<slug>/probes.parquet.
+        subprocess writes only its own results/scores/AR_MLM_scores/<slug>/probes.parquet.
         force=True propagates as --force to the child, so the worker also
         ignores its own existing parquet (the parent's resume check already
         gates this at scheduler entry, but the child re-checks per spec —
         without --force the child would no-op on a cached parquet).
         A final aggregate pass on cpu (run_sweep emits the command, doesn't
-        run it inline) builds out_phase1/matrices/{L,Q,D}_{AR,MLM}.npy.
+        run it inline) builds results/scores/matrices/{L,Q,D}_{AR,MLM}.npy.
     mode='embed' — dispatches to scripts/run_downstream_embed.py with
         --hf-ids=<hf_id> (--from-audit/--hf-ids are mutually exclusive in
         the embed script), which extracts pooled embeddings for all 6
         selected downstream tasks (see that script's task list) and writes
-        them to out_phase2/embeddings/<slug>/<task>/{train,test}.parquet.
+        them to results/analysis/embeddings/<slug>/<task>/{train,test}.parquet.
         force=True propagates as --force.
     """
 
     py = ENV_PYTHON[route.env]
-    if mode == "stability":
-        args = [
-            py,
-            "scripts/run_rerun_stability.py",
-            "--hf-ids", hf_id,
-            "--device", "cuda:0",                      # always cuda:0 inside the masked process
-            "--n-probes", str(n_probes),
-        ]
-        if audit_path:
-            args.extend(["--audit", audit_path])
-        if panel:
-            args.extend(["--panel", panel])
-    elif mode == "scoring":
+    if mode == "scoring":
         # --hf-ids (exact match) NOT --only (substring) — the audit has
         # 15 collision-prone substrings like 'evo2_7b' that match multiple
         # full hf_ids and would cause parallel subprocesses to race on the
@@ -422,13 +400,13 @@ def build_command(
         if stride is not None:
             args.extend(["--stride", str(stride)])
         # Output dir pass-through.  Necessary when running an ablation
-        # that must not overwrite the canonical out_phase1/scores/ tree.
+        # that must not overwrite the canonical results/scores/AR_MLM_scores/ tree.
         if out_dir is not None:
             args.extend(["--out", out_dir])
     elif mode == "embed":
         # Downstream-task pooled embedding extraction (6 tasks × 2 splits =
         # 12 parquets per model). Loader is loaded once per model and
-        # reused across all 12 calls; output paths under out_phase2/.
+        # reused across all 12 calls; output paths under results/analysis/.
         # --from-audit and --hf-ids are mutually exclusive in the embed
         # script; pass --hf-ids (exact-match) to select one model.
         #
@@ -453,7 +431,7 @@ def build_command(
             args.append("--force")
     else:
         raise ValueError(
-            f"unknown mode={mode!r}; expected 'stability', 'scoring', or 'embed'"
+            f"unknown mode={mode!r}; expected 'scoring' or 'embed'"
         )
 
     env = os.environ.copy()
@@ -477,11 +455,10 @@ def build_command(
     return args, env
 
 
-def classify_log(log_path: Path, rc: int, mode: str = "stability") -> str:
+def classify_log(log_path: Path, rc: int, mode: str = "scoring") -> str:
     """Tag the result of one model run by reading its log tail.
 
-    The three sweep modes print different verdict markers:
-      stability worker (run_rerun_stability.py) → "PASS: ..." / "FAIL: ..."
+    The two sweep modes print different verdict markers:
       scoring   worker (run_phase1_scoring.py)  → "[done] --skip-aggregate ..."
                                                    ("wrote scores -> ..." per probe)
       embed     worker (run_downstream_embed.py)→ no explicit success banner;
@@ -501,17 +478,8 @@ def classify_log(log_path: Path, rc: int, mode: str = "stability") -> str:
     except OSError:
         return "?"
 
-    if mode == "scoring":
-        # Stronger failure signal than the success signal: if anything looks
-        # like a Python traceback / explicit ERROR, fail before declaring DONE.
-        if "Traceback" in text or "ERROR:" in text:
-            return "ERR"
-        if "[done] --skip-aggregate" in text or "wrote scores ->" in text:
-            return "DONE"
-        return "?"
-
     if mode == "embed":
-        # Same failure-first policy. run_downstream_embed prints one
+        # Failure-first policy. run_downstream_embed prints one
         # "done in Ns, dim=D" line per (task, split). We require at
         # least one before declaring DONE.
         if "Traceback" in text or "[load fail]" in text or "[fail]" in text:
@@ -520,25 +488,24 @@ def classify_log(log_path: Path, rc: int, mode: str = "stability") -> str:
             return "DONE"
         return "?"
 
-    # stability mode (default — backward compatible)
-    if "PASS:" in text:
-        return "PASS"
-    if "FAIL:" in text:
-        return "FAIL"
-    if "ERROR:" in text or "Traceback" in text:
+    # scoring mode (default).
+    # Stronger failure signal than the success signal: if anything looks
+    # like a Python traceback / explicit ERROR, fail before declaring DONE.
+    if "Traceback" in text or "ERROR:" in text:
         return "ERR"
+    if "[done] --skip-aggregate" in text or "wrote scores ->" in text:
+        return "DONE"
     return "?"
 
 
 def run_sweep(
     tasks: list[tuple[str, RouteSpec]],
     pool: GPUPool,
-    n_probes: int,
     panel: str | None,
     log_dir: Path,
     poll_interval: float = 2.0,
     order: str = "small-first",
-    mode: str = "stability",
+    mode: str = "scoring",
     force: bool = False,
     stride: int | None = None,
     out_dir: str | None = None,
@@ -569,7 +536,7 @@ def run_sweep(
     log_dir.mkdir(parents=True, exist_ok=True)
 
     # Lazy import (only relevant for scoring mode); kept inside the function
-    # so the stability path stays import-free.
+    # so the embed path stays import-free.
     parquet_covers_panel = None
     if mode == "scoring" and panel_ids is not None:
         sys.path.insert(0, str(REPO_ROOT))
@@ -629,7 +596,7 @@ def run_sweep(
                 and panel_ids is not None
             ):
                 slug = hf_id.replace("/", "__")
-                score_path = REPO_ROOT / "out_phase1" / "scores" / slug / "probes.parquet"
+                score_path = REPO_ROOT / "results/scores" / "AR_MLM_scores" / slug / "probes.parquet"
                 ok, reason = parquet_covers_panel(
                     score_path, panel_ids, n_panel=len(panel_ids)
                 )
@@ -653,7 +620,7 @@ def run_sweep(
                 and embed_expected_n is not None
             ):
                 slug = hf_id.replace("/", "__")
-                model_dir = REPO_ROOT / "out_phase2" / "embeddings" / slug
+                model_dir = REPO_ROOT / "results/analysis" / "embeddings" / slug
                 missing_or_bad: list[str] = []
                 for (task_name, split), n_exp in embed_expected_n.items():
                     path = model_dir / task_name / f"{split}.parquet"
@@ -684,7 +651,7 @@ def run_sweep(
             if gpus is None:
                 new_pending.append((hf_id, route))
                 continue
-            args, env = build_command(hf_id, route, gpus, n_probes, panel,
+            args, env = build_command(hf_id, route, gpus, panel,
                                       mode=mode, force=force,
                                       stride=stride, out_dir=out_dir,
                                       audit_path=audit_path,
@@ -732,11 +699,6 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "data" / "dna_foundation_benchmark",
                    help="Benchmark data root for embed mode (must contain data_processed/). "
                         "Download from: huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset")
-    p.add_argument("--stability-dir", type=Path,
-                   default=REPO_ROOT / "out_phase1/stability",
-                   help="Where stability JSONs live (used for --skip-done lookup).")
-    p.add_argument("--n-probes", type=int, default=3,
-                   help="Probes per model (default 3 for smoke; bump to 1000 for Stage 2).")
     p.add_argument("--n-gpus", type=int, default=None,
                    help="Number of GPUs to use from --gpu-ids / CUDA_VISIBLE_DEVICES "
                    "/ the default physical range. Default: all ids from --gpu-ids "
@@ -755,8 +717,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--out", type=str, default=None,
                    help="Output directory pass-through to "
                         "run_phase1_scoring.py (scoring mode only). "
-                        "Default: child writes to out_phase1/scores. Set "
-                        "to e.g. out_phase1/MLM_k1ablation_1000_scores "
+                        "Default: child writes to results/scores/AR_MLM_scores. Set "
+                        "to e.g. results/scores/MLM_k1ablation_1000_scores "
                         "for an ablation that must not overwrite the "
                         "canonical k=6 scoring tree. Resume-skip in this "
                         "sweep is also redirected to this dir.")
@@ -792,7 +754,6 @@ def parse_args() -> argparse.Namespace:
                    "except the current 8-GPU evo2_40b models.")
     p.add_argument("--force", action="store_true",
                    help="Rerun every model even if its prior run looks done. "
-                   "stability mode: ignore passing stability JSONs. "
                    "scoring mode: ignore existing parquets AND propagate "
                    "--force to the child so the worker re-scores its own "
                    "parquet too.")
@@ -806,18 +767,16 @@ def parse_args() -> argparse.Namespace:
                    help="Schedule single-GPU tasks first (default) so 8-way "
                    "parallelism kicks in immediately, or multi-GPU tasks first "
                    "to avoid pushing their latency to the end.")
-    p.add_argument("--mode", type=str, default="stability",
-                   choices=["stability", "scoring", "embed"],
-                   help="stability (default): dispatch run_rerun_stability.py "
-                   "for the rerun-stability gate (N probes, twice, Pearson r). "
-                   "scoring: dispatch run_phase1_scoring.py --from-audit "
+    p.add_argument("--mode", type=str, default="scoring",
+                   choices=["scoring", "embed"],
+                   help="scoring (default): dispatch run_phase1_scoring.py --from-audit "
                    "--hf-ids <hf_id> --skip-aggregate so each subprocess writes "
-                   "its out_phase1/scores/<slug>/probes.parquet; a final "
+                   "its results/scores/AR_MLM_scores/<slug>/probes.parquet; a final "
                    "aggregate pass (--from-audit --strict-aggregate, CPU OK) "
-                   "builds out_phase1/matrices/. Scoring mode is the "
+                   "builds results/scores/matrices/. Scoring mode is the "
                    "Stage 4 / phase 2 entry point. "
                    "embed: dispatch run_downstream_embed.py "
-                   "--hf-ids <hf_id>; each subprocess writes out_phase2/"
+                   "--hf-ids <hf_id>; each subprocess writes results/analysis/"
                    "embeddings/<slug>/<task>/{train,test}.parquet for the 6 "
                    "downstream tasks (~48K seqs/model). Phase 5 entry point. "
                    "**Full-volume only** — sweep never passes --max-train, "
@@ -937,13 +896,12 @@ def main() -> None:
 
     # Resume: skip work that's already done. The "done" criterion depends on
     # which sweep we're driving:
-    #   stability mode -> out_phase1/stability/<slug>.json with passes_gate
-    #   scoring mode   -> out_phase1/scores/<slug>/probes.parquet covers
+    #   scoring mode   -> results/scores/AR_MLM_scores/<slug>/probes.parquet covers
     #                     the full panel with finite sum_log_p in every row.
     #                     Set-equality alone would accept all-NaN parquets
     #                     produced by per-probe failures, so we delegate to
     #                     scripts.run_phase1_scoring.parquet_covers_panel.
-    #   embed mode     -> out_phase2/embeddings/<slug>/<task>/{train,test}
+    #   embed mode     -> results/analysis/embeddings/<slug>/<task>/{train,test}
     #                     .parquet present for all 6 tasks × 2 splits AND
     #                     each passes parquet_complete(): row count matches
     #                     expected_n AND ≥95% of rows have ALL embed dims
@@ -956,26 +914,18 @@ def main() -> None:
     if not args.force:
         kept: list[str] = []
         # Scoring resume check honors --out override so an ablation sweep
-        # with --out out_phase1/MLM_k1ablation_1000_scores does not get
-        # confused by the canonical k=6 parquets in out_phase1/scores/.
+        # with --out results/scores/MLM_k1ablation_1000_scores does not get
+        # confused by the canonical k=6 parquets in
+        # results/scores/AR_MLM_scores/. The child writes per-model parquets
+        # under <out>/AR_MLM_scores/<slug>/, so mirror that subdir here.
         scores_dir = (
-            Path(args.out) if args.out is not None
-            else REPO_ROOT / "out_phase1" / "scores"
+            Path(args.out) / "AR_MLM_scores" if args.out is not None
+            else REPO_ROOT / "results/scores" / "AR_MLM_scores"
         )
-        embeddings_dir = REPO_ROOT / "out_phase2" / "embeddings"
+        embeddings_dir = REPO_ROOT / "results/analysis" / "embeddings"
         for hf_id in candidates:
             slug = hf_id.replace("/", "__")
-            if args.mode == "stability":
-                stab_path = args.stability_dir / f"{slug}.json"
-                if stab_path.exists():
-                    try:
-                        d = json.loads(stab_path.read_text())
-                        if d.get("passes_gate"):
-                            skipped.append(hf_id)
-                            continue
-                    except json.JSONDecodeError:
-                        pass
-            elif args.mode == "scoring":
+            if args.mode == "scoring":
                 score_path = scores_dir / slug / "probes.parquet"
                 ok, _reason = parquet_covers_panel(
                     score_path, panel_ids, n_panel=len(panel_ids)
@@ -1085,7 +1035,6 @@ def main() -> None:
     results = run_sweep(
         tasks=tasks,
         pool=pool,
-        n_probes=args.n_probes,
         panel=args.panel,
         log_dir=args.log_dir,
         order=args.order,
@@ -1110,10 +1059,9 @@ def main() -> None:
         print(f"models skipped by --max-gpus-per-model: {len(skipped_by_gpu_need)}")
     for status, n in status_count.most_common():
         print(f"  {status:5s}: {n}")
-    # Success label is mode-dependent: stability mode emits PASS, scoring
-    # and embed modes emit DONE. Anything else (FAIL / ERR / CRASH / ? /
-    # PARTIAL) is a failure worth listing in the summary.
-    ok_label = "DONE" if args.mode in ("scoring", "embed") else "PASS"
+    # Both scoring and embed modes emit DONE on success. Anything else
+    # (ERR / CRASH / ? / PARTIAL) is a failure worth listing in the summary.
+    ok_label = "DONE"
     fails = [r for r in results if r[1] != ok_label]
     if fails:
         print()

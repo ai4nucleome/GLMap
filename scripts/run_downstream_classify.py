@@ -2,10 +2,10 @@
 """Phase 5 (downstream eval): linear probe AUC for each (model, task) pair.
 
 Reads embeddings written by `scripts/run_downstream_embed.py`
-(out_phase2/embeddings/<model>/<task>/{train,test}.parquet), fits an L2
+(results/analysis/embeddings/<model>/<task>/{train,test}.parquet), fits an L2
 logistic regression with C grid via 5-fold CV on train, evaluates on
 test, and writes a result JSON per (model, task) to
-out_phase2/downstream/<model>/<task>/result.json containing:
+results/analysis/downstream/<model>/<task>/result.json containing:
 
     {
       "model": <hf_id>,
@@ -31,13 +31,13 @@ is written into the per-pair result.json as `auc_average` so future
 multiclass additions can be audited.
 
 Aggregate (every invocation, regardless of --hf-ids / --tasks filter):
-    out_phase2/matrices/auc_matrix.npy    (M, T) float64
-    out_phase2/matrices/auc_matrix_meta.json    {model_ids, task_ids,
+    results/analysis/matrices/auc_matrix.npy    (M, T) float64
+    results/analysis/matrices/auc_matrix_meta.json    {model_ids, task_ids,
                                                   aggregate_scope=
                                                   "all_existing_results",
                                                   generated_at_utc, ...}
 
-The aggregate ALWAYS rescans the full out_phase2/downstream/ tree, even
+The aggregate ALWAYS rescans the full results/analysis/downstream/ tree, even
 when this invocation's per-pair fit was filtered. This way a partial
 re-fit (e.g. `--hf-ids HuggingFaceBio/Carbon-3B` to refresh one model)
 patches the matrix in place without orphaning the rest. Consumers
@@ -73,9 +73,9 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--embeddings-dir", type=Path,
-                   default=REPO_ROOT / "out_phase2/embeddings")
+                   default=REPO_ROOT / "results/analysis/embeddings")
     p.add_argument("--out", type=Path,
-                   default=REPO_ROOT / "out_phase2",
+                   default=REPO_ROOT / "results/analysis",
                    help="Output root; downstream/ and matrices/ written here.")
     p.add_argument("--hf-ids", type=str, default=None,
                    help="Comma-separated EXACT hf_id list to classify.")
@@ -106,7 +106,7 @@ def parse_args() -> argparse.Namespace:
                         "known-broken (model, task) pair across all "
                         "future runs, use --hf-ids / --tasks to filter "
                         "it out of discovery, or move its embedding "
-                        "parquet directory out of out_phase2/embeddings/ "
+                        "parquet directory out of results/analysis/embeddings/ "
                         "— deleting the cached result.json does NOT "
                         "freeze it, the pair would be re-discovered via "
                         "its embedding parquets and refit on the next "
@@ -380,7 +380,7 @@ def main() -> None:
             #
             # To PERMANENTLY exclude a known-broken (model, task) pair,
             # filter it out of discovery via --hf-ids / --tasks, or move
-            # its embedding parquet directory out of out_phase2/embeddings/.
+            # its embedding parquet directory out of results/analysis/embeddings/.
             # Deleting the cached result.json does NOT freeze it — the
             # pair is re-discovered from its embedding parquets every
             # run (see the `pairs` loop earlier in main()) and would
@@ -685,7 +685,7 @@ def main() -> None:
         "n_finite": int(np.isfinite(auc_matrix).sum()),
         "n_missing": int(np.isnan(auc_matrix).sum()),
         # Document that the matrix is built from EVERY result.json
-        # under out_phase2/downstream/ regardless of this invocation's
+        # under results/analysis/downstream/ regardless of this invocation's
         # filter scope. Consumers that need "results from this exact
         # run only" should look at per-pair result.json instead.
         "aggregate_scope": "all_existing_results",
@@ -738,7 +738,7 @@ def main() -> None:
         if args.tasks:
             scopes_used.append("--tasks")
         scope_note = (
-            "  [note] re-aggregated full out_phase2/downstream/ tree "
+            "  [note] re-aggregated full results/analysis/downstream/ tree "
             "even though the per-pair fit was scoped by "
             + " + ".join(scopes_used)
         )

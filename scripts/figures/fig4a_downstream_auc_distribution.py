@@ -20,8 +20,8 @@ printed to stdout and in the paper caption.
 
 Inputs
 ------
-  out_phase2/matrices/auc_matrix.npy        — (123, 6) per-model AUC
-  out_phase2/matrices/auc_matrix_meta.json  — model_ids + task_ids
+  results/analysis/matrices/auc_matrix.npy        — (123, 6) per-model AUC
+  results/analysis/matrices/auc_matrix_meta.json  — model_ids + task_ids
   data/audits/models.json                   — branch labels
 
 Output
@@ -79,9 +79,9 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--auc-matrix", type=Path,
-                   default=REPO_ROOT / "out_phase2/matrices/auc_matrix.npy")
+                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix.npy")
     p.add_argument("--auc-meta", type=Path,
-                   default=REPO_ROOT / "out_phase2/matrices/auc_matrix_meta.json")
+                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix_meta.json")
     p.add_argument("--audit", type=Path,
                    default=REPO_ROOT / "data/audits/models.json")
     p.add_argument("--sort-tasks", type=str, default="median",

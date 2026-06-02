@@ -181,12 +181,12 @@ _HF_PANEL_FILES = {
 }
 
 _MATRIX_PATHS = {
-    "V_AR":  "out_phase1/matrices/L_AR.npy",
-    "Vd_AR": "out_phase1/matrices/Q_AR.npy",
-    "D_AR":  "out_phase1/matrices/D_AR.npy",
-    "V_MLM":  "out_phase1/matrices/L_MLM.npy",
-    "Vd_MLM": "out_phase1/matrices/Q_MLM.npy",
-    "D_MLM":  "out_phase1/matrices/D_MLM.npy",
+    "V_AR":  "results/scores/matrices/L_AR.npy",
+    "Vd_AR": "results/scores/matrices/Q_AR.npy",
+    "D_AR":  "results/scores/matrices/D_AR.npy",
+    "V_MLM":  "results/scores/matrices/L_MLM.npy",
+    "Vd_MLM": "results/scores/matrices/Q_MLM.npy",
+    "D_MLM":  "results/scores/matrices/D_MLM.npy",
 }
 
 

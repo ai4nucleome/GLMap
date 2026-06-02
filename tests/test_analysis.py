@@ -219,7 +219,6 @@ def test_phase1_analysis_main_runs_on_synthetic_fixture(tmp_path) -> None:
     in_dir = tmp_path / "phase1_in"
     out_dir = tmp_path / "phase1_out"
     (in_dir / "matrices").mkdir(parents=True)
-    (in_dir / "probes").mkdir(parents=True)
 
     # 6 models × 8 probes synthetic Q. Two groups visibly differ on
     # the first 4 probes — multivariate F_ST should be > 0.
@@ -252,12 +251,14 @@ def test_phase1_analysis_main_runs_on_synthetic_fixture(tmp_path) -> None:
         "functional_element": ["promoter"] * 4 + ["enhancer"] * 4,
         "GC_content": rng.uniform(0.3, 0.7, size=8),
     })
-    panel.to_parquet(in_dir / "probes" / "main_panel.parquet", index=False)
+    panel_path = in_dir / "panel.parquet"
+    panel.to_parquet(panel_path, index=False)
 
     PY = "/nvme-data3/yusen/micomamba/bin/python"
     proc = subprocess.run(
         [PY, str(REPO_ROOT / "scripts/run_phase1_analysis.py"),
-         "--in-dir", str(in_dir), "--out", str(out_dir)],
+         "--in-dir", str(in_dir), "--panel", str(panel_path),
+         "--out", str(out_dir)],
         capture_output=True, text=True, timeout=120,
     )
     assert proc.returncode == 0, (

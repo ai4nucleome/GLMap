@@ -20,7 +20,7 @@ Important: GENERanno is **not** GENERator. The two share an organization
 on HuggingFace but use different tokenizers — GENERanno-eukaryote/prokaryote
 ship a single-nucleotide tokenizer (1 token per base, no ``<oov>``) and
 must continue to route through the plain `HFCausalLMLoader` /
-`HFMaskedLMLoader`. The dispatch in `scripts/run_rerun_stability.py`
+`HFMaskedLMLoader`. The dispatch in `glmap.loaders.dispatch`
 explicitly excludes GENERanno from this loader.
 """
 

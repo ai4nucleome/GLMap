@@ -7,7 +7,7 @@ the six-task mean AUC.
 
 Inputs
 ------
-  out_phase2/phenotype_prediction/metrics_summary.csv
+  results/analysis/phenotype_prediction/metrics_summary.csv
 
 Outputs
 -------
@@ -26,7 +26,7 @@ from pathlib import Path
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-METRICS_PATH = REPO_ROOT / "out_phase2/phenotype_prediction/metrics_summary.csv"
+METRICS_PATH = REPO_ROOT / "results/analysis/phenotype_prediction/metrics_summary.csv"
 TABLE_DIR = REPO_ROOT / "tables"
 
 TASK_ORDER = [
