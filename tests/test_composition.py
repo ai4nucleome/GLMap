@@ -1,4 +1,4 @@
-"""Unit tests for src.panel.composition."""
+"""Unit tests for build_panel.composition."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import math
 
 import pytest
 
-from glmap.panel.composition import (
+from build_panel.composition import (
     BASES,
     DINUC_INDEX,
     DINUC_ORDER,

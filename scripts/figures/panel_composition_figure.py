@@ -179,7 +179,7 @@ def _build_features(
     would discard signal we care about.
     """
     from sklearn.preprocessing import StandardScaler
-    from glmap.panel.composition import _kmer_counts
+    from build_panel.composition import _kmer_counts
 
     if k_min < 1:
         raise ValueError(f"k_min must be >= 1, got {k_min}")

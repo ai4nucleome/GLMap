@@ -23,10 +23,8 @@ PACKAGES = [
     "glmap.loaders.megadna",
     "glmap.loaders.plasmidgpt",
     "glmap.scoring",
-    "glmap.panel",
     "glmap.matrices",
     "glmap.analysis",
-    "glmap.figures",
 ]
 
 

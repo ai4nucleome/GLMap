@@ -27,7 +27,7 @@ Three operations live here:
   - build_main_panel():   call readers per dataset, sample, assemble ProbeRow rows
   - write_panel_outputs(): emit parquet + manifest + markdown summary
 
-Readers/filters live in src/panel/readers.py; this module only does sampling
+Readers/filters live in data/build_panel/readers.py; this module only does sampling
 and assembly.
 """
 
@@ -42,7 +42,7 @@ from typing import Any
 import pandas as pd
 import yaml
 
-from glmap.panel.composition import dinuc_vec, gc_fraction, trinuc_vec
+from build_panel.composition import dinuc_vec, gc_fraction, trinuc_vec
 from build_panel.readers import ReaderResult, read_dataset
 
 
