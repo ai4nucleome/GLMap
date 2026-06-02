@@ -4,7 +4,7 @@
 #
 # Two experiments, separately launched:
 #   A. ALL 56 MLM models × 1000-probe stratified subset × k=1
-#      → results/scores/MLM_k1ablation_1000_scores/<slug>/probes.parquet
+#      → results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/MLM_true-PLL_scores/<slug>/probes.parquet
 #      → ~5-7 h on 8 GPUs
 #   B. 10 representative MLM models × full 10000-probe panel × k=1
 #      → results/scores/MLM_k1_ablation_full_scores/<slug>/probes.parquet
@@ -93,7 +93,7 @@ run_A() {
     echo "===================================================================="
     echo "Experiment A — 56 MLM × 1000 probes × stride=${STRIDE}"
     echo "  Panel : ${SUBSET_PANEL#${REPO_ROOT}/}"
-    echo "  Output: results/scores/MLM_k1ablation_1000_scores/"
+    echo "  Output: results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/"
     echo "  Logs  : ${log_dir}"
     echo "  GPUs  : ${GPU_IDS}"
     echo "  Dry   : ${DRY_RUN_ARGS[*]:-(actual run)}"
@@ -103,7 +103,8 @@ run_A() {
         --branch mlm \
         --panel "${SUBSET_PANEL}" \
         --stride "${STRIDE}" \
-        --out results/scores/MLM_k1ablation_1000_scores \
+        --out results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples \
+        --scores-subdir MLM_true-PLL_scores \
         --gpu-ids "${GPU_IDS}" \
         --log-dir "${log_dir}" \
         "${DRY_RUN_ARGS[@]}"

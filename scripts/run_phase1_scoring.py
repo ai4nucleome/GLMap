@@ -646,6 +646,13 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--panel", type=Path, default=REPO_ROOT / "data/panels/main_panel.parquet")
     p.add_argument("--out", type=Path, default=REPO_ROOT / "results/scores")
     p.add_argument(
+        "--scores-subdir", dest="scores_subdir", type=str, default="AR_MLM_scores",
+        help="Name of the per-model score subdirectory under --out "
+             "(<out>/<scores-subdir>/<slug>/probes.parquet). Default "
+             "'AR_MLM_scores' for the canonical tree; override e.g. "
+             "'MLM_true-PLL_scores' for the k=1 true-PLL ablation so it "
+             "lands in its own folder.")
+    p.add_argument(
         "--device",
         default=("cuda:0" if torch.cuda.is_available() else "cpu"),
         help="cuda:N or cpu. Default auto-picks cuda:0 when CUDA is available.",
@@ -724,7 +731,7 @@ def main() -> None:
     print(f"[panel] loaded {len(panel)} probes from {args.panel}", flush=True)
 
     args.out.mkdir(parents=True, exist_ok=True)
-    (args.out / "AR_MLM_scores").mkdir(parents=True, exist_ok=True)
+    (args.out / args.scores_subdir).mkdir(parents=True, exist_ok=True)
     (args.out / "matrices").mkdir(parents=True, exist_ok=True)
 
     # Resolve the model roster.
@@ -797,7 +804,7 @@ def main() -> None:
         }, indent=2))
 
     for spec in models_to_run:
-        score_dir = args.out / "AR_MLM_scores" / spec.slug
+        score_dir = args.out / args.scores_subdir / spec.slug
         score_dir.mkdir(parents=True, exist_ok=True)
         score_path = score_dir / "probes.parquet"
         # Per-model metadata snapshot now lives inside the model's own
@@ -878,10 +885,10 @@ def main() -> None:
     mlm_specs = [s for s in roster if s.branch == "mlm"]
 
     ar_matrices, ar_actual = _build_branch_matrices(
-        ar_specs, panel, args.out / "AR_MLM_scores", allow_missing=args.allow_missing,
+        ar_specs, panel, args.out / args.scores_subdir, allow_missing=args.allow_missing,
     )
     mlm_matrices, mlm_actual = _build_branch_matrices(
-        mlm_specs, panel, args.out / "AR_MLM_scores", allow_missing=args.allow_missing,
+        mlm_specs, panel, args.out / args.scores_subdir, allow_missing=args.allow_missing,
     )
 
     # Persist the explicit "which models actually contributed scores" record so

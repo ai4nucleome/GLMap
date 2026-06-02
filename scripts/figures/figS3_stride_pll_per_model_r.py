@@ -12,7 +12,7 @@ across the 51 models that completed the k=1 sweep.
 
 Inputs
 ------
-  results/scores/MLM_k1ablation_1000_scores/AR_MLM_scores/<slug>/probes.parquet
+  results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/MLM_true-PLL_scores/<slug>/probes.parquet
     51 / 56 MLM models successfully scored at stride=1 (true PLL) on
     the 1000-probe ablation subset.  Five PlantCAD2 / GENERanno /
     AIDO.DNA-7B checkpoints did not complete — they are excluded.
@@ -36,7 +36,7 @@ Outputs
           vs k=1 sum_log_p (y), with overall pooled Pearson r in the
           annotation.
 
-  results/scores/figS3_per_model_r.json
+  results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/figS3_per_model_r.json
     JSON record of the per-model r values + summary stats, so paper
     prose / supplementary tables can reference the exact numbers.
 
@@ -70,7 +70,7 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.figures.phase1_main_figure import PALETTE, RCPARAMS  # noqa: E402
 
 
-K1_DIR = REPO_ROOT / "results/scores/MLM_k1ablation_1000_scores/AR_MLM_scores"
+K1_DIR = REPO_ROOT / "results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/MLM_true-PLL_scores"
 K6_DIR = REPO_ROOT / "results/scores/AR_MLM_scores"
 PANEL_SUBSET = REPO_ROOT / "data/panels/MLM_k1ablation_1000_main_panel.parquet"
 AUDIT_JSON = REPO_ROOT / "data/audits/models.json"
@@ -120,7 +120,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--out-fig", type=Path,
                    default=REPO_ROOT / "figures/FigS3-stride_pll_per_model_r.pdf")
     p.add_argument("--out-json", type=Path,
-                   default=REPO_ROOT / "results/scores/figS3_per_model_r.json")
+                   default=REPO_ROOT / "results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/figS3_per_model_r.json")
     p.add_argument("--figsize", type=str, default="13,5.8")
     return p.parse_args()
 

@@ -352,6 +352,7 @@ def build_command(
     force: bool = False,
     stride: int | None = None,
     out_dir: str | None = None,
+    scores_subdir: str = "AR_MLM_scores",
     audit_path: str | None = None,
     benchmark_dir: str | None = None,
 ) -> tuple[list[str], dict[str, str]]:
@@ -403,6 +404,10 @@ def build_command(
         # that must not overwrite the canonical results/scores/AR_MLM_scores/ tree.
         if out_dir is not None:
             args.extend(["--out", out_dir])
+        # Per-model score subdir pass-through.  Default AR_MLM_scores; the
+        # k=1 true-PLL ablation overrides it to MLM_true-PLL_scores so its
+        # parquets land in their own folder under --out.
+        args.extend(["--scores-subdir", scores_subdir])
     elif mode == "embed":
         # Downstream-task pooled embedding extraction (6 tasks × 2 splits =
         # 12 parquets per model). Loader is loaded once per model and
@@ -509,6 +514,7 @@ def run_sweep(
     force: bool = False,
     stride: int | None = None,
     out_dir: str | None = None,
+    scores_subdir: str = "AR_MLM_scores",
     panel_ids: set[str] | None = None,
     embed_expected_n: dict | None = None,
     parquet_complete_fn=None,
@@ -596,7 +602,8 @@ def run_sweep(
                 and panel_ids is not None
             ):
                 slug = hf_id.replace("/", "__")
-                score_path = REPO_ROOT / "results/scores" / "AR_MLM_scores" / slug / "probes.parquet"
+                base_dir = Path(out_dir) if out_dir is not None else REPO_ROOT / "results/scores"
+                score_path = base_dir / scores_subdir / slug / "probes.parquet"
                 ok, reason = parquet_covers_panel(
                     score_path, panel_ids, n_panel=len(panel_ids)
                 )
@@ -654,6 +661,7 @@ def run_sweep(
             args, env = build_command(hf_id, route, gpus, panel,
                                       mode=mode, force=force,
                                       stride=stride, out_dir=out_dir,
+                                      scores_subdir=scores_subdir,
                                       audit_path=audit_path,
                                       benchmark_dir=benchmark_dir)
             slug = hf_id.replace("/", "__")
@@ -718,10 +726,16 @@ def parse_args() -> argparse.Namespace:
                    help="Output directory pass-through to "
                         "run_phase1_scoring.py (scoring mode only). "
                         "Default: child writes to results/scores/AR_MLM_scores. Set "
-                        "to e.g. results/scores/MLM_k1ablation_1000_scores "
+                        "to e.g. results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples "
                         "for an ablation that must not overwrite the "
                         "canonical k=6 scoring tree. Resume-skip in this "
                         "sweep is also redirected to this dir.")
+    p.add_argument("--scores-subdir", dest="scores_subdir", type=str,
+                   default="AR_MLM_scores",
+                   help="Per-model score subdir under --out passed through to "
+                        "run_phase1_scoring.py (<out>/<scores-subdir>/<slug>/). "
+                        "Default 'AR_MLM_scores'; the k=1 true-PLL ablation uses "
+                        "'MLM_true-PLL_scores'. Resume/DONE checks honor it too.")
     p.add_argument("--only", type=str, default=None,
                    help="Comma-separated SUBSTRING filters on hf_id; only models matching "
                    "at least one substring run. Use --hf-ids for exact match.")
@@ -913,15 +927,15 @@ def main() -> None:
     skipped: list[str] = []
     if not args.force:
         kept: list[str] = []
-        # Scoring resume check honors --out override so an ablation sweep
-        # with --out results/scores/MLM_k1ablation_1000_scores does not get
-        # confused by the canonical k=6 parquets in
-        # results/scores/AR_MLM_scores/. The child writes per-model parquets
-        # under <out>/AR_MLM_scores/<slug>/, so mirror that subdir here.
+        # Scoring resume check honors --out + --scores-subdir so an ablation
+        # sweep (e.g. --out results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples
+        # --scores-subdir MLM_true-PLL_scores) does not get confused by the
+        # canonical parquets in results/scores/AR_MLM_scores/. The child writes
+        # per-model parquets under <out>/<scores-subdir>/<slug>/, so mirror it.
         scores_dir = (
-            Path(args.out) / "AR_MLM_scores" if args.out is not None
-            else REPO_ROOT / "results/scores" / "AR_MLM_scores"
-        )
+            Path(args.out) if args.out is not None
+            else REPO_ROOT / "results/scores"
+        ) / args.scores_subdir
         embeddings_dir = REPO_ROOT / "results/analysis" / "embeddings"
         for hf_id in candidates:
             slug = hf_id.replace("/", "__")
@@ -1042,6 +1056,7 @@ def main() -> None:
         force=args.force,
         stride=args.stride,
         out_dir=args.out,
+        scores_subdir=args.scores_subdir,
         panel_ids=panel_ids,
         embed_expected_n=embed_expected_n,
         parquet_complete_fn=parquet_complete_fn,
