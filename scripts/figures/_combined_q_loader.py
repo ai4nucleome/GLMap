@@ -1,7 +1,7 @@
 """Shared loader for the combined-branch GLMap representation matrix.
 
 The canonical strict-aggregate output (`results/scores/matrices/`) writes
-L_AR / L_MLM / Q_AR / Q_MLM / D_AR / D_MLM as PER-BRANCH matrices, per
+V_AR / V_MLM / V_d_AR / V_d_MLM / D_AR / D_MLM as PER-BRANCH matrices, per
 the phase_1.md single-matrix protocol. For figures that adopt the
 "combined GLMap" presentation (Option B in the Fig 2d / 2e design
 discussion — see paper.md), this module assembles a 123-model

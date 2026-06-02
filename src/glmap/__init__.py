@@ -181,11 +181,11 @@ _HF_PANEL_FILES = {
 }
 
 _MATRIX_PATHS = {
-    "V_AR":  "results/scores/matrices/L_AR.npy",
-    "Vd_AR": "results/scores/matrices/Q_AR.npy",
+    "V_AR":  "results/scores/matrices/V_AR.npy",
+    "Vd_AR": "results/scores/matrices/V_d_AR.npy",
     "D_AR":  "results/scores/matrices/D_AR.npy",
-    "V_MLM":  "results/scores/matrices/L_MLM.npy",
-    "Vd_MLM": "results/scores/matrices/Q_MLM.npy",
+    "V_MLM":  "results/scores/matrices/V_MLM.npy",
+    "Vd_MLM": "results/scores/matrices/V_d_MLM.npy",
     "D_MLM":  "results/scores/matrices/D_MLM.npy",
 }
 
@@ -264,9 +264,9 @@ def load_matrix(name: str):
     ----------
     name : str
         One of ``"V_AR"``, ``"Vd_AR"``, ``"D_AR"``, ``"V_MLM"``,
-        ``"Vd_MLM"``, ``"D_MLM"``. The internal storage uses ``L`` and
-        ``Q`` filenames (``L_AR.npy``, ``Q_AR.npy``, …); the public
-        ``V`` / ``Vd`` names are transparently mapped here.
+        ``"Vd_MLM"``, ``"D_MLM"``. On-disk the double-centered matrix is
+        stored as ``V_d_AR.npy`` / ``V_d_MLM.npy``; the public ``Vd``
+        names are transparently mapped to those files here.
 
     Returns
     -------

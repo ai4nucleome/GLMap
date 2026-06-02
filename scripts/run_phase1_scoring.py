@@ -13,23 +13,23 @@ data/panels/main_panel.parquet. Produces the canonical layout:
         # plus token_log_probs (per-token log p list; AR = T-1 floats,
         # MLM = content_position_count floats).
       matrices/
-        L_AR.npy                          # (M_AR, N) raw sum_log_p, floor-clipped at the
+        V_AR.npy                          # (M_AR, N) raw sum_log_p, floor-clipped at the
                                             #   2nd-percentile (ModelMap)
-        Q_AR.npy                          # double-centered (row mean + col mean removed)
-        D_AR.npy                          # (M_AR, M_AR) pairwise squared Euclidean on Q
+        V_d_AR.npy                        # double-centered (row mean + col mean removed)
+        D_AR.npy                          # (M_AR, M_AR) pairwise squared Euclidean on V_d
                                             #   approximates KL under small-divergence Taylor
-        L_MLM.npy / Q_MLM.npy / D_MLM.npy
+        V_MLM.npy / V_d_MLM.npy / D_MLM.npy
         matrix_metadata.json              # ordered model_ids + probe_ids
                                           # + single-matrix protocol description
 
 Convention per phase_1.md § 单矩阵协议 (ModelMap, raw nats, no length norm, no sign flip):
     sum_log_p_m(x)  = sum_t log p(x_t | x_<t)  (AR)  /  stride PLL k=6  (MLM)
-    L[m, x]         = sum_log_p_m(x)           # negative (log p < 0), enters matrix
-    L_clipped       = floor_clip(L, q=0.02)    # ModelMap convention
-    Q               = double_center(L_clipped) # main matrix for PCA / F_ST
-    D               = pairwise_squared_distance(Q)
+    V[m, x]         = sum_log_p_m(x)           # negative (log p < 0), enters matrix
+    V_clipped       = floor_clip(V, q=0.02)    # ModelMap convention
+    V_d             = double_center(V_clipped) # main matrix for PCA / F_ST
+    D               = pairwise_squared_distance(V_d)
 ell_per_base = sum_log_p / base_length and bpb are written to probes.parquet
-as cross-tokenizer-readable reports but are NOT used to build L / Q / D.
+as cross-tokenizer-readable reports but are NOT used to build V / V_d / D.
 
 Codon-model handling (commit 5e59154 retired the three-matrix split):
     Codon-tokenized models (GenSLM, Codon-NT) emit raw likelihood on every
@@ -599,31 +599,31 @@ def _save_branch_matrices(
     branch_label: str,
     matrices: BranchMatrices,
 ) -> dict:
-    """Save L / Q / D for one branch.
+    """Save V / V_d / D for one branch.
 
     File-naming convention:
-      L_<branch>.npy   raw sum_log_p, floor-clipped at 2nd percentile
-      Q_<branch>.npy   double-centered L (consume in PCA / distance diagnostics)
-      D_<branch>.npy   (M, M) pairwise squared Euclidean on Q
+      V_<branch>.npy     raw sum_log_p, floor-clipped at 2nd percentile
+      V_d_<branch>.npy   double-centered V (consume in PCA / distance diagnostics)
+      D_<branch>.npy     (M, M) pairwise squared Euclidean on V_d
     """
     out_dir.mkdir(parents=True, exist_ok=True)
-    np.save(out_dir / f"L_{branch_label}.npy", matrices.L)
-    np.save(out_dir / f"Q_{branch_label}.npy", matrices.Q)
+    np.save(out_dir / f"V_{branch_label}.npy", matrices.L)
+    np.save(out_dir / f"V_d_{branch_label}.npy", matrices.Q)
     np.save(out_dir / f"D_{branch_label}.npy", matrices.D)
     metadata: dict = {
-        f"L_{branch_label}": {
+        f"V_{branch_label}": {
             "shape": list(matrices.L.shape),
             "row_model_ids": matrices.model_ids,
             "col_probe_ids": matrices.probe_ids,
             "n_nan_cells": int(np.isnan(matrices.L).sum()),
             "clip_threshold": matrices.clip_threshold,
         },
-        f"Q_{branch_label}": {
+        f"V_d_{branch_label}": {
             "shape": list(matrices.Q.shape),
             "row_model_ids": matrices.model_ids,
             "col_probe_ids": matrices.probe_ids,
             "n_nan_cells": int(np.isnan(matrices.Q).sum()),
-            "note": "double-centered L (row mean + column mean removed). "
+            "note": "double-centered V (row mean + column mean removed). "
             "Consume here in PCA and distance diagnostics.",
         },
         f"D_{branch_label}": {
@@ -631,7 +631,7 @@ def _save_branch_matrices(
             "row_model_ids": matrices.model_ids,
             "col_model_ids": matrices.model_ids,
             "n_nan_cells": int(np.isnan(matrices.D).sum()),
-            "note": "pairwise squared Euclidean on Q; approximates KL under "
+            "note": "pairwise squared Euclidean on V_d; approximates KL under "
             "small-divergence Taylor (ModelMap Sec. 6.1).",
         },
     }

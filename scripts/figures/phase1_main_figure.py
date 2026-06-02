@@ -8,11 +8,11 @@ Panels:
   B) Per-element heterozygosity (mean Var_m Q[m,x]) across 14
      functional_element, paired bars for AR vs MLM. Model counts read
      from PCA metadata so labels track DEFAULT_MODELS over time.
-  C) Cross-branch scatter — Q_AR column-mean (x) vs Q_MLM column-mean
+  C) Cross-branch scatter — V_d_AR column-mean (x) vs V_d_MLM column-mean
      (y), 10,000 probes colored by functional_element, with the y=x reference
      line + Spearman ρ annotation.
   D) GC-axis diagnostic — |Pearson r vs probe GC_content| for PC1/PC2/PC3 on
-     Q_AR and Q_MLM (single-matrix protocol per branch), with the phase_1.md
+     V_d_AR and V_d_MLM (single-matrix protocol per branch), with the phase_1.md
      0.7 GC-dominance threshold.
 
 Output:
@@ -194,8 +194,8 @@ def panel_a(fig, gs_cell, in_dir: Path) -> None:
     ax_ar = fig.add_subplot(sub[0, 0])
     ax_mlm = fig.add_subplot(sub[0, 1])
 
-    Z_ar, _, ev_ar, mids_ar = _load_pca(in_dir, "Q_AR")
-    Z_mlm, _, ev_mlm, mids_mlm = _load_pca(in_dir, "Q_MLM")
+    Z_ar, _, ev_ar, mids_ar = _load_pca(in_dir, "V_d_AR")
+    Z_mlm, _, ev_mlm, mids_mlm = _load_pca(in_dir, "V_d_MLM")
     _draw_pca_panel(ax_ar, Z_ar, ev_ar, mids_ar, AR_MODEL_SHADES, "PCA", "AR (Q)")
     _draw_pca_panel(ax_mlm, Z_mlm, ev_mlm, mids_mlm, MLM_MODEL_SHADES, "PCA", "MLM (Q)")
     ax_ar.text(
@@ -215,10 +215,10 @@ def panel_b(ax, in_dir: Path) -> None:
     # Read model counts from PCA metadata so labels stay in sync with the actual
     # scored matrices (DEFAULT_MODELS has grown since the original pilot).
     n_ar_meta = json.loads(
-        (in_dir / "analysis" / "pca" / "Q_AR" / "explained_variance.json").read_text()
+        (in_dir / "analysis" / "pca" / "V_d_AR" / "explained_variance.json").read_text()
     )
     n_mlm_meta = json.loads(
-        (in_dir / "analysis" / "pca" / "Q_MLM" / "explained_variance.json").read_text()
+        (in_dir / "analysis" / "pca" / "V_d_MLM" / "explained_variance.json").read_text()
     )
     n_ar = len(n_ar_meta["row_model_ids"])
     n_mlm = len(n_mlm_meta["row_model_ids"])
@@ -248,8 +248,8 @@ def panel_b(ax, in_dir: Path) -> None:
 
 
 def panel_c(ax, in_dir: Path) -> None:
-    Q_ar = np.load(in_dir / "matrices" / "Q_AR.npy")
-    Q_mlm = np.load(in_dir / "matrices" / "Q_MLM.npy")
+    Q_ar = np.load(in_dir / "matrices" / "V_d_AR.npy")
+    Q_mlm = np.load(in_dir / "matrices" / "V_d_MLM.npy")
     panel = pd.read_parquet(REPO_ROOT / "data/panels" / "main_panel.parquet")
     cross = json.loads((in_dir / "analysis" / "cross_branch" / "spearman.json").read_text())
 
@@ -318,8 +318,8 @@ def _compute_gc_abs_r(in_dir: Path, matrix: str) -> np.ndarray:
 
 def panel_d(ax, in_dir: Path) -> None:
     matrices = [
-        ("Q_AR", PALETTE["blue_main"]),
-        ("Q_MLM", PALETTE["red_strong"]),
+        ("V_d_AR", PALETTE["blue_main"]),
+        ("V_d_MLM", PALETTE["red_strong"]),
     ]
     pcs = [1, 2, 3, 4]
     n_groups = len(pcs)
@@ -372,8 +372,8 @@ def main() -> None:
         panel_d(ax_d, args.in_dir)
 
         # Pull live model counts so the suptitle tracks DEFAULT_MODELS.
-        n_ar_models = np.load(args.in_dir / "matrices" / "Q_AR.npy").shape[0]
-        n_mlm_models = np.load(args.in_dir / "matrices" / "Q_MLM.npy").shape[0]
+        n_ar_models = np.load(args.in_dir / "matrices" / "V_d_AR.npy").shape[0]
+        n_mlm_models = np.load(args.in_dir / "matrices" / "V_d_MLM.npy").shape[0]
         fig.suptitle(
             "Phase 1 representation map "
             f"({n_ar_models} AR + {n_mlm_models} MLM models, "

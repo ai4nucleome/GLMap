@@ -206,8 +206,8 @@ def test_marginal_fst_handles_nan_via_column_mean_imputation() -> None:
 
 def test_phase1_analysis_main_runs_on_synthetic_fixture(tmp_path) -> None:
     """Regression for the `analyze_matrix(R=...)` kwarg crash. Build a
-    minimal but realistic fixture: matrix_metadata.json + Q_AR.npy +
-    L_AR.npy + panel parquet, then invoke `main()` end-to-end. Test
+    minimal but realistic fixture: matrix_metadata.json + V_d_AR.npy +
+    V_AR.npy + panel parquet, then invoke `main()` end-to-end. Test
     must catch any signature drift between the caller and analyze_matrix."""
     import json
     import subprocess
@@ -225,23 +225,23 @@ def test_phase1_analysis_main_runs_on_synthetic_fixture(tmp_path) -> None:
     rng = np.random.default_rng(42)
     L = rng.normal(loc=-10.0, size=(6, 8))   # raw-scale L
     Q, *_ = double_center(L)
-    np.save(in_dir / "matrices" / "Q_AR.npy", Q)
-    np.save(in_dir / "matrices" / "L_AR.npy", L)
+    np.save(in_dir / "matrices" / "V_d_AR.npy", Q)
+    np.save(in_dir / "matrices" / "V_AR.npy", L)
 
     # MLM side: another (4, 8) matrix; needed for cross-branch step.
     L_mlm = rng.normal(loc=-30.0, size=(4, 8))
     Q_mlm, *_ = double_center(L_mlm)
-    np.save(in_dir / "matrices" / "Q_MLM.npy", Q_mlm)
-    np.save(in_dir / "matrices" / "L_MLM.npy", L_mlm)
+    np.save(in_dir / "matrices" / "V_d_MLM.npy", Q_mlm)
+    np.save(in_dir / "matrices" / "V_MLM.npy", L_mlm)
 
     ar_models = [f"family-{i}/model-{i}" for i in range(6)]
     mlm_models = [f"family-{i}/mlm-{i}" for i in range(4)]
     probe_ids = [f"probe_{i:03d}" for i in range(8)]
     (in_dir / "matrices" / "matrix_metadata.json").write_text(json.dumps({
-        "Q_AR": {"shape": [6, 8], "row_model_ids": ar_models, "col_probe_ids": probe_ids},
-        "L_AR": {"shape": [6, 8], "row_model_ids": ar_models, "col_probe_ids": probe_ids},
-        "Q_MLM": {"shape": [4, 8], "row_model_ids": mlm_models, "col_probe_ids": probe_ids},
-        "L_MLM": {"shape": [4, 8], "row_model_ids": mlm_models, "col_probe_ids": probe_ids},
+        "V_d_AR": {"shape": [6, 8], "row_model_ids": ar_models, "col_probe_ids": probe_ids},
+        "V_AR": {"shape": [6, 8], "row_model_ids": ar_models, "col_probe_ids": probe_ids},
+        "V_d_MLM": {"shape": [4, 8], "row_model_ids": mlm_models, "col_probe_ids": probe_ids},
+        "V_MLM": {"shape": [4, 8], "row_model_ids": mlm_models, "col_probe_ids": probe_ids},
     }, indent=2))
 
     # Panel parquet: probe_id, functional_element, GC_content (the three
@@ -266,8 +266,8 @@ def test_phase1_analysis_main_runs_on_synthetic_fixture(tmp_path) -> None:
         f"stderr={proc.stderr}\nstdout={proc.stdout}"
     )
     # Outputs we expect to land on disk
-    assert (out_dir / "pca" / "Q_AR" / "Z.npy").exists()
-    assert (out_dir / "pca" / "Q_MLM" / "Z.npy").exists()
+    assert (out_dir / "pca" / "V_d_AR" / "Z.npy").exists()
+    assert (out_dir / "pca" / "V_d_MLM" / "Z.npy").exists()
     assert (out_dir / "fst" / "marginal_fst.parquet").exists()
     assert (out_dir / "cross_branch" / "spearman.json").exists()
     # Cross-branch report should now use L (not double-centered Q)

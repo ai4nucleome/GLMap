@@ -8,10 +8,10 @@ shared anchor (``togethercomputer/evo-1-8k-base``):
   1. Load the AR-branch L matrix (all 67 AR models' per-probe sum_log_p
      sorted by probe_id) from ``results/scores/AR_MLM_scores/<slug>/probes.parquet``.
   2. Apply the ModelMap pipeline ``clip(q=0.02) + double_center`` →
-     Q_AR ∈ R^{67 × 10000}. This is the same Q matrix that drives every
+     V_d_AR ∈ R^{67 × 10000}. This is the same Q matrix that drives every
      other GLMap distance in the paper (Fig 4b, 5, 6, 7, etc.) — using
      it here keeps the lineage-distance values directly comparable.
-  3. For each partner i: ``D[i] = ||Q_AR[anchor] - Q_AR[partner_i]||²``
+  3. For each partner i: ``D[i] = ||V_d_AR[anchor] - V_d_AR[partner_i]||²``
      (squared Euclidean; matches ``src/matrices/build.py``).
 
 Output
