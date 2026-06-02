@@ -1,7 +1,7 @@
 # Model setup
 
 GLMap scores 123 genomic language models. Most are loaded directly from the
-[Hugging Face Hub](https://huggingface.co/); 9 require upstream GitHub repos
+[Hugging Face Hub](https://huggingface.co/); 8 require upstream GitHub repos
 that are not standard HF checkpoints.
 
 ## HuggingFace models (119 of 123)
@@ -12,17 +12,11 @@ Download all HF-hosted models listed in `download_models_list.txt`:
 bash scripts/download_models/download_models_from_list.sh
 ```
 
-The script calls `hf download` for each model, with two special cases:
-the 3 GenSLM entries are local weight names (not HF repos) and are
-skipped; `lingxusb/megaDNA` is fetched from `lingxusb/megaDNA_updated`
-on the Hub (the original `lingxusb/megaDNA` repo is no longer public).
-See the per-model notes below. Set `HF_HOME` to control the download
-location.
+The script calls `hf download` for each model. The 3 GenSLM entries are
+local weight names (not HF repos) and are skipped — see the GenSLM note
+below. Set `HF_HOME` to control the download location.
 
-**Note**: TensorFlow (`.h5`), joblib, and other non-PyTorch formats are
-excluded. PyTorch weights (`.pt`, `.bin`, `.safetensors`) are downloaded.
-
-## External models (9 of 123)
+## External models (8 of 123)
 
 These models ship as upstream GitHub repos with custom loading code
 (torch.load `.pt`, non-HF architectures, or separate packages):
@@ -37,7 +31,6 @@ These models ship as upstream GitHub repos with custom loading code
 | AIDO.DNA | [genbio-ai/ModelGenerator](https://github.com/genbio-ai/ModelGenerator) | `aido` |
 | PlantBiMoE | [HUST-Keep-Lin/PlantBiMoE](https://github.com/HUST-Keep-Lin/PlantBiMoE) | `plantbimoe` |
 | PlantCAD2 | [kuleshov-group/PlantCaduceus](https://github.com/kuleshov-group/PlantCaduceus) | `plantcad2` |
-| PlasmidGPT | [lingxusb/PlasmidGPT](https://github.com/lingxusb/PlasmidGPT) | `plasmidgpt` |
 
 Clone them all at the exact commits used in the paper:
 
@@ -49,17 +42,13 @@ This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
 
 ### Weight-source notes
 
-- **megaDNA**: The original HF repo `lingxusb/megaDNA` is no longer
-  publicly accessible. The weight file `megaDNA_phage_145M.pt` (582 MB)
-  is available from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
-  (license: CC-BY-NC-4.0). The download script automatically fetches it
-  into `models/modelsHFNoInfo/megaDNA/`. The GitHub clone
-  (`setup_external_models.sh`) provides the code package needed by
-  `torch.load`. The audit retains `lingxusb/megaDNA` as the canonical
-  identifier for consistency with the scoring outputs.
-- **PlasmidGPT**: The loader uses `hf_hub_download` internally, so the
-  GitHub clone is for provenance / upstream code only — it is **not**
-  required for scoring. HF download handles the weights.
+- **megaDNA**: The GitHub clone provides the code package needed to
+  `torch.load` the weight. The weight itself (`megaDNA_phage_145M.pt`,
+  582 MB, CC-BY-NC-4.0) is fetched automatically by the download script
+  from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
+  (the original `lingxusb/megaDNA` repo is no longer public). The audit
+  keeps `lingxusb/megaDNA` as the canonical id for consistency with the
+  scoring outputs.
 - **GenSLM**: Requires a separate manual step. After cloning the
   `genslm` repo above, download the 3 pretrained checkpoints and place
   them under `models/modelsHFNoInfo/genslm/weights/`:
@@ -88,7 +77,7 @@ table.
   bigbird-sparse models are commented out (excluded due to minimum seq_len
   incompatibility).
 - `evo-family-relationship.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
-- `setup_external_models.sh` — clones the 9 upstream repos at pinned SHAs.
+- `setup_external_models.sh` — clones the 8 upstream repos at pinned SHAs.
 
 ## Upstream licenses
 

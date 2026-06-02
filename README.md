@@ -164,7 +164,7 @@ GLMap/
 | Included in this repository | User must download separately |
 |---|---|
 | Probe panel (10,000 probes, 8 MB) | HF model weights (~119 models via `hf download`) |
-| V/Vd/D matrices for AR + MLM (20 MB) | 9 external model repos (`setup_external_models.sh`) |
+| V/Vd/D matrices for AR + MLM (20 MB) | 8 external model repos (`setup_external_models.sh`) |
 | Per-model scores, slimmed (48 MB) | GenSLM pretrained weights (manual) |
 | Downstream AUC results (6 MB) | Benchmark task CSVs from [DNA Foundation Benchmark](https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset) |
 | Phenotype prediction outputs (2 MB) | |
@@ -181,15 +181,14 @@ GLMap/
 bash scripts/download_models/download_models_from_list.sh
 ```
 
-**External models** (9 repos with custom loaders):
+**External models** (8 repos with custom loaders):
 
 ```bash
 bash models/setup_external_models.sh
 ```
 
 See [models/README.md](models/README.md) for details on megaDNA, GenSLM,
-PlasmidGPT, and other special cases. Model weights follow their own
-upstream licenses.
+and other special cases. Model weights follow their own upstream licenses.
 
 ---
 

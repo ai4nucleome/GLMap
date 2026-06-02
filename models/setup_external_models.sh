@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup_external_models.sh — clone the 9 upstream repos that cannot be loaded
+# setup_external_models.sh — clone the 8 upstream repos that cannot be loaded
 # via standard HuggingFace transformers (torch.load .pt, custom architectures,
 # or non-HF model packages).
 #
@@ -54,10 +54,9 @@ clone_at megaDNA        https://github.com/lingxusb/megaDNA.git              cb2
 clone_at ModelGenerator https://github.com/genbio-ai/ModelGenerator.git     c562a20
 clone_at PlantBiMoE     https://github.com/HUST-Keep-Lin/PlantBiMoE.git     e3b6d53
 clone_at PlantCaduceus  https://github.com/kuleshov-group/PlantCaduceus.git  f0d18ac
-clone_at PlasmidGPT     https://github.com/lingxusb/PlasmidGPT.git          5578c91
 
 echo ""
-echo "All 9 repos cloned into $DEST/"
+echo "All 8 repos cloned into $DEST/"
 echo "Next steps:"
 echo "  1. See docs/env_routing.md for per-family environment setup."
 echo "  2. Download HuggingFace models: bash scripts/download_models/download_models_from_list.sh"
