@@ -1,25 +1,57 @@
 # Model setup
 
-GLMap scores 123 genomic language models. Most are loaded directly from the
-[Hugging Face Hub](https://huggingface.co/); 8 require upstream GitHub repos
-that are not standard HF checkpoints.
+GLMap scores 123 genomic language models. This directory holds the model
+catalog and the setup scripts needed to obtain their weights and (for a
+few families) their custom loading code.
 
-## HuggingFace models (119 of 123)
+## 1. Download model weights
 
-Download all HF-hosted models listed in `download_models_list.txt`:
+Most models are hosted on the [Hugging Face Hub](https://huggingface.co/).
+Download all weights listed in `download_models_list.txt`:
 
 ```bash
 bash scripts/download_models/download_models_from_list.sh
 ```
 
-The script calls `hf download` for each model. The 3 GenSLM entries are
-local weight names (not HF repos) and are skipped — see the GenSLM note
-below. Set `HF_HOME` to control the download location.
+Set `HF_HOME` to control the download cache location.
 
-## External models (8 of 123)
+Two special cases are handled by the script:
 
-These models ship as upstream GitHub repos with custom loading code
-(torch.load `.pt`, non-HF architectures, or separate packages):
+- **GenSLM** (3 entries): these are local weight names, not HF repos, so
+  the script skips them. Download the 3 checkpoints manually (see below).
+- **megaDNA**: the original `lingxusb/megaDNA` repo is no longer public,
+  so the script fetches the weight (`megaDNA_phage_145M.pt`, 582 MB) from
+  [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
+  instead. The audit keeps `lingxusb/megaDNA` as the canonical id for
+  consistency with the scoring outputs.
+
+### GenSLM weights (manual)
+
+After cloning the `genslm` repo (next section), download the 3 pretrained
+checkpoints and place them under `models/modelsHFNoInfo/genslm/weights/`:
+
+```
+models/modelsHFNoInfo/genslm/weights/
+├── patric_25m_epoch01-val_loss_0.57_bias_removed.pt
+├── patric_250m_epoch00_val_loss_0.48_attention_removed.pt
+└── patric_2.5b_epoch00_val_los_0.29_bias_removed.pt
+```
+
+See the [GenSLM README](https://github.com/ramanathanlab/genslm) for
+download links.
+
+## 2. Clone custom loading code
+
+8 families cannot be loaded via standard HuggingFace `transformers` — they
+need their own model code (`torch.load` of a custom `.pt`, non-HF
+architectures, or a separate package). Clone all of them at the exact
+commits used in the paper:
+
+```bash
+bash models/setup_external_models.sh
+```
+
+This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
 
 | Family | Repo | Loader kind |
 |---|---|---|
@@ -32,43 +64,8 @@ These models ship as upstream GitHub repos with custom loading code
 | PlantBiMoE | [HUST-Keep-Lin/PlantBiMoE](https://github.com/HUST-Keep-Lin/PlantBiMoE) | `plantbimoe` |
 | PlantCAD2 | [kuleshov-group/PlantCaduceus](https://github.com/kuleshov-group/PlantCaduceus) | `plantcad2` |
 
-Clone them all at the exact commits used in the paper:
-
-```bash
-bash models/setup_external_models.sh
-```
-
-This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
-
-### Weight-source notes
-
-- **megaDNA**: The GitHub clone provides the code package needed to
-  `torch.load` the weight. The weight itself (`megaDNA_phage_145M.pt`,
-  582 MB, CC-BY-NC-4.0) is fetched automatically by the download script
-  from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
-  (the original `lingxusb/megaDNA` repo is no longer public). The audit
-  keeps `lingxusb/megaDNA` as the canonical id for consistency with the
-  scoring outputs.
-- **GenSLM**: Requires a separate manual step. After cloning the
-  `genslm` repo above, download the 3 pretrained checkpoints and place
-  them under `models/modelsHFNoInfo/genslm/weights/`:
-
-```
-models/modelsHFNoInfo/genslm/weights/
-├── patric_25m_epoch01-val_loss_0.57_bias_removed.pt
-├── patric_250m_epoch00_val_loss_0.48_attention_removed.pt
-└── patric_2.5b_epoch00_val_los_0.29_bias_removed.pt
-```
-
-See the [GenSLM README](https://github.com/ramanathanlab/genslm) for
-download links.
-
-## Environment routing
-
-Different model families require different Python environments (e.g. Evo-2
-needs a specific CUDA toolkit, GenSLM needs the `genslm` package). See
-[docs/env_routing.md](../docs/env_routing.md) for the per-family routing
-table.
+(For megaDNA the clone supplies only the code package; its weight is
+downloaded automatically in step 1.)
 
 ## Files in this directory
 
