@@ -16,7 +16,7 @@ shared anchor (``togethercomputer/evo-1-8k-base``):
 
 Output
 ------
-  tables/table_fig4a_evo_lineage_distances.tex   LaTeX booktabs.
+  tables/table3_evo_family_distances-V_d.tex   LaTeX booktabs.
   Markdown preview to stdout.
 
 Schema (3 columns):
@@ -51,11 +51,8 @@ from glmap.matrices.build import clip_lower, double_center  # noqa: E402
 CSV_PATH = REPO_ROOT / "models" / "evo-family-relationship.csv"
 AUDIT_PATH = REPO_ROOT / "data" / "audits" / "models.json"
 SCORES_DIR = REPO_ROOT / "out_phase1" / "scores"
-# Two LaTeX outputs, one per cosine-similarity variant.
-TEX_OUT_RAWL = (REPO_ROOT / "tables"
-                / "table_fig4a_evo_lineage_distances_cosine-rawL.tex")
-TEX_OUT_Q    = (REPO_ROOT / "tables"
-                / "table_fig4a_evo_lineage_distances_cosine-Q.tex")
+# Single LaTeX output: Euclidean distance + cosine similarity on V_d.
+TEX_OUT_Q = REPO_ROOT / "tables" / "table3_evo_family_distances-V_d.tex"
 
 
 # Architecture labels per the Evo family lineage. Used for the leftmost
@@ -311,17 +308,6 @@ def main() -> None:
         r"\texttt{src/matrices/build.py}). This is the same pipeline "
         r"distance used in Figs.~2c, 5, 6, 7, and 8. "
     )
-    CAPTION_RAWL_COSINE = (
-        r"\textbf{Cosine similarity (raw L)} $= L[\text{anchor}] \cdot "
-        r"L[\text{partner}] / (\|L[\text{anchor}]\| \, "
-        r"\|L[\text{partner}]\|)$ is computed on the raw pre-pipeline "
-        r"\texttt{sum\_log\_p} vectors and is scale-invariant. Values "
-        r"are uniformly close to $1$ across DNA foundation models "
-        r"because all \texttt{sum\_log\_p} entries are negative and "
-        r"dominated by per-probe baseline difficulty; the discriminative "
-        r"signal sits in the residual $(1-\cos)$, which shows the same "
-        r"order-of-magnitude separation as the Euclidean distance. "
-    )
     CAPTION_Q_COSINE = (
         r"\textbf{Cosine similarity (Q)} $= Q[\text{anchor}] \cdot "
         r"Q[\text{partner}] / (\|Q[\text{anchor}]\| \, "
@@ -384,24 +370,16 @@ def main() -> None:
         out.append(r"\end{table}")
         return "\n".join(out) + "\n"
 
-    TEX_OUT_RAWL.parent.mkdir(parents=True, exist_ok=True)
-    TEX_OUT_RAWL.write_text(_make_table_tex(
-        cosine_key="cosine_sim_rawL",
-        cosine_label="Cosine similarity (raw L)",
-        caption_cosine_text=CAPTION_RAWL_COSINE,
-        latex_label="tab:evo_lineage_distance_cosrawL",
-    ))
+    TEX_OUT_Q.parent.mkdir(parents=True, exist_ok=True)
     TEX_OUT_Q.write_text(_make_table_tex(
         cosine_key="cosine_sim_Q",
-        cosine_label="Cosine similarity (Q)",
+        cosine_label="Cosine similarity ($V_d$)",
         caption_cosine_text=CAPTION_Q_COSINE,
-        latex_label="tab:evo_lineage_distance_cosQ",
+        latex_label="tab:evo_family_distances",
     ))
     print(f"# LaTeX written to:")
-    print(f"#   {TEX_OUT_RAWL.relative_to(REPO_ROOT)}  "
-          "(Euclidean distance + Cosine similarity on raw L)")
     print(f"#   {TEX_OUT_Q.relative_to(REPO_ROOT)}     "
-          "(Euclidean distance + Cosine similarity on Q)")
+          "(Euclidean distance + Cosine similarity on V_d)")
 
 
 if __name__ == "__main__":

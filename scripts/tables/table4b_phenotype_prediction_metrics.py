@@ -11,10 +11,8 @@ Inputs
 
 Outputs
 -------
-  tables/table4b_phenotype_prediction_V_kfold.tex
-  tables/table4b_phenotype_prediction_Vd_kfold.tex
-  tables/table4b_phenotype_prediction_V_family-groupkfold.tex
-  tables/table4b_phenotype_prediction_Vd_family-groupkfold.tex
+  tables/table4_phenotype_prediction_Vd_kfold.tex
+  tables/table4_phenotype_prediction_Vd_family-groupkfold.tex
 
 Usage
 -----
@@ -62,10 +60,8 @@ SPLIT_LABEL = {
 }
 
 OUT_NAME = {
-    ("V", "kfold"): "table4b_phenotype_prediction_V_kfold.tex",
-    ("V_d", "kfold"): "table4b_phenotype_prediction_Vd_kfold.tex",
-    ("V", "family_groupkfold"): "table4b_phenotype_prediction_V_family-groupkfold.tex",
-    ("V_d", "family_groupkfold"): "table4b_phenotype_prediction_Vd_family-groupkfold.tex",
+    ("V_d", "kfold"): "table4_phenotype_prediction_Vd_kfold.tex",
+    ("V_d", "family_groupkfold"): "table4_phenotype_prediction_Vd_family-groupkfold.tex",
 }
 
 
@@ -140,7 +136,7 @@ def main() -> None:
     df = pd.read_csv(METRICS_PATH)
     TABLE_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("# Table 4b phenotype-prediction metrics")
+    print("# Table 4 phenotype-prediction metrics")
     for feature_set, split in OUT_NAME:
         tex = _make_table(df, feature_set, split)
         out_path = TABLE_DIR / OUT_NAME[(feature_set, split)]
