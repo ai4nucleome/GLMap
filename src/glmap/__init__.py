@@ -173,12 +173,11 @@ _PANEL_PATHS = {
     "MLM_k1ablation_1000":  "out_panel/MLM_k1ablation_1000_main_panel.parquet",
 }
 
-# HuggingFace Dataset fallback for the panel parquets. Files are stored
-# flat (no out_panel/ prefix) in the dataset repo.
+# HuggingFace Dataset fallback for the panel parquet. Only the main
+# panel is published to HF; the k=1 ablation subset is repo-only.
 _HF_PANEL_REPO = "Tim419/GLMap-panels"
 _HF_PANEL_FILES = {
-    "main":                 "main_panel.parquet",
-    "MLM_k1ablation_1000":  "MLM_k1ablation_1000_main_panel.parquet",
+    "main": "main_panel.parquet",
 }
 
 _MATRIX_PATHS = {
@@ -230,6 +229,15 @@ def load_panel(name: str = "main", path=None):
         return pd.read_parquet(local)
     except FileNotFoundError:
         pass  # fall through to HuggingFace download
+
+    # Only the main panel is published to HuggingFace; other named panels
+    # (e.g. the k=1 ablation subset) are repo-only.
+    if name not in _HF_PANEL_FILES:
+        raise FileNotFoundError(
+            f"Panel {name!r} not found locally and has no HuggingFace "
+            "fallback (only the 'main' panel is published to HF). "
+            "Set $GLMAP_DATA_DIR or run from a GLMap repository checkout."
+        )
 
     try:
         from huggingface_hub import hf_hub_download
