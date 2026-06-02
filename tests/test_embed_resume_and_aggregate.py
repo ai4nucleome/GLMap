@@ -8,8 +8,8 @@
      re-extracted.
 
   2. run_downstream_classify.py aggregate pass rescans every
-     out_phase2/downstream/<model>/<task>/result.json on disk and writes
-     out_phase2/matrices/auc_matrix.{npy,meta.json}, even when the
+     out_phase2/per_model_AUC_result_6tasks/<model>/<task>/result.json on disk and writes
+     out_phase2/all_model_AUC_6tasks/auc_matrix.{npy,meta.json}, even when the
      per-pair fit was scoped by --hf-ids / --tasks. The meta records
      aggregate_scope="all_existing_results" so consumers can detect this.
 
@@ -81,11 +81,11 @@ def test_parquet_complete_rejects_mostly_nan_embed(tmp_path: Path) -> None:
 
 def test_classify_aggregate_builds_matrix(tmp_path: Path) -> None:
     """run_downstream_classify.py aggregate pass: given a few
-    out_phase2/downstream/<model>/<task>/result.json files, produces an
-    out_phase2/matrices/auc_matrix.npy with shape (M, T) sorted by
+    out_phase2/per_model_AUC_result_6tasks/<model>/<task>/result.json files, produces an
+    out_phase2/all_model_AUC_6tasks/auc_matrix.npy with shape (M, T) sorted by
     model + task slug, NaN-filled for missing pairs."""
     out_phase2 = tmp_path / "out_phase2"
-    downstream = out_phase2 / "downstream"
+    downstream = out_phase2 / "per_model_AUC_result_6tasks"
     # 3 models × 2 tasks, one pair intentionally missing
     fixtures = {
         ("modelA", "task1"): 0.92,
@@ -121,7 +121,7 @@ def test_classify_aggregate_builds_matrix(tmp_path: Path) -> None:
     )
     assert proc.returncode == 0, f"stderr={proc.stderr}\nstdout={proc.stdout}"
 
-    matrices_dir = out_phase2 / "matrices"
+    matrices_dir = out_phase2 / "all_model_AUC_6tasks"
     auc = np.load(matrices_dir / "auc_matrix.npy")
     meta = json.loads((matrices_dir / "auc_matrix_meta.json").read_text())
 
@@ -221,7 +221,7 @@ def test_classify_result_records_drop_counts(tmp_path: Path) -> None:
     assert proc.returncode == 0, f"stderr={proc.stderr}\nstdout={proc.stdout}"
 
     result = json.loads(
-        (out_phase2 / "downstream" / "modelA" / "task1" / "result.json").read_text()
+        (out_phase2 / "per_model_AUC_result_6tasks" / "modelA" / "task1" / "result.json").read_text()
     )
     assert result["n_train_raw"] == 200
     assert result["n_train_dropped"] == 20
@@ -242,7 +242,7 @@ def test_classify_aggregate_skips_corrupt_and_reports_count(tmp_path: Path) -> N
     in meta.n_corrupt_skipped + listed in meta.corrupt_examples and
     flagged in stdout."""
     out_phase2 = tmp_path / "out_phase2"
-    downstream = out_phase2 / "downstream"
+    downstream = out_phase2 / "per_model_AUC_result_6tasks"
 
     # Two good results
     for (m, t, auc) in [("modelA", "task1", 0.81), ("modelA", "task2", 0.74)]:
@@ -279,7 +279,7 @@ def test_classify_aggregate_skips_corrupt_and_reports_count(tmp_path: Path) -> N
     assert "3 corrupt/invalid result.json" in proc.stdout
 
     meta = json.loads(
-        (out_phase2 / "matrices" / "auc_matrix_meta.json").read_text()
+        (out_phase2 / "all_model_AUC_6tasks" / "auc_matrix_meta.json").read_text()
     )
     assert meta["n_corrupt_skipped"] == 3
     assert len(meta["corrupt_examples"]) == 3
@@ -439,7 +439,7 @@ def test_classify_class_gate_records_skip_reason(tmp_path: Path) -> None:
     assert "[class-gate]" in proc.stdout
 
     result = json.loads(
-        (out_phase2 / "downstream" / "modelA" / "tinytask" / "result.json").read_text()
+        (out_phase2 / "per_model_AUC_result_6tasks" / "modelA" / "tinytask" / "result.json").read_text()
     )
     assert "skip_reason" in result
     assert "smallest train class" in result["skip_reason"]
@@ -449,7 +449,7 @@ def test_classify_class_gate_records_skip_reason(tmp_path: Path) -> None:
 
     # Aggregate must classify this as a deliberate skip, NOT corrupt.
     meta = json.loads(
-        (out_phase2 / "matrices" / "auc_matrix_meta.json").read_text()
+        (out_phase2 / "all_model_AUC_6tasks" / "auc_matrix_meta.json").read_text()
     )
     assert meta["n_corrupt_skipped"] == 0
     assert meta["n_deliberate_skips"] == 1
@@ -464,7 +464,7 @@ def test_aggregate_axes_include_skip_only_models(tmp_path: Path) -> None:
     class-gate-skipped would silently vanish from the axis, making the
     matrix shape lie about coverage."""
     out_phase2 = tmp_path / "out_phase2"
-    downstream = out_phase2 / "downstream"
+    downstream = out_phase2 / "per_model_AUC_result_6tasks"
 
     # modelA: clean fits on both tasks
     for (t, auc) in [("task1", 0.82), ("task2", 0.71)]:
@@ -507,7 +507,7 @@ def test_aggregate_axes_include_skip_only_models(tmp_path: Path) -> None:
     assert proc.returncode == 0, f"stderr={proc.stderr}\nstdout={proc.stdout}"
 
     meta = json.loads(
-        (out_phase2 / "matrices" / "auc_matrix_meta.json").read_text()
+        (out_phase2 / "all_model_AUC_6tasks" / "auc_matrix_meta.json").read_text()
     )
     # All three models MUST appear, including all-skip modelB
     assert meta["model_ids"] == ["modelA", "modelB", "modelC"], meta["model_ids"]
@@ -519,7 +519,7 @@ def test_aggregate_axes_include_skip_only_models(tmp_path: Path) -> None:
     assert meta["n_deliberate_skips"] == 3   # B×2 + C×1
     assert meta["n_corrupt_skipped"] == 0
 
-    auc = np.load(out_phase2 / "matrices" / "auc_matrix.npy")
+    auc = np.load(out_phase2 / "all_model_AUC_6tasks" / "auc_matrix.npy")
     # modelB row entirely NaN
     assert np.all(np.isnan(auc[1, :])), auc[1, :]
     # modelC has one finite (task1=0.65), one NaN (task2 skipped)
@@ -572,7 +572,7 @@ def test_classify_gate_catches_multiclass_test_missing_classes(tmp_path: Path) -
     assert "[class-gate]" in proc.stdout
 
     result = json.loads(
-        (out_phase2 / "downstream" / "modelX" / "multitask" / "result.json").read_text()
+        (out_phase2 / "per_model_AUC_result_6tasks" / "modelX" / "multitask" / "result.json").read_text()
     )
     assert "skip_reason" in result
     assert "train classes [0, 1, 2]" in result["skip_reason"]
@@ -740,7 +740,7 @@ def test_classify_refits_corrupt_cached_result(tmp_path: Path) -> None:
     _make_good_embed_pair(out_phase2, "modelA", "task1")
 
     # Plant a corrupt cached result.json predating any embed parquet
-    bad_path = out_phase2 / "downstream" / "modelA" / "task1" / "result.json"
+    bad_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelA" / "task1" / "result.json"
     bad_path.parent.mkdir(parents=True)
     bad_path.write_text("{not valid json")
 
@@ -775,7 +775,7 @@ def test_classify_refits_on_param_fingerprint_change(tmp_path: Path) -> None:
         capture_output=True, text=True, timeout=120,
     )
     assert proc1.returncode == 0, proc1.stderr
-    result_path = out_phase2 / "downstream" / "modelB" / "taskX" / "result.json"
+    result_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelB" / "taskX" / "result.json"
     first = json.loads(result_path.read_text())
     assert first["fit_params"]["seed"] == 42
 
@@ -832,7 +832,7 @@ def test_classify_load_fail_writes_structured_result(tmp_path: Path) -> None:
     assert proc.returncode == 0, proc.stderr
     assert "[load fail]" in proc.stdout
 
-    result_path = out_phase2 / "downstream" / "modelC" / "task1" / "result.json"
+    result_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelC" / "task1" / "result.json"
     assert result_path.exists(), "load_fail must still produce a result.json"
     result = json.loads(result_path.read_text())
     assert result["error_type"] == "load_fail"
@@ -914,7 +914,7 @@ def test_classify_refit_then_fit_fail_overwrites_stale_auc(tmp_path: Path) -> No
     # Pre-plant a "successful" cached result.json with a stale auc and a
     # fit_params fingerprint that DIFFERS from what we'll invoke with.
     # The cache invalidation will trigger [refit].
-    cached_path = out_phase2 / "downstream" / "modelD" / "task1" / "result.json"
+    cached_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelD" / "task1" / "result.json"
     cached_path.parent.mkdir(parents=True)
     cached_path.write_text(json.dumps({
         "auc_test": 0.99,                   # ← stale, must be overwritten
@@ -994,8 +994,8 @@ def test_classify_skip_records_include_fit_params(tmp_path: Path) -> None:
         capture_output=True, text=True, timeout=120,
     )
     assert proc1.returncode == 0
-    tiny_path = out_phase2 / "downstream" / "modelTiny" / "tiny" / "result.json"
-    gate_path = out_phase2 / "downstream" / "modelGate" / "gated" / "result.json"
+    tiny_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelTiny" / "tiny" / "result.json"
+    gate_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelGate" / "gated" / "result.json"
 
     tiny_rec = json.loads(tiny_path.read_text())
     gate_rec = json.loads(gate_path.read_text())
@@ -1041,7 +1041,7 @@ def test_aggregate_separates_deliberate_from_pipeline_error_skips(
     the matrix but they're separately counted in meta so retry-vs-
     audit triage is straightforward."""
     out_phase2 = tmp_path / "out_phase2"
-    downstream = out_phase2 / "downstream"
+    downstream = out_phase2 / "per_model_AUC_result_6tasks"
 
     cases = [
         ("modelA", "task1", "tiny",       "tiny: n_train=10"),
@@ -1069,7 +1069,7 @@ def test_aggregate_separates_deliberate_from_pipeline_error_skips(
     )
     assert proc.returncode == 0, proc.stderr
     meta = json.loads(
-        (out_phase2 / "matrices" / "auc_matrix_meta.json").read_text()
+        (out_phase2 / "all_model_AUC_6tasks" / "auc_matrix_meta.json").read_text()
     )
     assert meta["n_deliberate_skips"] == 2     # tiny + class_gate
     assert meta["n_pipeline_errors"] == 2      # load_fail + fit_fail
@@ -1092,7 +1092,7 @@ def test_classify_auto_retries_pipeline_error_on_rerun(tmp_path: Path) -> None:
     _write_fixture_embed_parquet(emb / "test.parquet",  n=80,  n_dropped=0)
 
     # Plant a cached load_fail record from a hypothetical earlier run.
-    cached_path = out_phase2 / "downstream" / "modelR" / "task1" / "result.json"
+    cached_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelR" / "task1" / "result.json"
     cached_path.parent.mkdir(parents=True)
     cached_path.write_text(json.dumps({
         "skip_reason": "load_fail: FileNotFoundError: prior bug",
@@ -1126,7 +1126,7 @@ def test_classify_no_retry_pipeline_errors_keeps_failure(tmp_path: Path) -> None
     _write_fixture_embed_parquet(emb / "train.parquet", n=200, n_dropped=0)
     _write_fixture_embed_parquet(emb / "test.parquet",  n=80,  n_dropped=0)
 
-    cached_path = out_phase2 / "downstream" / "modelK" / "task1" / "result.json"
+    cached_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelK" / "task1" / "result.json"
     cached_path.parent.mkdir(parents=True)
     cached_payload = {
         "skip_reason": "fit_fail: RuntimeError: known broken",
@@ -1168,7 +1168,7 @@ def test_classify_no_retry_still_refits_on_embed_mtime(tmp_path: Path) -> None:
     _write_fixture_embed_parquet(emb / "train.parquet", n=200, n_dropped=0)
     _write_fixture_embed_parquet(emb / "test.parquet",  n=80,  n_dropped=0)
 
-    cached_path = out_phase2 / "downstream" / "modelM" / "task1" / "result.json"
+    cached_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelM" / "task1" / "result.json"
     cached_path.parent.mkdir(parents=True)
     cached_path.write_text(json.dumps({
         "skip_reason": "fit_fail: RuntimeError: prior failure",
@@ -1211,7 +1211,7 @@ def test_classify_deleting_result_json_does_not_freeze_pair(tmp_path: Path) -> N
     _write_fixture_embed_parquet(emb / "train.parquet", n=200, n_dropped=0)
     _write_fixture_embed_parquet(emb / "test.parquet",  n=80,  n_dropped=0)
 
-    cached_path = out_phase2 / "downstream" / "modelDel" / "task1" / "result.json"
+    cached_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelDel" / "task1" / "result.json"
     cached_path.parent.mkdir(parents=True)
     cached_path.write_text(json.dumps({
         "skip_reason": "load_fail: imagined prior",
@@ -1324,7 +1324,7 @@ def test_classify_no_retry_still_refits_on_param_change(tmp_path: Path) -> None:
     _write_fixture_embed_parquet(emb / "train.parquet", n=200, n_dropped=0)
     _write_fixture_embed_parquet(emb / "test.parquet",  n=80,  n_dropped=0)
 
-    cached_path = out_phase2 / "downstream" / "modelN" / "task1" / "result.json"
+    cached_path = out_phase2 / "per_model_AUC_result_6tasks" / "modelN" / "task1" / "result.json"
     cached_path.parent.mkdir(parents=True)
     cached_path.write_text(json.dumps({
         "skip_reason": "load_fail: prior",
@@ -1356,7 +1356,7 @@ def test_aggregate_unknown_error_type_counted_separately(tmp_path: Path) -> None
     NOT be silently bucketed as deliberate. The aggregate must put it in
     `n_unknown_skips` and emit a WARN so the user notices."""
     out_phase2 = tmp_path / "out_phase2"
-    downstream = out_phase2 / "downstream"
+    downstream = out_phase2 / "per_model_AUC_result_6tasks"
 
     # Plant 4 records spanning all four buckets
     cases = [
@@ -1387,7 +1387,7 @@ def test_aggregate_unknown_error_type_counted_separately(tmp_path: Path) -> None
     assert proc.returncode == 0, proc.stderr
     assert "unknown/missing error_type" in proc.stdout
     meta = json.loads(
-        (out_phase2 / "matrices" / "auc_matrix_meta.json").read_text()
+        (out_phase2 / "all_model_AUC_6tasks" / "auc_matrix_meta.json").read_text()
     )
     assert meta["n_deliberate_skips"] == 2          # tiny + class_gate
     assert meta["n_pipeline_errors"] == 1           # load_fail

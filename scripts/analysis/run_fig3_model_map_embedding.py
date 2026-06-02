@@ -8,8 +8,8 @@ rerunning t-SNE / MDS.
 Inputs
 ------
   results/scores/AR_MLM_scores/                         per-model probe scores
-  results/analysis/matrices/auc_matrix.npy         downstream AUC matrix
-  results/analysis/matrices/auc_matrix_meta.json   AUC row / column metadata
+  results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix.npy         downstream AUC matrix
+  results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix_meta.json   AUC row / column metadata
   data/audits/models.json                    model metadata
 
 Outputs
@@ -60,9 +60,9 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--auc-matrix", type=Path,
-                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix.npy")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix.npy")
     p.add_argument("--auc-meta", type=Path,
-                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix_meta.json")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix_meta.json")
     p.add_argument("--audit", type=Path,
                    default=REPO_ROOT / "data/audits/models.json")
     p.add_argument("--out-dir", type=Path,

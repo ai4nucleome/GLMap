@@ -7,8 +7,8 @@ iterated quickly.
 
 Inputs
 ------
-  results/analysis/phenotype_prediction/predictions.csv
-  results/analysis/phenotype_prediction/config.json
+  results/analysis/benchmark_perform_prediction/phenotype_prediction/predictions.csv
+  results/analysis/benchmark_perform_prediction/phenotype_prediction/config.json
 
 Output
 ------
@@ -67,9 +67,9 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--predictions", type=Path,
-                   default=REPO_ROOT / "results/analysis/phenotype_prediction/predictions.csv")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/phenotype_prediction/predictions.csv")
     p.add_argument("--config", type=Path,
-                   default=REPO_ROOT / "results/analysis/phenotype_prediction/config.json")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/phenotype_prediction/config.json")
     p.add_argument("--split", choices=["kfold", "family_groupkfold"],
                    default="kfold")
     p.add_argument("--feature-set", choices=["V", "V_d"], default="V_d")

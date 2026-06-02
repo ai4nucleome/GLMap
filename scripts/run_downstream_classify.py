@@ -5,7 +5,7 @@ Reads embeddings written by `scripts/run_downstream_embed.py`
 (results/analysis/embeddings/<model>/<task>/{train,test}.parquet), fits an L2
 logistic regression with C grid via 5-fold CV on train, evaluates on
 test, and writes a result JSON per (model, task) to
-results/analysis/downstream/<model>/<task>/result.json containing:
+results/analysis/benchmark_perform_prediction/per_model_AUC_result_6tasks/<model>/<task>/result.json containing:
 
     {
       "model": <hf_id>,
@@ -31,13 +31,13 @@ is written into the per-pair result.json as `auc_average` so future
 multiclass additions can be audited.
 
 Aggregate (every invocation, regardless of --hf-ids / --tasks filter):
-    results/analysis/matrices/auc_matrix.npy    (M, T) float64
-    results/analysis/matrices/auc_matrix_meta.json    {model_ids, task_ids,
+    results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix.npy    (M, T) float64
+    results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix_meta.json    {model_ids, task_ids,
                                                   aggregate_scope=
                                                   "all_existing_results",
                                                   generated_at_utc, ...}
 
-The aggregate ALWAYS rescans the full results/analysis/downstream/ tree, even
+The aggregate ALWAYS rescans the full results/analysis/benchmark_perform_prediction/per_model_AUC_result_6tasks/ tree, even
 when this invocation's per-pair fit was filtered. This way a partial
 re-fit (e.g. `--hf-ids HuggingFaceBio/Carbon-3B` to refresh one model)
 patches the matrix in place without orphaning the rest. Consumers
@@ -75,8 +75,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--embeddings-dir", type=Path,
                    default=REPO_ROOT / "results/analysis/embeddings")
     p.add_argument("--out", type=Path,
-                   default=REPO_ROOT / "results/analysis",
-                   help="Output root; downstream/ and matrices/ written here.")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction",
+                   help="Output root; per_model_AUC_result_6tasks/ and "
+                        "all_model_AUC_6tasks/ written here.")
     p.add_argument("--hf-ids", type=str, default=None,
                    help="Comma-separated EXACT hf_id list to classify.")
     p.add_argument("--tasks", type=str, default=None,
@@ -258,7 +259,7 @@ def main() -> None:
 
     print(f"[downstream-classify] {len(pairs)} (model, task) pairs", flush=True)
 
-    out_root = args.out / "downstream"
+    out_root = args.out / "per_model_AUC_result_6tasks"
     out_root.mkdir(parents=True, exist_ok=True)
 
     # Parameter fingerprint stored in every newly-written result.json
@@ -585,7 +586,7 @@ def main() -> None:
     # to refresh one model after fixing its embeddings) updates the
     # matrix in-place without orphaning the other 124 models. The meta
     # JSON records aggregate_scope so consumers can detect this.
-    matrices_dir = args.out / "matrices"
+    matrices_dir = args.out / "all_model_AUC_6tasks"
     matrices_dir.mkdir(parents=True, exist_ok=True)
 
     rows: dict[str, dict[str, float]] = {}
@@ -685,7 +686,7 @@ def main() -> None:
         "n_finite": int(np.isfinite(auc_matrix).sum()),
         "n_missing": int(np.isnan(auc_matrix).sum()),
         # Document that the matrix is built from EVERY result.json
-        # under results/analysis/downstream/ regardless of this invocation's
+        # under results/analysis/benchmark_perform_prediction/per_model_AUC_result_6tasks/ regardless of this invocation's
         # filter scope. Consumers that need "results from this exact
         # run only" should look at per-pair result.json instead.
         "aggregate_scope": "all_existing_results",
@@ -738,7 +739,7 @@ def main() -> None:
         if args.tasks:
             scopes_used.append("--tasks")
         scope_note = (
-            "  [note] re-aggregated full results/analysis/downstream/ tree "
+            "  [note] re-aggregated full results/analysis/benchmark_perform_prediction/per_model_AUC_result_6tasks/ tree "
             "even though the per-pair fit was scoped by "
             + " + ".join(scopes_used)
         )

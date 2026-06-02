@@ -8,16 +8,16 @@ model's downstream linear-probe AUC profile with out-of-fold RidgeCV.
 Inputs
 ------
   results/scores/AR_MLM_scores/                         raw per-probe sum_log_p files
-  results/analysis/matrices/auc_matrix.npy         (123, 6) downstream AUC matrix
-  results/analysis/matrices/auc_matrix_meta.json   model_ids + task_ids
+  results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix.npy         (123, 6) downstream AUC matrix
+  results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix_meta.json   model_ids + task_ids
   data/audits/models.json                    model metadata and family labels
 
 Outputs
 -------
-  results/analysis/phenotype_prediction/predictions.csv
-  results/analysis/phenotype_prediction/metrics_by_seed.csv
-  results/analysis/phenotype_prediction/metrics_summary.csv
-  results/analysis/phenotype_prediction/config.json
+  results/analysis/benchmark_perform_prediction/phenotype_prediction/predictions.csv
+  results/analysis/benchmark_perform_prediction/phenotype_prediction/metrics_by_seed.csv
+  results/analysis/benchmark_perform_prediction/phenotype_prediction/metrics_summary.csv
+  results/analysis/benchmark_perform_prediction/phenotype_prediction/config.json
 
 Usage
 -----
@@ -70,13 +70,13 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--auc-matrix", type=Path,
-                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix.npy")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix.npy")
     p.add_argument("--auc-meta", type=Path,
-                   default=REPO_ROOT / "results/analysis/matrices/auc_matrix_meta.json")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/all_model_AUC_6tasks/auc_matrix_meta.json")
     p.add_argument("--audit", type=Path,
                    default=REPO_ROOT / "data/audits/models.json")
     p.add_argument("--out-dir", type=Path,
-                   default=REPO_ROOT / "results/analysis/phenotype_prediction")
+                   default=REPO_ROOT / "results/analysis/benchmark_perform_prediction/phenotype_prediction")
     p.add_argument("--seeds", type=str, default="0,1,2,3,4")
     p.add_argument("--n-splits", type=int, default=5)
     p.add_argument("--inner-cv", type=int, default=5,
