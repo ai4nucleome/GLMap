@@ -8,7 +8,7 @@ the six benchmark tasks.
 
 Output
 ------
-  figures/Fig3c-model_map_6task_mean.pdf
+  results/figures/Fig3c-model_map_6task_mean.pdf
 
 Usage
 -----
@@ -45,7 +45,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--coords", type=Path,
                    default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_Vd_tsne.csv")
     p.add_argument("--out", type=Path,
-                   default=REPO_ROOT / "figures/Fig3c-model_map_6task_mean.pdf")
+                   default=REPO_ROOT / "results/figures/Fig3c-model_map_6task_mean.pdf")
     p.add_argument("--figsize", type=str, default="6.3,6.3")
     return p.parse_args()
 

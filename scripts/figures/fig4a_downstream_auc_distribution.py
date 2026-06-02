@@ -26,7 +26,7 @@ Inputs
 
 Output
 ------
-  figures/Fig4a-downstream_auc_distribution.pdf
+  results/figures/Fig4a-downstream_auc_distribution.pdf
 
 Usage
 -----
@@ -90,7 +90,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--figsize", type=str, default="12.8,6.4",
                    help='Inches, "W,H". Default "12.8,6.4".')
     p.add_argument("--out", dest="out_path", type=Path,
-                   default=REPO_ROOT / "figures/Fig4a-downstream_auc_distribution.pdf")
+                   default=REPO_ROOT / "results/figures/Fig4a-downstream_auc_distribution.pdf")
     return p.parse_args()
 
 

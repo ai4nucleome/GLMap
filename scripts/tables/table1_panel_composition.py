@@ -5,7 +5,7 @@ Reads data/panels/main_panel.parquet, aggregates per (biological category,
 functional element), and emits two formats:
 
   - Markdown to stdout (for visual review)
-  - LaTeX (booktabs) to tables/table1_panel_composition.tex
+  - LaTeX (booktabs) to results/tables/table1_panel_composition.tex
 
 Re-run after any panel rebuild (build_panel.py)
 to keep the figure in sync.
@@ -21,7 +21,7 @@ import pyarrow.parquet as pq
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PANEL_PQ = REPO_ROOT / "data/panels" / "main_panel.parquet"
-TEX_OUT = REPO_ROOT / "tables" / "table1_panel_composition.tex"
+TEX_OUT = REPO_ROOT / "results/tables" / "table1_panel_composition.tex"
 
 GROUP_ORDER = ["Human", "Plant", "Fungi", "Virus"]
 

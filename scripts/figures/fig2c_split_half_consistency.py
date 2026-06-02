@@ -58,7 +58,7 @@ Scatter plot:
 
 Output
 ------
-  figures/Fig2c-split-half-mantel_<method>_seed<seed>_<pipeline>.pdf
+  results/figures/Fig2c-split-half-mantel_<method>_seed<seed>_<pipeline>.pdf
     where <pipeline> ∈ {with-pipeline, no-pipeline}
 
 Usage
@@ -614,7 +614,7 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "results/scores/AR_MLM_scores",
                    help="Directory containing <slug>/probes.parquet.")
     p.add_argument("--out", dest="out_dir", type=Path,
-                   default=REPO_ROOT / "figures",
+                   default=REPO_ROOT / "results/figures",
                    help="Output directory.")
     p.add_argument("--split-method", type=str, default="element-disjoint",
                    choices=["stratified", "element-disjoint"],

@@ -14,7 +14,7 @@ Inputs
 
 Output
 ------
-  tables/table2_downstream_tasks.tex   — booktabs LaTeX, paper-ready.
+  results/tables/table2_downstream_tasks.tex   — booktabs LaTeX, paper-ready.
   Markdown preview printed to stdout.
 
 Re-run whenever the downstream-task set changes:
@@ -31,7 +31,7 @@ import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BENCH_ROOT = REPO_ROOT / "data" / "dna_foundation_benchmark"
-TEX_OUT = REPO_ROOT / "tables" / "table2_downstream_tasks.tex"
+TEX_OUT = REPO_ROOT / "results/tables" / "table2_downstream_tasks.tex"
 
 # Canonical task list — the 6 binary classification tasks used by
 # scripts/run_downstream_classify.py. Each entry carries

@@ -324,7 +324,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--clip-q", type=float, default=0.02,
                    help="GLMap pipeline clip quantile (default 0.02).")
     p.add_argument("--out", dest="out_dir", type=Path,
-                   default=REPO_ROOT / "figures",
+                   default=REPO_ROOT / "results/figures",
                    help="Output directory.")
     p.add_argument("--figsize", type=str, default="6,6",
                    help='Inches, "W,H". Default "6,6".')

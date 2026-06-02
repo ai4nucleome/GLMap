@@ -7,11 +7,11 @@ t-SNE / MDS, so styling can be iterated quickly.
 
 Main output
 -----------
-  figures/Fig3-model_map.pdf
+  results/figures/Fig3-model_map.pdf
 
 Diagnostic output
 -----------------
-  figures/_preview/Fig3-embedding_comparison_V_Vd_D.pdf
+  results/figures/_preview/Fig3-embedding_comparison_V_Vd_D.pdf
 
 Usage
 -----
@@ -85,9 +85,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--coords-d", type=Path,
                    default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_D_mds.csv")
     p.add_argument("--out", type=Path,
-                   default=REPO_ROOT / "figures/Fig3-model_map.pdf")
+                   default=REPO_ROOT / "results/figures/Fig3-model_map.pdf")
     p.add_argument("--preview-out", type=Path,
-                   default=REPO_ROOT / "figures/_preview/Fig3-embedding_comparison_V_Vd_D.pdf")
+                   default=REPO_ROOT / "results/figures/_preview/Fig3-embedding_comparison_V_Vd_D.pdf")
     p.add_argument("--family-min-count", type=int, default=4)
     p.add_argument("--figsize", type=str, default="20.0,5.2")
     p.add_argument("--preview-figsize", type=str, default="14.5,4.7")

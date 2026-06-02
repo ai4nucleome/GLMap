@@ -16,7 +16,7 @@ shared anchor (``togethercomputer/evo-1-8k-base``):
 
 Output
 ------
-  tables/table3_evo_family_distances-V_d.tex   LaTeX booktabs.
+  results/tables/table3_evo_family_distances-V_d.tex   LaTeX booktabs.
   Markdown preview to stdout.
 
 Schema (3 columns):
@@ -52,7 +52,7 @@ CSV_PATH = REPO_ROOT / "models" / "evo-family-relationship.csv"
 AUDIT_PATH = REPO_ROOT / "data" / "audits" / "models.json"
 SCORES_DIR = REPO_ROOT / "results/scores" / "AR_MLM_scores"
 # Single LaTeX output: Euclidean distance + cosine similarity on V_d.
-TEX_OUT_Q = REPO_ROOT / "tables" / "table3_evo_family_distances-V_d.tex"
+TEX_OUT_Q = REPO_ROOT / "results/tables" / "table3_evo_family_distances-V_d.tex"
 
 
 # Architecture labels per the Evo family lineage. Used for the leftmost

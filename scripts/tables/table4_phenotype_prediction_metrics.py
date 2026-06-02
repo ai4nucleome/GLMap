@@ -11,8 +11,8 @@ Inputs
 
 Outputs
 -------
-  tables/table4_phenotype_prediction_Vd_kfold.tex
-  tables/table4_phenotype_prediction_Vd_family-groupkfold.tex
+  results/tables/table4_phenotype_prediction_Vd_kfold.tex
+  results/tables/table4_phenotype_prediction_Vd_family-groupkfold.tex
 
 Usage
 -----
@@ -27,7 +27,7 @@ import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 METRICS_PATH = REPO_ROOT / "results/analysis/benchmark_perform_prediction/phenotype_prediction/metrics_summary.csv"
-TABLE_DIR = REPO_ROOT / "tables"
+TABLE_DIR = REPO_ROOT / "results/tables"
 
 TASK_ORDER = [
     "iDNA_ABF/5mC",

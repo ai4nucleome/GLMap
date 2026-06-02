@@ -12,7 +12,7 @@ Inputs
 
 Output
 ------
-  figures/Fig4b-phenotype_prediction_scatter.pdf
+  results/figures/Fig4b-phenotype_prediction_scatter.pdf
 
 Usage
 -----
@@ -75,7 +75,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--feature-set", choices=["V", "V_d"], default="V_d")
     p.add_argument("--figsize", type=str, default="6.4,5.6")
     p.add_argument("--out", dest="out_path", type=Path,
-                   default=REPO_ROOT / "figures/Fig4b-phenotype_prediction_scatter.pdf")
+                   default=REPO_ROOT / "results/figures/Fig4b-phenotype_prediction_scatter.pdf")
     return p.parse_args()
 
 

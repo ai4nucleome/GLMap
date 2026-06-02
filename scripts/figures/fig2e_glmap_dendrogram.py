@@ -15,7 +15,7 @@ Fig 2d.
 
 Output
 ------
-  figures/Fig2e-dendrogram_combined-123models.pdf
+  results/figures/Fig2e-dendrogram_combined-123models.pdf
 
 Usage
 -----
@@ -121,7 +121,7 @@ def parse_args() -> argparse.Namespace:
                    help='Inches, "W,H". Default "15,5.8" (wide layout for '
                         '123 leaves; orientation=right may want "10,30").')
     p.add_argument("--out", dest="out_path", type=Path,
-                   default=REPO_ROOT / "figures"
+                   default=REPO_ROOT / "results/figures"
                    / "Fig2e-dendrogram_combined-123models.pdf",
                    help="Output PDF path.")
     p.add_argument("--label-by", type=str, default="family",

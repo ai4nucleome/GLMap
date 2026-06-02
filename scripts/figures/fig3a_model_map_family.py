@@ -7,7 +7,7 @@ family-colored model-map panel.
 
 Output
 ------
-  figures/Fig3a-model_map_family.pdf
+  results/figures/Fig3a-model_map_family.pdf
 
 Usage
 -----
@@ -89,7 +89,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--coords", type=Path,
                    default=REPO_ROOT / "results/analysis/model_map/fig3_embedding_Vd_tsne.csv")
     p.add_argument("--out", type=Path,
-                   default=REPO_ROOT / "figures/Fig3a-model_map_family.pdf")
+                   default=REPO_ROOT / "results/figures/Fig3a-model_map_family.pdf")
     p.add_argument("--family-min-count", type=int, default=4)
     p.add_argument("--figsize", type=str, default="6.3,6.3")
     p.add_argument("--no-annotations", action="store_true",

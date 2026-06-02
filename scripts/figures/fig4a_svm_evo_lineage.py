@@ -42,7 +42,7 @@ Pipeline
 
 Output
 ------
-  figures/Fig4a-SVM_evo-lineage_LOO-AUC[_{kernel}][_{projection}].pdf
+  results/figures/Fig4a-SVM_evo-lineage_LOO-AUC[_{kernel}][_{projection}].pdf
 
 Methodology rationale
 ---------------------
@@ -488,7 +488,7 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "results/scores/AR_MLM_scores",
                    help="Directory containing <slug>/probes.parquet.")
     p.add_argument("--out", dest="out_dir", type=Path,
-                   default=REPO_ROOT / "figures",
+                   default=REPO_ROOT / "results/figures",
                    help="Output directory.")
     p.add_argument("--figsize", type=str, default="7,6",
                    help='Inches, "W,H". Default "7,6".')

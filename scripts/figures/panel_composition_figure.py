@@ -79,9 +79,9 @@ Main figure command (paper, locked):
   python scripts/figures/panel_composition_figure.py \\
       --k-min 1 --k-max 3 --feature-transform hellinger \\
       --n-neighbors 50 --min-dist 0.3
-  → figures/Fig3-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
-  → figures/FigS1-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-element.pdf
-  → figures/Fig3-GC-content_by-element.pdf
+  → results/figures/Fig3-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
+  → results/figures/FigS1-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-element.pdf
+  → results/figures/Fig3-GC-content_by-element.pdf
 
 Outputs (regenerated, not git-tracked): pdf only. Methodological
 parameters (k range, transform, UMAP n_neighbors / min_dist) are
@@ -428,7 +428,7 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "data/panels/main_panel.parquet",
                    help="Stage 2 main panel parquet.")
     p.add_argument("--out", dest="out_dir", type=Path,
-                   default=REPO_ROOT / "figures",
+                   default=REPO_ROOT / "results/figures",
                    help="Output directory.")
     p.add_argument("--k-min", type=int, default=1, dest="k_min",
                    help="Lowest k included in the k-mer feature stack "

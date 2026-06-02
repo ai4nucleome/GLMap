@@ -146,14 +146,17 @@ GLMap/
 │   └── panels/             Prebuilt probe panel parquets
 ├── results/
 │   ├── scores/             Scoring outputs
-│   │   ├── matrices/       V/Vd/D for AR and MLM branches
-│   │   └── scores/         Per-model likelihood responses (slimmed)
-│   └── analysis/           Downstream analysis outputs
-│       ├── downstream/     Per-model per-task AUC results
-│       ├── phenotype_prediction/ RidgeCV prediction outputs
-│       └── model_map/      t-SNE embeddings for Fig 3
-├── figures/                Paper figure PDFs
-├── tables/                 Paper table LaTeX sources
+│   │   ├── matrices/       V/V_d/D for AR and MLM branches
+│   │   └── AR_MLM_scores/  Per-model likelihood responses (slimmed)
+│   ├── analysis/           Downstream + secondary analysis outputs
+│   │   ├── benchmark_perform_prediction/
+│   │   │   ├── per_model_AUC_result_6tasks/  Per-model per-task AUC results
+│   │   │   ├── all_model_AUC_6tasks/         Aggregated (123×6) AUC matrix
+│   │   │   └── phenotype_prediction/         Predict downstream AUC from GLMap signatures
+│   │   ├── model_map/      t-SNE / MDS embeddings for Fig 3
+│   │   └── MLM_stride-PLL_vs_true-PLL_1000samples/  k=1 vs k=6 PLL ablation (Fig S3)
+│   ├── figures/            Paper figure PDFs
+│   └── tables/             Paper table LaTeX sources
 └── models/                 Model download manifest, setup scripts,
                             and per-family environment routing (env_routing.md)
 ```

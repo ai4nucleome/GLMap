@@ -32,7 +32,7 @@ Design choices (per scientific-figure-making house style)
 
 Output
 ------
-  figures/Fig2d-Q-heatmap_combined_by-{family,organization}.pdf
+  results/figures/Fig2d-Q-heatmap_combined_by-{family,organization}.pdf
 
 Usage
 -----
@@ -279,7 +279,7 @@ def main() -> None:
     args = parse_args()
     if args.out_path is None:
         args.out_path = (
-            REPO_ROOT / "figures"
+            REPO_ROOT / "results/figures"
             / f"Fig2d-Q-heatmap_combined_by-{args.row_group_by}.pdf"
         )
 

@@ -14,7 +14,7 @@ Inputs
   results/scores/AR_MLM_scores/<slug>/probes.parquet  — per-model sum_log_p
   data/audits/models.json                  — branches + families
 
-Outputs (standalone PDFs under figures/)
+Outputs (standalone PDFs under results/figures/)
 ----------------------------------------
   FigS2-a-raw_V_score_scale.pdf     raw V per-(model, probe) score distributions
   FigS2-b-Vd_row_std.pdf            V_d row-std distributions after centering
@@ -277,7 +277,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--no-figure", action="store_true",
                    help="Print the diagnostic numbers only; skip the PDFs.")
     p.add_argument("--out-dir", type=Path,
-                   default=REPO_ROOT / "figures",
+                   default=REPO_ROOT / "results/figures",
                    help="Directory for the FigS2-{a,b,c,d}*.pdf panels.")
     return p.parse_args()
 

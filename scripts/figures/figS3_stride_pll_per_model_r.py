@@ -26,7 +26,7 @@ Inputs
 
 Outputs
 -------
-  figures/FigS3-stride_pll_per_model_r.pdf
+  results/figures/FigS3-stride_pll_per_model_r.pdf
     Two-panel figure:
       (a) Per-model Pearson r distribution — violin + jittered strip
           plot of the 51 r values, colored by family (top families
@@ -118,7 +118,7 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--out-fig", type=Path,
-                   default=REPO_ROOT / "figures/FigS3-stride_pll_per_model_r.pdf")
+                   default=REPO_ROOT / "results/figures/FigS3-stride_pll_per_model_r.pdf")
     p.add_argument("--out-json", type=Path,
                    default=REPO_ROOT / "results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/figS3_per_model_r.json")
     p.add_argument("--figsize", type=str, default="13,5.8")
