@@ -7,11 +7,10 @@ the phase_1.md single-matrix protocol. For figures that adopt the
 discussion — see paper.md), this module assembles a 123-model
 matrix on-the-fly and applies the canonical clip + double-center
 pipeline once across both branches. The empirical justification for
-showing AR + MLM in one centered-response GLMap is documented in
-`docs/ar_mlm_merge_diagnostic.md`: raw scores are not treated as
-commensurate probabilities, but branch effects are small in total
-Q-space variance, do not dominate the leading PCs, and joint centering
-preserves each branch's internal distance geometry.
+showing AR + MLM in one centered-response GLMap is produced by
+`scripts/analysis/ar_mlm_merge_diagnostic.py` (Fig. S2): raw scores are
+not treated as commensurate probabilities, but branch effects are small
+in total V_d-space variance relative to model family.
 
 Returned data
 -------------

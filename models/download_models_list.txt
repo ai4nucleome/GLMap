@@ -54,8 +54,6 @@ AIRI-Institute/gena-lm-bert-base-t2t
 AIRI-Institute/gena-lm-bert-base
 AIRI-Institute/gena-lm-bert-base-t2t-multi
 AIRI-Institute/gena-lm-bert-large-t2t
-# AIRI-Institute/gena-lm-bigbird-base-sparse        # excluded: BigBird block-sparse attention requires seq_len >= 704 tokens (block_size=64); phase 1 panel probes tokenize to 7-170 tokens, incompatible
-# AIRI-Institute/gena-lm-bigbird-base-sparse-t2t    # excluded: same as above
 AIRI-Institute/gena-lm-bigbird-base-t2t
 AIRI-Institute/gena-lm-bert-base-fly
 AIRI-Institute/gena-lm-bert-base-athaliana
