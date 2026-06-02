@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from build_panel.main_panel import DatasetSpec
-from build_panel.readers import read_dataset
+from panel_build.main_panel import DatasetSpec
+from panel_build.readers import read_dataset
 
 
 def _make_csv(tmp_path: Path, content: str, name: str = "ds.csv") -> Path:

@@ -196,7 +196,7 @@ def load_panel(name: str = "main", path=None):
     Resolution order:
 
     1. If ``path`` is given, read that parquet directly (use this to load
-       a custom panel built with ``data/build_panel/``).
+       a custom panel built with ``scripts/panel_build/``).
     2. Otherwise locate the named prebuilt panel locally via
        ``$GLMAP_DATA_DIR`` / package data / repo root.
     3. If not found locally (e.g. installed from a PyPI wheel without the

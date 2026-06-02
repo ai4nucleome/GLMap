@@ -44,8 +44,11 @@ except Exception:  # pragma: no cover
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODELS_LIST_PATH = REPO_ROOT / "models/download_models_list.txt"
 AUDIT_DIR = REPO_ROOT / "data/audits"
-CONTEXT_OVERRIDES_PATH = AUDIT_DIR / "context_overrides.yaml"
-PARAM_OVERRIDES_PATH = AUDIT_DIR / "param_overrides.yaml"
+# Manual override files live next to the audit scripts (this directory),
+# not in the generated-output directory data/audits/.
+AUDIT_SCRIPTS_DIR = Path(__file__).resolve().parent
+CONTEXT_OVERRIDES_PATH = AUDIT_SCRIPTS_DIR / "context_overrides.yaml"
+PARAM_OVERRIDES_PATH = AUDIT_SCRIPTS_DIR / "param_overrides.yaml"
 
 # Benchmark roots (scanned by benchmarks.py).
 BENCHMARK_ROOTS: dict[str, Path] = {

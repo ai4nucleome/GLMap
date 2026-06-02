@@ -177,6 +177,11 @@ def parse_args() -> argparse.Namespace:
         help="Skip HF config / tokenizer_config fetches (offline mode).",
     )
     parser.add_argument(
+        "--markdown",
+        action="store_true",
+        help="Also emit a human-readable models.md alongside models.json.",
+    )
+    parser.add_argument(
         "--max-models",
         type=int,
         default=None,
@@ -219,7 +224,6 @@ def main() -> None:
         )
 
     json_path = args.out_dir / "models.json"
-    md_path = args.out_dir / "models.md"
     write_json(
         {
             "generated_by": "scripts/audits/models.py",
@@ -228,9 +232,12 @@ def main() -> None:
         },
         json_path,
     )
-    render_markdown(records, md_path)
+    if args.markdown:
+        md_path = args.out_dir / "models.md"
+        render_markdown(records, md_path)
+        print(f"[models] wrote {md_path.name}", file=sys.stderr)
     print(
-        f"[models] wrote {json_path} + {md_path.name} ({len(records)} models)",
+        f"[models] wrote {json_path} ({len(records)} models)",
         file=sys.stderr,
     )
 

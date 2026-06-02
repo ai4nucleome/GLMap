@@ -10,7 +10,7 @@ All public functions in this module require **uppercase ACGT-only**
 sequences. Non-ACGT input (N, lowercase, IUPAC ambiguity codes) raises
 ``AssertionError`` at the entry point. Sanitize upstream — for example,
 the panel build pipeline uses
-``data/build_panel/readers.py::_normalize_and_validate`` to drop any
+``scripts/panel_build/readers.py::_normalize_and_validate`` to drop any
 sequence containing non-ACGT characters before it enters the panel.
 
 These utilities are kept dependency-light (no numpy) so they can be
@@ -43,7 +43,7 @@ def _assert_acgt(sequence: str) -> None:
     assert not bad, (
         f"glmap.panel.composition expects ACGT-only input; got non-ACGT "
         f"characters {sorted(bad)}. Normalize upstream "
-        f"(e.g. data/build_panel/readers.py::_normalize_and_validate)."
+        f"(e.g. scripts/panel_build/readers.py::_normalize_and_validate)."
     )
 
 

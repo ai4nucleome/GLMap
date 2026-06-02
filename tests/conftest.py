@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 for path in (
     REPO_ROOT,
     REPO_ROOT / "scripts" / "audits",
-    REPO_ROOT / "data",  # for `from build_panel.main_panel import ...`
+    REPO_ROOT / "scripts",  # for `from panel_build.main_panel import ...`
 ):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))

@@ -27,7 +27,7 @@ Three operations live here:
   - build_main_panel():   call readers per dataset, sample, assemble ProbeRow rows
   - write_panel_outputs(): emit parquet + manifest + markdown summary
 
-Readers/filters live in data/build_panel/readers.py; this module only does sampling
+Readers/filters live in scripts/panel_build/readers.py; this module only does sampling
 and assembly.
 """
 
@@ -42,11 +42,11 @@ from typing import Any
 import pandas as pd
 import yaml
 
-from build_panel.composition import dinuc_vec, gc_fraction, trinuc_vec
-from build_panel.readers import ReaderResult, read_dataset
+from panel_build.composition import dinuc_vec, gc_fraction, trinuc_vec
+from panel_build.readers import ReaderResult, read_dataset
 
 
-# data/build_panel/main_panel.py → repo root is parents[2]
+# scripts/panel_build/main_panel.py → repo root is parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCES_YAML = REPO_ROOT / "data" / "panel_sources.yaml"
 

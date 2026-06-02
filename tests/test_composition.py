@@ -1,4 +1,4 @@
-"""Unit tests for build_panel.composition."""
+"""Unit tests for panel_build.composition."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import math
 
 import pytest
 
-from build_panel.composition import (
+from panel_build.composition import (
     BASES,
     DINUC_INDEX,
     DINUC_ORDER,

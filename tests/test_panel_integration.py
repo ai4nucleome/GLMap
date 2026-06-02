@@ -1,7 +1,7 @@
 """Integration tests on the actual built panel parquet file.
 
 These tests run against ``out_panel/main_panel.parquet``, produced by
-``scripts/build_panel.py`` (delegating to ``data/build_panel/``). Skipped
+``scripts/build_panel.py`` (delegating to ``scripts/panel_build/``). Skipped
 if the file does not exist (e.g. fresh checkout where the user has not
 yet built the panel).
 

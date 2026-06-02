@@ -55,7 +55,7 @@ import glmap
 #   HuggingFace Dataset (Tim419/GLMap-panels) and cached.
 panel = glmap.load_panel()       # (10000, 11) DataFrame
 
-# Or load your own custom panel built with data/build_panel/
+# Or load your own custom panel built with scripts/panel_build/
 # panel = glmap.load_panel(path="my_panel.parquet")
 
 # Load precomputed matrices (these live in the repo / $GLMAP_DATA_DIR)
@@ -130,16 +130,16 @@ GLMap/
 ├── src/glmap/              Python package (pip install -e .)
 │   ├── loaders/            12 loader families (HF, evo, genslm, ...)
 │   ├── scoring/            AR log-likelihood + MLM stride PLL
-│   ├── panel/              Probe panel construction
 │   ├── matrices/           clip + double-center + pairwise distances
 │   ├── analysis/           PCA, GC-axis, heterozygosity
 │   └── io/                 Parquet schema helpers
 ├── scripts/                CLI entry points for paper reproduction
+│   ├── panel_build/        Probe panel construction (readers, sampling, k-mer)
 │   ├── figures/            One script per paper figure
 │   ├── tables/             One script per paper table
-│   ├── audits/             Model + benchmark audit scripts
+│   ├── audits/             Model audit script + context overrides
 │   └── download_models/    HF model download helper
-├── tests/                  217 pytest tests
+├── tests/                  pytest test suite
 ├── data/
 │   ├── audits/             123-model audit (models.json)
 │   ├── panel_sources.yaml  Panel construction spec
@@ -266,7 +266,7 @@ models audited in this work for releasing their weights and code publicly.
 This repository uses **two licenses**:
 
 - **Source code** (everything under `src/`, `scripts/`, `tests/`,
-  `data/build_panel/`, etc.): [Apache-2.0](LICENSE).
+  `scripts/panel_build/`, etc.): [Apache-2.0](LICENSE).
 - **Data artefacts** (`out_panel/`, `out_phase1/matrices/`,
   `out_phase1/scores/`, `out_phase2/`): [CC-BY-NC-SA-4.0](LICENSE-DATA).
   These artefacts inherit the upstream Plant Genomic Benchmark license

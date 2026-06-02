@@ -1,4 +1,4 @@
-# data/build_panel/
+# scripts/panel_build/
 
 Panel construction code. Reads raw benchmark CSV/FASTA files and produces
 the canonical 10,000-probe panel (`out_panel/main_panel.parquet`).
@@ -21,7 +21,7 @@ panel = glmap.load_panel()
 ## Layout
 
 ```
-data/build_panel/
+scripts/panel_build/
 ├── main_panel.py    Orchestrator: config parsing + sampling + ProbeRow assembly
 ├── readers.py       Per-format readers (CSV + 3 PGB FASTA variants)
 └── README.md        (this file)
