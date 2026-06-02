@@ -49,10 +49,16 @@ the source repository. No GPU, no model download, no scoring required.
 ```python
 import glmap
 
-# Load the 10,000-probe panel
+# Load the 10,000-probe panel.
+# - From a repo checkout: read locally.
+# - From a pip install (no checkout): auto-downloaded from the GLMap
+#   HuggingFace Dataset (Tim419/GLMap-panels) and cached.
 panel = glmap.load_panel()       # (10000, 11) DataFrame
 
-# Load precomputed matrices
+# Or load your own custom panel built with data/build_panel/
+# panel = glmap.load_panel(path="my_panel.parquet")
+
+# Load precomputed matrices (these live in the repo / $GLMAP_DATA_DIR)
 V_AR  = glmap.load_matrix("V_AR")    # (64, 10000) raw AR responses
 Vd_AR = glmap.load_matrix("Vd_AR")   # (64, 10000) double-centered
 
@@ -67,6 +73,11 @@ Vd_new = glmap.project(new_model_scores, info)
 audit = glmap.load_audit()       # list of 123 dicts
 specs = glmap.specs_from_audit() # list of 123 ModelSpec objects
 ```
+
+> The panel is published as a HuggingFace Dataset at
+> [`Tim419/GLMap-panels`](https://huggingface.co/datasets/Tim419/GLMap-panels)
+> (CC-BY-NC-SA-4.0). `load_matrix` and `load_audit` read from the
+> repository checkout or `$GLMAP_DATA_DIR` (not auto-downloaded).
 
 ---
 

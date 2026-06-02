@@ -173,6 +173,14 @@ _PANEL_PATHS = {
     "MLM_k1ablation_1000":  "out_panel/MLM_k1ablation_1000_main_panel.parquet",
 }
 
+# HuggingFace Dataset fallback for the panel parquets. Files are stored
+# flat (no out_panel/ prefix) in the dataset repo.
+_HF_PANEL_REPO = "Tim419/GLMap-panels"
+_HF_PANEL_FILES = {
+    "main":                 "main_panel.parquet",
+    "MLM_k1ablation_1000":  "MLM_k1ablation_1000_main_panel.parquet",
+}
+
 _MATRIX_PATHS = {
     "V_AR":  "out_phase1/matrices/L_AR.npy",
     "Vd_AR": "out_phase1/matrices/Q_AR.npy",
@@ -183,25 +191,62 @@ _MATRIX_PATHS = {
 }
 
 
-def load_panel(name: str = "main"):
-    """Load a pre-built probe panel as a :class:`pandas.DataFrame`.
+def load_panel(name: str = "main", path=None):
+    """Load a probe panel as a :class:`pandas.DataFrame`.
+
+    Resolution order:
+
+    1. If ``path`` is given, read that parquet directly (use this to load
+       a custom panel built with ``data/build_panel/``).
+    2. Otherwise locate the named prebuilt panel locally via
+       ``$GLMAP_DATA_DIR`` / package data / repo root.
+    3. If not found locally (e.g. installed from a PyPI wheel without the
+       repository checkout), download it from the GLMap HuggingFace
+       Dataset (``Tim419/GLMap-panels``, CC-BY-NC-SA-4.0) and cache it.
 
     Parameters
     ----------
     name : str, default ``"main"``
         One of ``"main"`` (10,000-probe biological panel) or
         ``"MLM_k1ablation_1000"`` (1,000-probe stratified subset used for
-        the k=1 vs k=6 stride PLL ablation).
+        the k=1 vs k=6 stride PLL ablation). Ignored if ``path`` is given.
+    path : str or pathlib.Path, optional
+        Explicit path to a panel parquet. Bypasses name lookup and the
+        HuggingFace fallback.
     """
     import pandas as pd
-    from glmap._data_resolver import resolve_data_path
-    try:
-        rel = _PANEL_PATHS[name]
-    except KeyError:
+
+    if path is not None:
+        return pd.read_parquet(path)
+
+    if name not in _PANEL_PATHS:
         raise ValueError(
             f"Unknown panel name {name!r}; expected one of {list(_PANEL_PATHS)}"
         )
-    return pd.read_parquet(resolve_data_path(rel))
+
+    from glmap._data_resolver import resolve_data_path
+    try:
+        local = resolve_data_path(_PANEL_PATHS[name])
+        return pd.read_parquet(local)
+    except FileNotFoundError:
+        pass  # fall through to HuggingFace download
+
+    try:
+        from huggingface_hub import hf_hub_download
+    except ImportError as exc:
+        raise FileNotFoundError(
+            f"Panel {name!r} not found locally and huggingface_hub is not "
+            "installed for the download fallback. Either install it "
+            "(`pip install huggingface_hub`), set $GLMAP_DATA_DIR, or run "
+            "from a GLMap repository checkout."
+        ) from exc
+
+    fpath = hf_hub_download(
+        repo_id=_HF_PANEL_REPO,
+        repo_type="dataset",
+        filename=_HF_PANEL_FILES[name],
+    )
+    return pd.read_parquet(fpath)
 
 
 def load_matrix(name: str):

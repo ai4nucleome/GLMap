@@ -52,6 +52,7 @@ dependencies = [
     "seaborn",
     "umap-learn",
     "PyYAML",
+    "huggingface_hub",  # panel download fallback (load_panel); lightweight, no torch
 ]
 
 [project.optional-dependencies]
