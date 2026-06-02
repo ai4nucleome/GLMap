@@ -7,7 +7,7 @@ yet built the panel).
 
 The goal is to catch silent regressions in the build pipeline — if any
 test fails after a code change, the build is producing a panel that
-differs from the frozen spec in ``data/panel_sources.yaml``.
+differs from the frozen spec in ``scripts/panel_build/panel_sources.yaml``.
 """
 
 from __future__ import annotations

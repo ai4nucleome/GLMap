@@ -134,7 +134,7 @@ GLMap/
 │   ├── analysis/           PCA, GC-axis, heterozygosity
 │   └── io/                 Parquet schema helpers
 ├── scripts/                CLI entry points for paper reproduction
-│   ├── panel_build/        Probe panel construction (readers, sampling, k-mer)
+│   ├── panel_build/        Panel construction + panel_sources.yaml spec
 │   ├── figures/            One script per paper figure
 │   ├── tables/             One script per paper table
 │   ├── audits/             Model audit script + context overrides
@@ -142,8 +142,7 @@ GLMap/
 ├── tests/                  pytest test suite
 ├── data/
 │   ├── audits/             123-model audit (models.json)
-│   ├── panel_sources.yaml  Panel construction spec
-│   └── benchmark_manifests/ Downstream task metadata
+│   └── downstream_tasks/   Downstream task metadata
 ├── out_panel/              Prebuilt probe panel parquets
 ├── out_phase1/
 │   ├── matrices/           V/Vd/D for AR and MLM branches
@@ -205,7 +204,7 @@ huggingface-cli download hfeng3/dna_foundation_benchmark_dataset \
     --repo-type dataset --local-dir data/dna_foundation_benchmark
 ```
 
-See [data/benchmark_manifests/README.md](data/benchmark_manifests/README.md)
+See [data/downstream_tasks/README.md](data/downstream_tasks/README.md)
 for expected directory layout and task details.
 
 ---

@@ -905,7 +905,7 @@ def main() -> None:
 
         # Try reading expected row counts from the benchmark manifest first
         # (avoids requiring raw CSVs just for dry-run / resume checks).
-        manifest_path = REPO_ROOT / "data" / "benchmark_manifests" / "downstream_tasks.json"
+        manifest_path = REPO_ROOT / "data" / "downstream_tasks" / "downstream_tasks.json"
         if manifest_path.exists():
             manifest = json.loads(manifest_path.read_text())
             for task in _EMBED_TASKS:
@@ -929,9 +929,9 @@ def main() -> None:
             except Exception as exc:
                 sys.exit(
                     f"[sweep] mode=embed needs task row counts. Either:\n"
-                    f"  1. Ensure data/benchmark_manifests/downstream_tasks.json exists, or\n"
+                    f"  1. Ensure data/downstream_tasks/downstream_tasks.json exists, or\n"
                     f"  2. Download task CSVs to {bench_dir}/data_processed/\n"
-                    f"     (see data/benchmark_manifests/README.md)\n"
+                    f"     (see data/downstream_tasks/README.md)\n"
                     f"Error: {exc}"
                 )
 

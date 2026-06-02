@@ -20,7 +20,7 @@ ProbeRow schema (11 fields):
                               multiclass_species   — label encodes species (kept all, label → species)
                               multi_label_any_pos  — multi-label task, kept rows with ≥1 positive
 
-Allocation source of truth: data/panel_sources.yaml.
+Allocation source of truth: scripts/panel_build/panel_sources.yaml.
 
 Three operations live here:
   - load_panel_config():  parse the yaml into typed dataclasses
@@ -48,7 +48,8 @@ from panel_build.readers import ReaderResult, read_dataset
 
 # scripts/panel_build/main_panel.py → repo root is parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SOURCES_YAML = REPO_ROOT / "data" / "panel_sources.yaml"
+# panel_sources.yaml lives next to this build code.
+DEFAULT_SOURCES_YAML = Path(__file__).resolve().parent / "panel_sources.yaml"
 
 
 # ─────────────────────────── Schema ───────────────────────────

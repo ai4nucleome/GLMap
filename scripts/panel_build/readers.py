@@ -1,6 +1,6 @@
 """Per-format readers for panel datasets.
 
-Four supported formats (matching `format:` field in data/panel_sources.yaml):
+Four supported formats (matching `format:` field in scripts/panel_build/panel_sources.yaml):
 
   csv
       Plain CSV with named sequence + label columns. Used by all GUE and

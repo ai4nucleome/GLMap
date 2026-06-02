@@ -48,7 +48,7 @@ The panel covers **14 functional elements** across 4 biological categories:
 Probe lengths range from 156 to 1,024 bp. Sampling is stratified by
 functional element with a fixed random seed (42) for reproducibility.
 
-The panel construction spec is in `data/panel_sources.yaml`. The prebuilt
+The panel construction spec is in `scripts/panel_build/panel_sources.yaml`. The prebuilt
 panel is at `out_panel/main_panel.parquet` (deterministic, regenerable via
 `python scripts/build_panel.py`).
 
@@ -156,7 +156,7 @@ We used 6 binary classification tasks from the
 (Feng et al., 2025): Yeast H4, enhancer, 5mC, promoter TATA (300 bp),
 mouse TFBS 3, and *Arabidopsis* promoter TATA. Total: 48,439 samples.
 
-Task metadata is in `data/benchmark_manifests/downstream_tasks.json`.
+Task metadata is in `data/downstream_tasks/downstream_tasks.json`.
 
 ### Embedding extraction
 
@@ -230,7 +230,7 @@ branch Spearman ρ = 0.963).
 
 - All random operations use explicit seeds (panel: 42; phenotype
   prediction: 5 seeds per fold; split-half: configurable via `--seed`).
-- The probe panel is deterministic given `data/panel_sources.yaml` and
+- The probe panel is deterministic given `scripts/panel_build/panel_sources.yaml` and
   seed 42; `python scripts/build_panel.py` regenerates identical
   parquets.
 - Per-model scores depend on model weights, CUDA version, and floating-

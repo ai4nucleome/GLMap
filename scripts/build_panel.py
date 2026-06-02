@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the main biological panel (10K probes) from local benchmark sources.
 
-Reads `data/panel_sources.yaml` — the single source of truth for which
+Reads `scripts/panel_build/panel_sources.yaml` — the single source of truth for which
 dataset feeds which functional element, how labels are filtered, how
 sequences are truncated, and how many probes each element gets.
 
@@ -42,8 +42,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--sources",
         type=Path,
-        default=REPO_ROOT / "data" / "panel_sources.yaml",
-        help="Panel config YAML (default: data/panel_sources.yaml)",
+        default=REPO_ROOT / "scripts" / "panel_build" / "panel_sources.yaml",
+        help="Panel config YAML (default: scripts/panel_build/panel_sources.yaml)",
     )
     p.add_argument(
         "--out-dir",

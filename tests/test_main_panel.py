@@ -175,7 +175,7 @@ def test_make_probe_row_applies_crop() -> None:
 # ─────────────────────── config loading ───────────────────────
 
 def test_load_real_panel_config() -> None:
-    """Loads the actual data/panel_sources.yaml and validates structure."""
+    """Loads the actual scripts/panel_build/panel_sources.yaml and validates structure."""
     cfg = load_panel_config()
     assert isinstance(cfg, PanelConfig)
     assert cfg.total_probes == 10000

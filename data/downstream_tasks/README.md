@@ -16,7 +16,7 @@ from the upstream HuggingFace dataset:
 
 ```bash
 # Option 1: download the full dataset
-huggingface-cli download hfeng3/dna_foundation_benchmark_dataset --repo-type dataset --local-dir data/dna_foundation_benchmark
+hf download hfeng3/dna_foundation_benchmark_dataset --repo-type dataset --local-dir data/dna_foundation_benchmark
 
 # Option 2: clone the benchmark repo and follow its setup
 git clone https://github.com/ChongWuLab/dna_foundation_benchmark
@@ -35,16 +35,3 @@ data/dna_foundation_benchmark/data_processed/
 ```
 
 Each CSV has columns `Sequence` (DNA string) and `Label` (0 or 1).
-
-## Panel source benchmarks
-
-The 10,000-probe panel is drawn from three published benchmark suites.
-The panel construction spec is in `data/panel_sources.yaml`; probe
-sequences are in `out_panel/main_panel.parquet`. See the paper Methods
-and `docs/METHODS.md` for details.
-
-The upstream benchmark suites are:
-
-- **GUE** (DNABERT / DNABERT-2): promoter, splice, fungi, yeast, virus tasks
-- **PGB** (Plant Genomic Benchmark): chromatin access, polyA, lncRNA, nascent RNA, plant splicing
-- **NT Bench** (Nucleotide Transformer): enhancer task
