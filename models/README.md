@@ -12,10 +12,12 @@ Download all HF-hosted models listed in `download_models_list.txt`:
 bash scripts/download_models/download_models_from_list.sh
 ```
 
-The script calls `hf download` for each model, automatically skipping
-4 entries whose weights come from GitHub clones instead of HF Hub:
-3 GenSLM local names and `lingxusb/megaDNA` (see below). Set `HF_HOME`
-to control the download location.
+The script calls `hf download` for each model, with two special cases:
+the 3 GenSLM entries are local weight names (not HF repos) and are
+skipped; `lingxusb/megaDNA` is fetched from `lingxusb/megaDNA_updated`
+on the Hub (the original `lingxusb/megaDNA` repo is no longer public).
+See the per-model notes below. Set `HF_HOME` to control the download
+location.
 
 **Note**: TensorFlow (`.h5`), joblib, and other non-PyTorch formats are
 excluded. PyTorch weights (`.pt`, `.bin`, `.safetensors`) are downloaded.
@@ -85,7 +87,7 @@ table.
   repos + 3 GenSLM local names + 1 megaDNA special-cased). Two additional
   bigbird-sparse models are commented out (excluded due to minimum seq_len
   incompatibility).
-- `fig4a-svm.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
+- `evo-family-relationship.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
 - `setup_external_models.sh` — clones the 9 upstream repos at pinned SHAs.
 
 ## Upstream licenses

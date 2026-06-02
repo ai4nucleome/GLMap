@@ -9,18 +9,18 @@ each row is an ordered pair (anchor, partner) with a binary label:
 The feature vector for each pair is the per-probe signed difference:
   feature = L_partner - L_anchor                      ∈ ℝ^N (N=10,000)
 This is the parsimonious "single-anchor" feature — for the current
-fig4a-svm.csv whose anchor column is constant (togethercomputer/
+evo-family-relationship.csv whose anchor column is constant (togethercomputer/
 evo-1-8k-base), the magnitude |diff| is a deterministic function of
 diff and adds no new information, so we use diff only.
 
 The LLaMA-2 sibling script (plot_able_llama2_dist.py) uses the
 concatenation [|diff|, diff] because its CSV mixes multiple anchors
 and the magnitude term is anchor-invariant. Re-introduce the concat
-form here if you extend fig4a-svm.csv to multi-anchor data.
+form here if you extend evo-family-relationship.csv to multi-anchor data.
 
 Inputs
 ------
-  models/fig4a-svm.csv   CSV of (anchor, partner, label) rows. In the
+  models/evo-family-relationship.csv   CSV of (anchor, partner, label) rows. In the
                           current panel of 8 rows the anchor is fixed
                           to togethercomputer/evo-1-8k-base.
   out_phase1/scores/<slug>/probes.parquet   per-probe sum_log_p vectors
@@ -63,7 +63,7 @@ Usage
 -----
   $PY scripts/figures/fig4a_svm_evo_lineage.py
   $PY scripts/figures/fig4a_svm_evo_lineage.py \\
-      --labels-csv models/fig4a-svm.csv \\
+      --labels-csv models/evo-family-relationship.csv \\
       --out figures \\
       --figsize 7,6 \\
       --kernel linear --projection pca
@@ -93,7 +93,7 @@ from scripts.figures.phase1_main_figure import PALETTE, RCPARAMS  # noqa: E402
 
 
 def _load_label_csv(csv_path: Path) -> list[tuple[str, str, int]]:
-    """Load fig4a-svm.csv as a list of (anchor, partner, label) rows.
+    """Load evo-family-relationship.csv as a list of (anchor, partner, label) rows.
 
     Schema (3 columns, no header):
       anchor   hf_id of the reference model
@@ -182,7 +182,7 @@ def _load_pair_features(
 
     if len(anchors_seen) != 1:
         sys.exit(
-            "fig4a-svm.csv must use a single shared anchor in column 1; "
+            "evo-family-relationship.csv must use a single shared anchor in column 1; "
             f"found {len(anchors_seen)} distinct anchors: {sorted(anchors_seen)}"
         )
 
@@ -482,7 +482,7 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--labels-csv", type=Path,
-                   default=REPO_ROOT / "models/fig4a-svm.csv",
+                   default=REPO_ROOT / "models/evo-family-relationship.csv",
                    help="CSV file with two columns: hf_id, lineage_label (0/1).")
     p.add_argument("--scores-dir", type=Path,
                    default=REPO_ROOT / "out_phase1/scores",

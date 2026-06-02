@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the table replacing the original Fig 4a (SVM scatter).
 
-For each (anchor, partner, label) row in ``models/fig4a-svm.csv`` we
+For each (anchor, partner, label) row in ``models/evo-family-relationship.csv`` we
 compute the GLMap pipeline distance between the partner model and the
 shared anchor (``togethercomputer/evo-1-8k-base``):
 
@@ -22,7 +22,7 @@ Output
 Schema (3 columns):
   Partner model | Derived from anchor (✓/✗) | GLMap distance to anchor
 
-✓ corresponds to label = 1 in ``fig4a-svm.csv`` (partner is a direct
+✓ corresponds to label = 1 in ``evo-family-relationship.csv`` (partner is a direct
 fine-tune / descendant of the anchor); ✗ corresponds to label = 0
 (partner is a fresh / unrelated training run).
 
@@ -48,7 +48,7 @@ if str(REPO_ROOT) not in sys.path:
 from glmap.matrices.build import clip_lower, double_center  # noqa: E402
 
 
-CSV_PATH = REPO_ROOT / "models" / "fig4a-svm.csv"
+CSV_PATH = REPO_ROOT / "models" / "evo-family-relationship.csv"
 AUDIT_PATH = REPO_ROOT / "data" / "audits" / "models.json"
 SCORES_DIR = REPO_ROOT / "out_phase1" / "scores"
 # Two LaTeX outputs, one per cosine-similarity variant.
@@ -85,7 +85,7 @@ def _load_csv():
             rows.append((anchor, partner, int(label)))
     anchors = {a for a, _, _ in rows}
     if len(anchors) != 1:
-        sys.exit(f"fig4a-svm.csv must share a single anchor; got {anchors}")
+        sys.exit(f"evo-family-relationship.csv must share a single anchor; got {anchors}")
     return next(iter(anchors)), rows
 
 
@@ -299,7 +299,7 @@ def main() -> None:
     # cosine variant correctly.
     CAPTION_COMMON = (
         r"Evo lineage distances. For each partner model in "
-        r"\texttt{models/fig4a-svm.csv}, two complementary metrics "
+        r"\texttt{models/evo-family-relationship.csv}, two complementary metrics "
         r"relate it to the shared anchor "
         r"\texttt{togethercomputer/evo-1-8k-base} (StripedHyena, evo1 "
         r"family). "
