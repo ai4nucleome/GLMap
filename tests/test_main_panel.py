@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from glmap.panel.main_panel import (
+from build_panel.main_panel import (
     DatasetSpec,
     ElementSpec,
     PanelConfig,
@@ -22,7 +22,7 @@ from glmap.panel.main_panel import (
     _make_probe_row,
     load_panel_config,
 )
-from glmap.panel.readers import ReaderResult
+from build_panel.readers import ReaderResult
 
 
 # ─────────────────────── helpers ───────────────────────

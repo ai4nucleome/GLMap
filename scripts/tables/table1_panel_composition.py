@@ -7,7 +7,7 @@ functional element), and emits two formats:
   - Markdown to stdout (for visual review)
   - LaTeX (booktabs) to tables/table1_panel_composition.tex
 
-Re-run after any panel rebuild (build_panel.py / build_control_panel.py)
+Re-run after any panel rebuild (build_panel.py)
 to keep the figure in sync.
 """
 

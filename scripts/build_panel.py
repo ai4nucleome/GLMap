@@ -24,8 +24,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+# Panel construction code lives outside the library at data/build_panel/
+# (see data/build_panel/README.md). Add data/ to sys.path so `from
+# build_panel.main_panel import ...` works.
+if str(REPO_ROOT / "data") not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT / "data"))
 
-from glmap.panel.main_panel import (  # noqa: E402
+from build_panel.main_panel import (  # noqa: E402
     build_main_panel,
     load_panel_config,
     write_panel_outputs,

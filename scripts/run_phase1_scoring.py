@@ -6,7 +6,6 @@ out_panel/main_panel.parquet. Produces the canonical layout:
 
     out_phase1/
       probes/main_panel.parquet           # copy of input
-      probes/control_panel.parquet        # copy of input (if available)
       models/{model_id_slug}.json         # per-model metadata
       scores/{model_id_slug}/probes.parquet
         # one row per panel probe, aligned by probe_id; columns include
@@ -51,7 +50,6 @@ Resume:
 Usage:
     python scripts/run_phase1_scoring.py \\
         [--panel out_panel/main_panel.parquet] \\
-        [--control out_panel/control_panel.parquet] \\
         [--out out_phase1] \\
         [--device cuda:6] \\
         [--stride 6] \\
@@ -801,8 +799,6 @@ def _write_report(
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--panel", type=Path, default=REPO_ROOT / "out_panel/main_panel.parquet")
-    p.add_argument("--control", type=Path,
-                   default=REPO_ROOT / "out_panel/control_panel.parquet")
     p.add_argument("--out", type=Path, default=REPO_ROOT / "out_phase1")
     p.add_argument(
         "--device",
@@ -887,10 +883,6 @@ def main() -> None:
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "probes").mkdir(parents=True, exist_ok=True)
     panel.to_parquet(args.out / "probes" / "main_panel.parquet", index=False)
-    if args.control.exists():
-        control = pd.read_parquet(args.control)
-        control.to_parquet(args.out / "probes" / "control_panel.parquet", index=False)
-        print(f"[panel] copied control panel ({len(control)} probes)", flush=True)
 
     (args.out / "models").mkdir(parents=True, exist_ok=True)
     (args.out / "scores").mkdir(parents=True, exist_ok=True)

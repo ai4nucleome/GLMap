@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import math
 
+import pytest
+
 from glmap.panel.composition import (
     BASES,
     DINUC_INDEX,
@@ -36,7 +38,7 @@ def test_gc_fraction_basic() -> None:
     assert gc_fraction("AAAA") == 0.0
     assert gc_fraction("GGGG") == 1.0
     assert math.isclose(gc_fraction("ACGT"), 0.5)
-    assert math.isclose(gc_fraction("ACGTN"), 0.4)  # N is not GC
+    assert math.isclose(gc_fraction("ACGTACGTGC"), 0.6)
 
 
 def test_dinuc_vec_sums_to_one_for_dna() -> None:
@@ -72,13 +74,14 @@ def test_trinuc_vec_sums_to_one() -> None:
     assert math.isclose(sum(vec), 1.0, rel_tol=1e-9)
 
 
-def test_dinuc_ignores_non_acgt() -> None:
-    """Ns produce no dinucleotide counts, vector still normalizes correctly."""
-    vec_with_n = dinuc_vec("ACNGT")
-    # Valid dinucleotides: AC (CN dropped, NG dropped, GT kept) -> AC, GT only
-    expected_nonzero = {DINUC_INDEX["AC"]: 0.5, DINUC_INDEX["GT"]: 0.5}
-    for idx, expected in expected_nonzero.items():
-        assert math.isclose(vec_with_n[idx], expected, rel_tol=1e-6)
+def test_dinuc_rejects_non_acgt() -> None:
+    """Non-ACGT input violates the composition.py contract and raises."""
+    with pytest.raises(AssertionError, match="ACGT-only"):
+        dinuc_vec("ACNGT")
+    with pytest.raises(AssertionError, match="ACGT-only"):
+        dinuc_vec("acgt")  # lowercase also rejected
+    with pytest.raises(AssertionError, match="ACGT-only"):
+        gc_fraction("ACGT-N")
 
 
 def test_gc_stratify_default_bins() -> None:

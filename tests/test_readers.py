@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from glmap.panel.main_panel import DatasetSpec
-from glmap.panel.readers import read_dataset
+from build_panel.main_panel import DatasetSpec
+from build_panel.readers import read_dataset
 
 
 def _make_csv(tmp_path: Path, content: str, name: str = "ds.csv") -> Path:

@@ -21,7 +21,7 @@ Matrix pipeline (paper notation: ``V`` raw, ``V_d`` double-centered):
 
 Pre-built artefacts:
 
-* :func:`load_panel` / :func:`load_control_panel` — load probe panel parquet.
+* :func:`load_panel` — load the prebuilt probe panel parquet.
 * :func:`load_matrix` — load a pre-built ``V_AR`` / ``Vd_AR`` / ``D_AR`` /
   ``V_MLM`` / ``Vd_MLM`` / ``D_MLM`` numpy matrix.
 * :func:`load_audit` — load the 123-model audit as ``list[dict]``.
@@ -53,7 +53,6 @@ __all__ = [
     "project",
     # Pre-built artefacts
     "load_panel",
-    "load_control_panel",
     "load_matrix",
     "load_audit",
     # Model scoring
@@ -171,7 +170,6 @@ def project(V_new_row, fit_info: dict):
 
 _PANEL_PATHS = {
     "main":                 "out_panel/main_panel.parquet",
-    "control":              "out_panel/control_panel.parquet",
     "MLM_k1ablation_1000":  "out_panel/MLM_k1ablation_1000_main_panel.parquet",
 }
 
@@ -191,8 +189,7 @@ def load_panel(name: str = "main"):
     Parameters
     ----------
     name : str, default ``"main"``
-        One of ``"main"`` (10,000-probe biological panel),
-        ``"control"`` (10,000-probe synthetic control panel), or
+        One of ``"main"`` (10,000-probe biological panel) or
         ``"MLM_k1ablation_1000"`` (1,000-probe stratified subset used for
         the k=1 vs k=6 stride PLL ablation).
     """
@@ -205,11 +202,6 @@ def load_panel(name: str = "main"):
             f"Unknown panel name {name!r}; expected one of {list(_PANEL_PATHS)}"
         )
     return pd.read_parquet(resolve_data_path(rel))
-
-
-def load_control_panel():
-    """Convenience: same as ``load_panel("control")``."""
-    return load_panel("control")
 
 
 def load_matrix(name: str):

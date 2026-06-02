@@ -252,6 +252,16 @@ models audited in this work for releasing their weights and code publicly.
 
 ## License
 
-This repository is licensed under [Apache-2.0](LICENSE). Individual model
-weights follow their own upstream licenses (see
+This repository uses **two licenses**:
+
+- **Source code** (everything under `src/`, `scripts/`, `tests/`,
+  `data/build_panel/`, etc.): [Apache-2.0](LICENSE).
+- **Data artefacts** (`out_panel/`, `out_phase1/matrices/`,
+  `out_phase1/scores/`, `out_phase2/`): [CC-BY-NC-SA-4.0](LICENSE-DATA).
+  These artefacts inherit the upstream Plant Genomic Benchmark license
+  (1,600 probes drawn from PGB; CC-BY-NC-SA-4.0 via ShareAlike). They
+  are usable for non-commercial research with attribution; commercial
+  use requires obtaining the panel from a license-compatible source.
+
+Individual model weights also follow their own upstream licenses (see
 [models/README.md](models/README.md)).

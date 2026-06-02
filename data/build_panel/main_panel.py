@@ -42,11 +42,12 @@ from typing import Any
 import pandas as pd
 import yaml
 
-from .composition import dinuc_vec, gc_fraction, trinuc_vec
-from .readers import ReaderResult, read_dataset
+from glmap.panel.composition import dinuc_vec, gc_fraction, trinuc_vec
+from build_panel.readers import ReaderResult, read_dataset
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# data/build_panel/main_panel.py → repo root is parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCES_YAML = REPO_ROOT / "data" / "panel_sources.yaml"
 
 
