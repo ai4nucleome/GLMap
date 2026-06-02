@@ -1,8 +1,7 @@
 # data/
 
 Metadata and manifests for GLMap. This directory holds small,
-version-controlled files only. The large raw benchmark corpora are
-**not** committed — download them as described below.
+version-controlled files only. **The large raw benchmark corpora should download as described below.**
 
 ## Committed contents
 
@@ -23,12 +22,11 @@ data/
 build config lives at `scripts/panel_build/panel_sources.yaml` (next to
 the build code).
 
-## Raw benchmark data (not committed)
+## Raw benchmark data
 
 GLMap draws its 10,000-probe panel from three published genomic
-benchmarks, and its downstream evaluation from a fourth. None of the raw
-data is shipped in this repository (≈ 70 GB total); download what you
-need into `data/` before running the corresponding pipeline.
+benchmarks. None of the raw data is shipped in this repository; 
+download what you need into `data/` before running the corresponding pipeline.
 
 ### 1. GUE — panel: promoter, splice, fungi, yeast, virus (~5,600 probes)
 
@@ -46,12 +44,6 @@ need into `data/` before running the corresponding pipeline.
 
 - **Source**: Feng et al., 2025 — Apache-2.0
 - **Download**: <https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset>
-
-  ```bash
-  hf download hfeng3/dna_foundation_benchmark_dataset \
-      --repo-type dataset --local-dir data/dna_foundation_benchmark
-  ```
-
 - **Extract to**: `data/dna_foundation_benchmark/`
 
 The exact per-file paths consumed by the panel build are listed in
@@ -70,32 +62,11 @@ data/
 │   └── README.md
 │
 ├── GUE/                            ← downloaded (panel)
-│   ├── prom/prom_300_{all,notata,tata}/{train,dev,test}.csv
-│   ├── splice/reconstructed/{train,dev,test}.csv
-│   ├── fungi/species_20/{train,dev,test}.csv
-│   ├── EMP/H3/{train,dev,test}.csv
-│   └── virus/{species_40,covid}/{train,dev,test}.csv
 │
 ├── PGB/                            ← downloaded (panel)
-│   ├── chromatin_access/...
-│   ├── poly_a/...
-│   ├── lncrna/...
-│   ├── pro_seq/...
-│   └── splicing/...
 │
-└── dna_foundation_benchmark/       ← downloaded (panel enhancer + downstream)
-    ├── enhancers/enhancer/{train,test}.csv          (panel)
-    └── data_processed/                              (downstream tasks)
-        ├── EMP/Yeast_H4/{train,test}.csv
-        ├── enhancers/enhancer/{train,test}.csv
-        ├── iDNA_ABF/5mC/{train,test}.csv
-        ├── iPro-WAEL/Promoter_Arabidopsis_TATA/{train,test}.csv
-        ├── mouse/mouse_TFBS_3/{train,test}.csv
-        └── prom/promoter_tata_300bps/{train,test}.csv
+└── dna_foundation_benchmark/       ← downloaded (panel + downstream)
 ```
-
-All downloaded directories (`GUE/`, `PGB/`, `dna_foundation_benchmark/`)
-are gitignored.
 
 ## Licensing
 
