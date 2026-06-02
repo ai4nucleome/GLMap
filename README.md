@@ -154,7 +154,7 @@ GLMap/
 ├── figures/                Paper figure PDFs
 ├── tables/                 Paper table LaTeX sources
 ├── models/                 Model download manifest + setup scripts
-└── docs/                   Methods, env routing, model catalog
+└── docs/                   Per-family environment routing for scoring
 ```
 
 ---
