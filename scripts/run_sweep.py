@@ -1,7 +1,7 @@
 """Full-roster parallel sweep across the audit-derived roster (123 models as of 2026-05-20).
 
 For each scorable model in `data/audits/models.json`, look up the correct
-micromamba env + runtime knobs per docs/env_routing.md, then dispatch a
+micromamba env + runtime knobs per models/env_routing.md, then dispatch a
 per-model subprocess on a pool of GPUs. Two modes are supported:
 
   --mode stability (default)
@@ -114,7 +114,7 @@ def route_model(
     hf_id: str,
     evo2_40b_gpus: int | None = None,
 ) -> RouteSpec:
-    """Map hf_id → RouteSpec. Mirrors docs/env_routing.md table.
+    """Map hf_id → RouteSpec. Mirrors models/env_routing.md table.
 
     `evo2_40b_gpus` overrides the GPU allocation for any 40b evo2 model
     (both `arcinstitute/evo2_40b` and `arcinstitute/evo2_40b_base`). When
@@ -872,7 +872,7 @@ def main() -> None:
     if args.mode == "scoring":
         panel_path = (
             Path(args.panel) if args.panel
-            else REPO_ROOT / "out_panel" / "main_panel.parquet"
+            else REPO_ROOT / "data/panels" / "main_panel.parquet"
         )
         try:
             import pandas as _pd

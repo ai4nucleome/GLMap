@@ -12,7 +12,7 @@
 #   cd /path/to/GLMap-code-public
 #   bash models/setup_external_models.sh
 #
-# After cloning, see docs/env_routing.md for which micromamba environment
+# After cloning, see models/env_routing.md for which micromamba environment
 # each family requires.
 
 # Note: no `set -e` — one repo failing (network, deleted upstream, bad
@@ -75,5 +75,5 @@ fi
 
 echo "All 8 repos cloned into $DEST/"
 echo "Next steps:"
-echo "  1. See docs/env_routing.md for per-family environment setup."
+echo "  1. See models/env_routing.md for per-family environment setup."
 echo "  2. Download HuggingFace models: bash scripts/download_models/download_models_from_list.sh"

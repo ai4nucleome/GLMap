@@ -5,7 +5,7 @@ Reads `scripts/panel_build/panel_sources.yaml` — the single source of truth fo
 dataset feeds which functional element, how labels are filtered, how
 sequences are truncated, and how many probes each element gets.
 
-Emits under --out-dir (default `out_panel/`):
+Emits under --out-dir (default `data/panels/`):
     main_panel.parquet         10K rows × 11 fields (ProbeRow schema)
     panel_manifest.json        per-element / per-dataset emitted counts + seeds
     panel_summary.md           human-readable element × species cross-tab + GC stats
@@ -48,8 +48,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--out-dir",
         type=Path,
-        default=REPO_ROOT / "out_panel",
-        help="Output directory (default: out_panel/)",
+        default=REPO_ROOT / "data/panels",
+        help="Output directory (default: data/panels/)",
     )
     p.add_argument(
         "--fast",

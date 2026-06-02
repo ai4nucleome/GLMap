@@ -75,7 +75,7 @@ EXPERIMENTS = {
         "k1_dir": REPO_ROOT / "out_phase1/MLM_k1ablation_1000_scores/scores",
         "k6_dir": REPO_ROOT / "out_phase1/scores",
         "probe_filter_parquet": (
-            REPO_ROOT / "out_panel/MLM_k1ablation_1000_main_panel.parquet"
+            REPO_ROOT / "data/panels/MLM_k1ablation_1000_main_panel.parquet"
         ),
         "expected_models": 56,
         "headline": "56 MLM models × 1000 probes (stratified subset)",

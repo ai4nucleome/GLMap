@@ -36,7 +36,7 @@ STRIDE="${STRIDE:-1}"
 GPU_IDS="${GPU_IDS:-0,1,2,3,4,5,6,7}"
 
 # Pre-built 1000-probe subset for experiment A.
-SUBSET_PANEL="${REPO_ROOT}/out_panel/MLM_k1ablation_1000_main_panel.parquet"
+SUBSET_PANEL="${REPO_ROOT}/data/panels/MLM_k1ablation_1000_main_panel.parquet"
 if [[ ! -f "${SUBSET_PANEL}" ]]; then
     echo "subset panel missing — run:"
     echo "  ${PY} scripts/build_k-stride-PPL_ablation_subset.py"
@@ -116,7 +116,7 @@ run_B() {
     echo ""
     echo "===================================================================="
     echo "Experiment B — 10 representative MLM × full 10000 panel × stride=${STRIDE}"
-    echo "  Panel : out_panel/main_panel.parquet (default)"
+    echo "  Panel : data/panels/main_panel.parquet (default)"
     echo "  Output: out_phase1/MLM_k1_ablation_full_scores/"
     echo "  Logs  : ${log_dir}"
     echo "  GPUs  : ${GPU_IDS}"

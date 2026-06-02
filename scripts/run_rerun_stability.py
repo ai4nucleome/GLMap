@@ -143,7 +143,7 @@ def _save_report(out_dir: Path, report: dict) -> None:
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--panel", type=Path,
-                   default=REPO_ROOT / "out_panel/main_panel.parquet",
+                   default=REPO_ROOT / "data/panels/main_panel.parquet",
                    help="Path to the main panel parquet.")
     p.add_argument("--out", type=Path,
                    default=REPO_ROOT / "out_phase1/stability",

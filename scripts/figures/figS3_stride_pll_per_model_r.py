@@ -72,7 +72,7 @@ from scripts.figures.phase1_main_figure import PALETTE, RCPARAMS  # noqa: E402
 
 K1_DIR = REPO_ROOT / "out_phase1/MLM_k1ablation_1000_scores/scores"
 K6_DIR = REPO_ROOT / "out_phase1/scores"
-PANEL_SUBSET = REPO_ROOT / "out_panel/MLM_k1ablation_1000_main_panel.parquet"
+PANEL_SUBSET = REPO_ROOT / "data/panels/MLM_k1ablation_1000_main_panel.parquet"
 AUDIT_JSON = REPO_ROOT / "data/audits/models.json"
 
 OTHER_COLOR = "#B8B8B8"

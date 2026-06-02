@@ -29,7 +29,7 @@ metadata lists (hf_ids, branches, families, organizations):
   probe_ids        : list[str], length N
   functional_elements : list[str], length N
 
-The probe column order matches the canonical `out_panel/main_panel.parquet`
+The probe column order matches the canonical `data/panels/main_panel.parquet`
 probe_id ordering (the same one used everywhere else in this repo).
 """
 
@@ -84,7 +84,7 @@ class CombinedGLMap:
 def load_combined_glmap(
     audit_path: Path = REPO_ROOT / "data/audits/models.json",
     scores_dir: Path = REPO_ROOT / "out_phase1/scores",
-    panel_path: Path = REPO_ROOT / "out_panel/main_panel.parquet",
+    panel_path: Path = REPO_ROOT / "data/panels/main_panel.parquet",
     clip_q: float = 0.02,
 ) -> CombinedGLMap:
     """Build the combined 123-model GLMap on-the-fly. Fail-fast on any

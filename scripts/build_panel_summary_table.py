@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the Stage 2 panel summary table (paper Table 1 + Supplementary S1).
 
-For each of the 14 functional_element entries in `out_panel/main_panel.parquet`,
+For each of the 14 functional_element entries in `data/panels/main_panel.parquet`,
 aggregate:
   - source benchmark + original task path
   - species_group (domain) and dominant species
@@ -9,18 +9,14 @@ aggregate:
   - sequence length (median + range)
   - GC content (median + IQR)
 
-Two outputs (regenerated; the TSV is gitignored, the markdown is tracked
-under docs/ for the paper write-up):
+Output (regenerated; tracked for the paper write-up):
 
-  out_panel/panel_summary_table.tsv          machine-readable per-element row
-  out_panel/panel_summary_per_dataset.tsv    detail: per (element, source file)
-  docs/panel_summary.md                      human-readable markdown for the
-                                             paper Table 1 + Supplementary S1
+  data/panels/panel_summary.md                 human-readable markdown for the
+                                               paper Table 1 + Supplementary S1
 
 Run:
-  $PY scripts/build_panel_summary_table.py [--panel out_panel/main_panel.parquet]
-                                            [--out-tsv out_panel]
-                                            [--out-md docs]
+  $PY scripts/build_panel_summary_table.py [--panel data/panels/main_panel.parquet]
+                                            [--out-md data/panels]
 """
 
 from __future__ import annotations
@@ -274,13 +270,10 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--panel", type=Path,
-                   default=REPO_ROOT / "out_panel" / "main_panel.parquet",
+                   default=REPO_ROOT / "data/panels" / "main_panel.parquet",
                    help="Stage 2 main panel parquet.")
-    p.add_argument("--out-tsv", type=Path,
-                   default=REPO_ROOT / "out_panel",
-                   help="Directory for TSV outputs (gitignored).")
     p.add_argument("--out-md", type=Path,
-                   default=REPO_ROOT / "docs",
+                   default=REPO_ROOT / "data/panels",
                    help="Directory for the markdown summary (tracked).")
     p.add_argument("--md-name", type=str, default="panel_summary.md",
                    help="Filename for the markdown output.")
@@ -301,19 +294,11 @@ def main() -> None:
     per_dataset = build_per_dataset(panel)
     md = render_markdown(per_elem, per_dataset, n_total)
 
-    args.out_tsv.mkdir(parents=True, exist_ok=True)
     args.out_md.mkdir(parents=True, exist_ok=True)
 
-    tsv_elem = args.out_tsv / "panel_summary_table.tsv"
-    tsv_ds = args.out_tsv / "panel_summary_per_dataset.tsv"
     md_path = args.out_md / args.md_name
-
-    per_elem.to_csv(tsv_elem, sep="\t", index=False)
-    per_dataset.to_csv(tsv_ds, sep="\t", index=False)
     md_path.write_text(md)
 
-    print(f"[done] wrote {tsv_elem}  ({len(per_elem)} rows)", flush=True)
-    print(f"[done] wrote {tsv_ds}  ({len(per_dataset)} rows)", flush=True)
     print(f"[done] wrote {md_path}", flush=True)
 
 

@@ -169,8 +169,8 @@ def project(V_new_row, fit_info: dict):
 # ---------------------------------------------------------------------------
 
 _PANEL_PATHS = {
-    "main":                 "out_panel/main_panel.parquet",
-    "MLM_k1ablation_1000":  "out_panel/MLM_k1ablation_1000_main_panel.parquet",
+    "main":                 "data/panels/main_panel.parquet",
+    "MLM_k1ablation_1000":  "data/panels/MLM_k1ablation_1000_main_panel.parquet",
 }
 
 # HuggingFace Dataset fallback for the panel parquet. Only the main

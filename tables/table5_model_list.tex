@@ -1,0 +1,149 @@
+\onecolumn
+\begingroup\scriptsize
+\setlength{\tabcolsep}{4pt}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{@{} l l @{\extracolsep{\fill}} l r r l @{}}
+\caption{Model list of 123 genomic foundation models scored by GLMap. The Training method column flags each model as AR (autoregressive, forward log-likelihood) or MLM (masked-language, pseudo-log-likelihood under stride-$k$ masking with $k=6$). Parameter counts are formatted as $K=10^{3}$, $M=10^{6}$, $B=10^{9}$; context lengths as $k=10^{3}$, $M=10^{6}$ base pairs. Tokeniser categories are abbreviated: 1-nt = single-nucleotide tokeniser, $k$-mer = non-overlapping $k$-mer tokeniser, BPE = byte-pair-encoding tokeniser.}\label{table5}\\
+\toprule
+T.M. & Hugging Face identifier & Architecture & Params & Ctx (bp) & Tokeniser \\
+\midrule
+\endfirsthead
+\multicolumn{6}{c}{\tablename\ \thetable{} (continued).}\\
+\toprule
+T.M. & Hugging Face identifier & Architecture & Params & Ctx (bp) & Tokeniser \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{\textit{Continued on next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+AR & \seqsplit{arcinstitute/evo2\_40b} \cite{brixi2026genome} & StripedHyena2 & 40B & 1M & 1-nt \\
+AR & \seqsplit{arcinstitute/evo2\_40b\_base} \cite{brixi2026genome} & StripedHyena2 & 40B & 8.2k & 1-nt \\
+AR & \seqsplit{arcinstitute/evo2\_20b} \cite{brixi2026genome} & StripedHyena2 & 20B & 1M & 1-nt \\
+AR & \seqsplit{arcinstitute/evo2\_7b} \cite{brixi2026genome} & StripedHyena2 & 7B & 1M & 1-nt \\
+AR & \seqsplit{arcinstitute/evo2\_7b\_262k} \cite{brixi2026genome} & StripedHyena2 & 7B & 262k & 1-nt \\
+AR & \seqsplit{arcinstitute/evo2\_7b\_base} \cite{brixi2026genome} & StripedHyena2 & 7B & 8.2k & 1-nt \\
+AR & \seqsplit{evo-design/evo-2-7b-8k-microviridae} \cite{brixi2026genome} & StripedHyena2 & 7B & 8.2k & 1-nt \\
+AR & \seqsplit{evo-design/evo-1-7b-131k-microviridae} \cite{nguyen2024sequence} & StripedHyena & 6.5B & 131k & 1-nt \\
+AR & \seqsplit{LongSafari/evo-1-8k-crispr} \cite{nguyen2024sequence} & StripedHyena & 6.5B & 8.2k & 1-nt \\
+AR & \seqsplit{LongSafari/evo-1-8k-transposon} \cite{nguyen2024sequence} & StripedHyena & 6.5B & 8.2k & 1-nt \\
+AR & \seqsplit{evo-design/evo-1.5-8k-base} \cite{nguyen2024sequence} & StripedHyena & 6.5B & 8.2k & 1-nt \\
+AR & \seqsplit{togethercomputer/evo-1-131k-base} \cite{nguyen2024sequence} & StripedHyena & 6.4B & 131k & 1-nt \\
+AR & \seqsplit{togethercomputer/evo-1-8k-base} \cite{nguyen2024sequence} & StripedHyena & 6.4B & 8.2k & 1-nt \\
+AR & \seqsplit{arcinstitute/evo2\_1b\_base} \cite{nguyen2024sequence} & StripedHyena2 & 1B & 8.2k & 1-nt \\
+AR & \seqsplit{ZhejiangLab/Genos-10B} \cite{lin2025genos} & Decoder & 10B & 1M & BPE \\
+AR & \seqsplit{ZhejiangLab/Genos-10B-v2} \cite{lin2025genos} & Decoder & 10B & 1M & BPE \\
+AR & \seqsplit{ZhejiangLab/Genos-1.2B} \cite{lin2025genos} & Decoder & 1.2B & 1M & BPE \\
+AR & \seqsplit{HuggingFaceBio/Carbon-8B}\footnotemark[1]& Decoder & 8.3B & 197k & 6-mer \\
+AR & \seqsplit{HuggingFaceBio/Carbon-3B}\footnotemark[1]& Decoder & 3.5B & 197k & 6-mer \\
+AR & \seqsplit{HuggingFaceBio/Carbon-500M}\footnotemark[1]& Decoder & 512M & 49.2k & 6-mer \\
+AR & \seqsplit{Mishamq/HybriDNA-7B} \cite{ma2025hybridna} & Mamba Hybrid & 6.3B & 131k & 1-nt \\
+AR & \seqsplit{Mishamq/HybriDNA-3B} \cite{ma2025hybridna} & Mamba Hybrid & 3.1B & 131k & 1-nt \\
+AR & \seqsplit{Mishamq/HybriDNA-300M} \cite{ma2025hybridna} & Mamba Hybrid & 298M & 131k & 1-nt \\
+AR & \seqsplit{DOEJGI/GenomeOcean-4B} \cite{zhou2025genomeocean} & Decoder & 4.3B & 51.2k & BPE \\
+AR & \seqsplit{DOEJGI/GenomeOcean-4B-bgcFM} \cite{zhou2025genomeocean} & Decoder & 4.3B & 51.2k & BPE \\
+AR & \seqsplit{DOEJGI/GenomeOcean-500M} \cite{zhou2025genomeocean} & Decoder & 541M & 5.1k & BPE \\
+AR & \seqsplit{DOEJGI/GenomeOcean-500M-v1.2} \cite{zhou2025genomeocean} & Decoder & 541M & 5.1k & BPE \\
+AR & \seqsplit{DOEJGI/GenomeOcean-100M} \cite{zhou2025genomeocean} & Decoder & 120M & 5.1k & BPE \\
+AR & \seqsplit{DOEJGI/GenomeOcean-100M-v1.2} \cite{zhou2025genomeocean} & Decoder & 120M & 5.1k & BPE \\
+AR & \seqsplit{GenerTeam/GENERator-eukaryote-3b-base} \cite{wu2025generator} & Decoder & 3B & 98.3k & 6-mer \\
+AR & \seqsplit{GenerTeam/GENERator-v2-eukaryote-3b-base} \cite{Li2026.01.27.702015}& Decoder & 3B & 98.3k & 6-mer \\
+AR & \seqsplit{GenerTeam/GENERator-v2-prokaryote-3b-base} \cite{Li2026.01.27.702015}& Decoder & 3B & 98.3k & 6-mer \\
+AR & \seqsplit{GenerTeam/GENERator-eukaryote-1.2b-base} \cite{wu2025generator} & Decoder & 1.2B & 98.3k & 6-mer \\
+AR & \seqsplit{GenerTeam/GENERator-v2-eukaryote-1.2b-base} \cite{Li2026.01.27.702015}& Decoder & 1.2B & 98.3k & 6-mer \\
+AR & \seqsplit{GenerTeam/GENERator-v2-prokaryote-1.2b-base} \cite{Li2026.01.27.702015}& Decoder & 1.2B & 98.3k & 6-mer \\
+AR & \seqsplit{GenSLM-2.5B} \cite{zvyagin2023genslms} & Decoder & 2.5B & 6.1k & 3-mer \\
+AR & \seqsplit{GenSLM-250M} \cite{zvyagin2023genslms} & Decoder & 250M & 6.1k & 3-mer \\
+AR & \seqsplit{GenSLM-25M} \cite{zvyagin2023genslms} & Decoder & 25M & 6.1k & 3-mer \\
+AR & \seqsplit{ZhejiangLab/OneGenome-Rice} \cite{qian2026onegenomerice} & Decoder & 1.2B & 1M & BPE \\
+MLM & \seqsplit{living-models/Botanic0-L} \cite{ogier2026botanic}& Encoder & 991M & 6.2k & 6-mer \\
+MLM & \seqsplit{living-models/Botanic0-M} \cite{ogier2026botanic}& Encoder & 260M & 6.2k & 6-mer \\
+MLM & \seqsplit{living-models/Botanic0-S} \cite{ogier2026botanic}& Encoder & 114M & 6.2k & 6-mer \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-417M-Athaliana}\footnotemark[2]& Decoder & 422M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-422M-hg38}\footnotemark[2]& Decoder & 422M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-bacteria}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-bacteriophage}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-hg38}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-lncRNA}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-noncoding}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-plasmid}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-virus}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-138M-yeast}\footnotemark[2]& Decoder & 138M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-17M-cow-5races}\footnotemark[2]& Decoder & 16.8M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-17M-goat-5races}\footnotemark[2]& Decoder & 16.8M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-17M-hg38}\footnotemark[2]& Decoder & 16.8M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-17M-pig-13races}\footnotemark[2]& Decoder & 16.8M & 2k & BPE \\
+AR & \seqsplit{RaphaelMourad/Mistral-DNA-v1-1M-hg38}\footnotemark[2]& Decoder & 986K & 1k & BPE \\
+AR & \seqsplit{RaphaelMourad/Jamba-DNA-v1-114M-hg38}\footnotemark[2]& Mamba Hybrid & 114M & 4.1k & BPE \\
+AR & \seqsplit{lingxusb/megaDNA} \cite{shao2024long} & Decoder & 146M & 131k & 1-nt \\
+AR & \seqsplit{lingxusb/PlasmidGPT} \cite{shao2024plasmidgpt}& Decoder & 110M & 10.2k & BPE \\
+AR & \seqsplit{LongSafari/hyenadna-medium-160k-seqlen} \cite{nguyen2023hyenadna}& Hyena & 13.2M & 160k & 1-nt \\
+AR & \seqsplit{LongSafari/hyenadna-medium-450k-seqlen} \cite{nguyen2023hyenadna}& Hyena & 13.2M & 450k & 1-nt \\
+AR & \seqsplit{LongSafari/hyenadna-small-32k-seqlen} \cite{nguyen2023hyenadna}& Hyena & 6.6M & 32.8k & 1-nt \\
+AR & \seqsplit{LongSafari/hyenadna-tiny-16k-seqlen-d128} \cite{nguyen2023hyenadna}& Hyena & 1.7M & 16.4k & 1-nt \\
+AR & \seqsplit{LongSafari/hyenadna-tiny-1k-seqlen} \cite{nguyen2023hyenadna}& Hyena & 1.7M & 1024 & 1-nt \\
+AR & \seqsplit{LongSafari/hyenadna-tiny-1k-seqlen-d256} \cite{nguyen2023hyenadna}& Hyena & 1.7M & 1024 & 1-nt \\
+AR & \seqsplit{LongSafari/hyenadna-large-1m-seqlen} \cite{nguyen2023hyenadna}& Hyena & 1M & 1M & 1-nt \\
+MLM & \seqsplit{genbio-ai/AIDO.DNA-7B} \cite{ellington2024accurate}& Encoder & 7B & 4k & 1-nt \\
+MLM & \seqsplit{genbio-ai/AIDO.DNA-300M} \cite{ellington2024accurate}& Encoder & 300M & 4k & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-2.5b-1000g} \cite{dalla2025nucleotide}& Encoder & 2.5B & 6k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-2.5b-multi-species} \cite{dalla2025nucleotide}& Encoder & 2.5B & 6k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-v2-500m-multi-species} \cite{dalla2025nucleotide}& Encoder & 498M & 12.3k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-500m-1000g} \cite{dalla2025nucleotide}& Encoder & 486M & 6k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-500m-human-ref} \cite{dalla2025nucleotide}& Encoder & 486M & 6k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-v2-250m-multi-species} \cite{dalla2025nucleotide}& Encoder & 235M & 12.3k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-v2-100m-multi-species} \cite{dalla2025nucleotide}& Encoder & 97.9M & 12.3k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-v2-50m-multi-species} \cite{dalla2025nucleotide}& Encoder & 55.9M & 12.3k & 6-mer-like \\
+MLM & \seqsplit{InstaDeepAI/nucleotide-transformer-v2-50m-3mer-multi-species} \cite{dalla2025nucleotide}& Encoder & 51.8M & 6.2k & 3-mer \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_650M\_pre} \cite{boshar2025foundational} & U-Net Transformer & 652M & 1M & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_650M\_pre\_8kb} \cite{boshar2025foundational} & U-Net Transformer & 652M & 8.2k & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_5downsample\_pre} \cite{boshar2025foundational} & U-Net Transformer & 595M & 1M & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_5downsample\_pre\_8kb} \cite{boshar2025foundational} & U-Net Transformer & 595M & 8.2k & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_100M\_pre} \cite{boshar2025foundational} & U-Net Transformer & 106M & 1M & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_100M\_pre\_8kb} \cite{boshar2025foundational} & U-Net Transformer & 106M & 8.2k & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_8M\_pre} \cite{boshar2025foundational} & U-Net Transformer & 7.7M & 1M & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/NTv3\_8M\_pre\_8kb} \cite{boshar2025foundational} & U-Net Transformer & 7.7M & 8.2k & 1-nt \\
+MLM & \seqsplit{kuleshov-group/PlantCAD2-Large-l48-d1536} \cite{zhai2025plantcad2} & BiMamba & 1.4B & 8.2k & 1-nt \\
+MLM & \seqsplit{kuleshov-group/PlantCAD2-Medium-l48-d1024} \cite{zhai2025plantcad2} & BiMamba & 621M & 8.2k & 1-nt \\
+MLM & \seqsplit{kuleshov-group/PlantCAD2-Small-l24-d0768} \cite{zhai2025plantcad2} & BiMamba & 176M & 8.2k & 1-nt \\
+MLM & \seqsplit{InstaDeepAI/agro-nucleotide-transformer-1b} \cite{mendoza2024foundational}& Encoder & 991M & 6.2k & 6-mer \\
+MLM & \seqsplit{GenerTeam/GENERanno-eukaryote-0.5b-base} \cite{li2025gener}& Decoder & 493M & 8.2k & 1-nt \\
+MLM & \seqsplit{GenerTeam/GENERanno-prokaryote-0.5b-base} \cite{li2025gener}& Decoder & 493M & 8.2k & 1-nt \\
+MLM & \seqsplit{AIRI-Institute/moderngena-large} \cite{aspidova2026back}& ModernBERT & 378M & 9k & BPE \\
+MLM & \seqsplit{AIRI-Institute/moderngena-base} \cite{aspidova2026back}& ModernBERT & 136M & 9k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-large-t2t} \cite{fishman2025gena}& Encoder & 369M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bigbird-base-t2t} \cite{fishman2025gena}& Encoder & 139M & 36k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base} \cite{fishman2025gena}& Encoder & 136M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base-athaliana} \cite{fishman2025gena}& Encoder & 135M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base-fly} \cite{fishman2025gena}& Encoder & 135M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base-lastln-t2t} \cite{fishman2025gena}& Encoder & 135M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base-yeast} \cite{fishman2025gena}& Encoder & 135M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base-t2t} \cite{fishman2025gena}& Encoder & 135M & 4.5k & BPE \\
+MLM & \seqsplit{AIRI-Institute/gena-lm-bert-base-t2t-multi} \cite{fishman2025gena}& Encoder & 135M & 4.5k & BPE \\
+MLM & \seqsplit{plant-llms/PlantBiMoE} \cite{lin2025plantbimoe}& BiMamba MoE & 141M & 32.7k & 1-nt \\
+MLM & \seqsplit{zhihan1996/DNABERT-2-117M} \cite{zhou2024dnabert}& Encoder & 120M & 2k & BPE \\
+MLM & \seqsplit{zhihan1996/DNABERT-S} \cite{zhou2024dnaberts}& Encoder & 117M & 2k & BPE \\
+MLM & \seqsplit{RaphaelMourad/ModernBERT-DNA-v1-117M-Athaliana}\footnotemark[2]& ModernBERT & 117M & 32.8k & BPE \\
+MLM & \seqsplit{RaphaelMourad/ModernBERT-DNA-v1-117M-hg38}\footnotemark[2]& ModernBERT & 117M & 32.8k & BPE \\
+MLM & \seqsplit{RaphaelMourad/ModernBERT-DNA-v1-37M-Athaliana}\footnotemark[2]& ModernBERT & 36.8M & 32.8k & BPE \\
+MLM & \seqsplit{RaphaelMourad/ModernBERT-DNA-v1-37M-hg38}\footnotemark[2]& ModernBERT & 36.8M & 32.8k & BPE \\
+MLM & \seqsplit{RaphaelMourad/ModernBert-DNA-v1-37M-virus}\footnotemark[2]& ModernBERT & 36.8M & 32.8k & BPE \\
+MLM & \seqsplit{PoetschLab/GROVER} \cite{sanabria2024dna}& Encoder & 87.6M & 2k & BPE \\
+MLM & \seqsplit{JadenLong/MutBERT} \cite{long2025mutbert}& BERT & 85.7M & $>$1024 & 1-nt \\
+MLM & \seqsplit{JadenLong/MutBERT-Human-Ref} \cite{long2025mutbert}& BERT & 85.7M & $>$1024 & 1-nt \\
+MLM & \seqsplit{JadenLong/MutBERT-Multi} \cite{long2025mutbert}& BERT & 85.7M & $>$1024 & 1-nt \\
+MLM & \seqsplit{Hengchang-Liu/D3LM-from-nt} \cite{yang2026d3lm}& Encoder & 55.9M & 12.3k & 6-mer \\
+MLM & \seqsplit{Hengchang-Liu/D3LM-scratch} \cite{yang2026d3lm}& Encoder & 55.9M & 12.3k & 6-mer \\
+MLM & \seqsplit{kuleshov-group/caduceus-ps\_seqlen-131k\_d\_model-256\_n\_layer-16} \cite{schiff2024caduceus}& BiMamba & 7.7M & 131k & 1-nt \\
+MLM & \seqsplit{kuleshov-group/caduceus-ph\_seqlen-131k\_d\_model-256\_n\_layer-16} \cite{schiff2024caduceus}& BiMamba & 7.7M & 131k & 1-nt \\
+MLM & \seqsplit{kuleshov-group/caduceus-ps\_seqlen-1k\_d\_model-256\_n\_layer-4\_lr-8e-3} \cite{schiff2024caduceus}& BiMamba & 1.9M & 1024 & 1-nt \\
+MLM & \seqsplit{kuleshov-group/caduceus-ph\_seqlen-1k\_d\_model-256\_n\_layer-4\_lr-8e-3} \cite{schiff2024caduceus}& BiMamba & 1.9M & 1024 & 1-nt \\
+MLM & \seqsplit{kuleshov-group/caduceus-ps\_seqlen-1k\_d\_model-118\_n\_layer-4\_lr-8e-3} \cite{schiff2024caduceus}& BiMamba & 471K & 1024 & 1-nt \\
+MLM & \seqsplit{kuleshov-group/caduceus-ph\_seqlen-1k\_d\_model-118\_n\_layer-4\_lr-8e-3} \cite{schiff2024caduceus}& BiMamba & 471K & 1024 & 1-nt \\
+\footnotetext[1]{\url{https://huggingface.co/collections/HuggingFaceBio/carbon}}
+\footnotetext[2]{\url{https://huggingface.co/RaphaelMourad/}}
+\end{longtable}
+\endgroup
+\twocolumn

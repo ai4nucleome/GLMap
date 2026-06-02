@@ -1,6 +1,6 @@
 """Integration tests on the actual built panel parquet file.
 
-These tests run against ``out_panel/main_panel.parquet``, produced by
+These tests run against ``data/panels/main_panel.parquet``, produced by
 ``scripts/build_panel.py`` (delegating to ``scripts/panel_build/``). Skipped
 if the file does not exist (e.g. fresh checkout where the user has not
 yet built the panel).
@@ -21,8 +21,8 @@ import pandas as pd
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MAIN_PARQUET = REPO_ROOT / "out_panel" / "main_panel.parquet"
-MANIFEST = REPO_ROOT / "out_panel" / "panel_manifest.json"
+MAIN_PARQUET = REPO_ROOT / "data/panels" / "main_panel.parquet"
+MANIFEST = REPO_ROOT / "data/panels" / "panel_manifest.json"
 
 EXPECTED_COLUMNS = [
     "probe_id", "sequence", "length_bp", "functional_element",

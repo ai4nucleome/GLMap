@@ -425,7 +425,7 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--panel", type=Path,
-                   default=REPO_ROOT / "out_panel/main_panel.parquet",
+                   default=REPO_ROOT / "data/panels/main_panel.parquet",
                    help="Stage 2 main panel parquet.")
     p.add_argument("--out", dest="out_dir", type=Path,
                    default=REPO_ROOT / "figures",

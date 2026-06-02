@@ -4,7 +4,29 @@ GLMap scores 123 genomic language models. This directory holds the model
 catalog and the setup scripts needed to obtain their weights and (for a
 few families) their custom loading code.
 
-## 1. Download model weights
+## 1. Clone custom loading code
+
+8 families cannot be loaded via standard HuggingFace `transformers` — they
+need their own model code. Clone all of them:
+
+```bash
+bash models/setup_external_models.sh
+```
+
+This places each repo under `models/modelsHFNoInfo/<name>/`
+
+| Family | Repo | Loader kind |
+|---|---|---|
+| Evo 1.x | [evo-design/evo](https://github.com/evo-design/evo) | `evo1` |
+| Evo 2 | [ArcInstitute/evo2](https://github.com/ArcInstitute/evo2) | `evo2` |
+| GenSLM | [ramanathanlab/genslm](https://github.com/ramanathanlab/genslm) | `genslm` |
+| HyenaDNA | [HazyResearch/hyena-dna](https://github.com/HazyResearch/hyena-dna) | `hyenadna` |
+| megaDNA | [lingxusb/megaDNA](https://github.com/lingxusb/megaDNA) | `megadna` |
+| AIDO.DNA | [genbio-ai/ModelGenerator](https://github.com/genbio-ai/ModelGenerator) | `aido` |
+| PlantBiMoE | [HUST-Keep-Lin/PlantBiMoE](https://github.com/HUST-Keep-Lin/PlantBiMoE) | `plantbimoe` |
+| PlantCAD2 | [kuleshov-group/PlantCaduceus](https://github.com/kuleshov-group/PlantCaduceus) | `plantcad2` |
+
+## 2. Download model weights
 
 Most models are hosted on the [Hugging Face Hub](https://huggingface.co/).
 Download all weights listed in `download_models_list.txt`:
@@ -19,15 +41,11 @@ Two special cases are handled by the script:
 
 - **GenSLM** (3 entries): these are local weight names, not HF repos, so
   the script skips them. Download the 3 checkpoints manually (see below).
-- **megaDNA**: the original `lingxusb/megaDNA` repo is no longer public,
-  so the script fetches the weight (`megaDNA_phage_145M.pt`, 582 MB) from
-  [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
-  instead. The audit keeps `lingxusb/megaDNA` as the canonical id for
-  consistency with the scoring outputs.
+- **megaDNA**: the audit keeps `lingxusb/megaDNA` as the canonical id but the weight (`megaDNA_phage_145M.pt`) is fetched from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated) instead.
 
 ### GenSLM weights (manual)
 
-After cloning the `genslm` repo (next section), download the 3 pretrained
+After cloning the `genslm` repo (section 1), download the 3 pretrained
 checkpoints and place them under `models/modelsHFNoInfo/genslm/weights/`:
 
 ```
@@ -40,40 +58,12 @@ models/modelsHFNoInfo/genslm/weights/
 See the [GenSLM README](https://github.com/ramanathanlab/genslm) for
 download links.
 
-## 2. Clone custom loading code
-
-8 families cannot be loaded via standard HuggingFace `transformers` — they
-need their own model code (`torch.load` of a custom `.pt`, non-HF
-architectures, or a separate package). Clone all of them at the exact
-commits used in the paper:
-
-```bash
-bash models/setup_external_models.sh
-```
-
-This places each repo under `models/modelsHFNoInfo/<name>/` (gitignored).
-
-| Family | Repo | Loader kind |
-|---|---|---|
-| Evo 1.x | [evo-design/evo](https://github.com/evo-design/evo) | `evo1` |
-| Evo 2 | [ArcInstitute/evo2](https://github.com/ArcInstitute/evo2) | `evo2` |
-| GenSLM | [ramanathanlab/genslm](https://github.com/ramanathanlab/genslm) | `genslm` |
-| HyenaDNA | [HazyResearch/hyena-dna](https://github.com/HazyResearch/hyena-dna) | `hyenadna` |
-| megaDNA | [lingxusb/megaDNA](https://github.com/lingxusb/megaDNA) | `megadna` |
-| AIDO.DNA | [genbio-ai/ModelGenerator](https://github.com/genbio-ai/ModelGenerator) | `aido` |
-| PlantBiMoE | [HUST-Keep-Lin/PlantBiMoE](https://github.com/HUST-Keep-Lin/PlantBiMoE) | `plantbimoe` |
-| PlantCAD2 | [kuleshov-group/PlantCaduceus](https://github.com/kuleshov-group/PlantCaduceus) | `plantcad2` |
-
-(For megaDNA the clone supplies only the code package; its weight is
-downloaded automatically in step 1.)
-
 ## Files in this directory
 
-- `download_models_list.txt` — the full 123-model scoring catalog (119 HF
-  repos + 3 GenSLM local names + 1 megaDNA special-cased). Two additional
-  bigbird-sparse models are commented out (excluded due to minimum seq_len
-  incompatibility).
-- `evo-family-relationship.csv` — Evo lineage model subset used in Table 1 / Fig 4a.
+- `download_models_list.txt` — the full 123-model scoring catalog.
+- `evo-family-relationship.csv` — ground-truth Evo lineage labels as
+  `(anchor, partner, label)` pairs (`1` = partner is a direct descendant /
+  fine-tune of the anchor, `0` = unrelated); used by Table 3 / Fig 4a.
 - `setup_external_models.sh` — clones the 8 upstream repos at pinned SHAs.
 
 ## Upstream licenses

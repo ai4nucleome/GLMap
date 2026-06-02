@@ -94,7 +94,7 @@ python scripts/run_phase1_scoring.py --from-audit \
 ```
 
 **Full 123-model reproduction** (requires multiple environments + GPUs;
-see [docs/env_routing.md](docs/env_routing.md)):
+see [models/env_routing.md](models/env_routing.md)):
 
 ```bash
 # 1. Parallel scoring across 123 models (workers use --skip-aggregate)
@@ -118,7 +118,7 @@ python scripts/figures/fig3a_model_map_family.py
 # ... (see scripts/figures/ for all figure scripts)
 ```
 
-See [docs/env_routing.md](docs/env_routing.md) for per-family environment
+See [models/env_routing.md](models/env_routing.md) for per-family environment
 setup required by the parallel sweep.
 
 ---
@@ -142,8 +142,8 @@ GLMap/
 ├── tests/                  pytest test suite
 ├── data/
 │   ├── audits/             123-model audit (models.json)
-│   └── downstream_tasks/   Downstream task metadata
-├── out_panel/              Prebuilt probe panel parquets
+│   ├── downstream_tasks/   Downstream task metadata
+│   └── panels/             Prebuilt probe panel parquets
 ├── out_phase1/
 │   ├── matrices/           V/Vd/D for AR and MLM branches
 │   └── scores/             Per-model likelihood responses (slimmed)
@@ -153,8 +153,8 @@ GLMap/
 │   └── model_map/          t-SNE embeddings for Fig 3
 ├── figures/                Paper figure PDFs
 ├── tables/                 Paper table LaTeX sources
-├── models/                 Model download manifest + setup scripts
-└── docs/                   Per-family environment routing for scoring
+└── models/                 Model download manifest, setup scripts,
+                            and per-family environment routing (env_routing.md)
 ```
 
 ---
@@ -265,7 +265,7 @@ This repository uses **two licenses**:
 
 - **Source code** (everything under `src/`, `scripts/`, `tests/`,
   `scripts/panel_build/`, etc.): [Apache-2.0](LICENSE).
-- **Data artefacts** (`out_panel/`, `out_phase1/matrices/`,
+- **Data artefacts** (`data/panels/`, `out_phase1/matrices/`,
   `out_phase1/scores/`, `out_phase2/`): [CC-BY-NC-SA-4.0](LICENSE-DATA).
   These artefacts inherit the upstream Plant Genomic Benchmark license
   (1,600 probes drawn from PGB; CC-BY-NC-SA-4.0 via ShareAlike). They

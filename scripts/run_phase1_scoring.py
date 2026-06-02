@@ -2,7 +2,7 @@
 """Phase 1 scoring: AR + MLM models x full main panel -> L → clip → Q → D (per branch).
 
 Implements phase_1.md § 打分协议 + § Sequence-likelihood matrix on
-out_panel/main_panel.parquet. Produces the canonical layout:
+data/panels/main_panel.parquet. Produces the canonical layout:
 
     out_phase1/
       probes/main_panel.parquet           # copy of input
@@ -49,7 +49,7 @@ Resume:
 
 Usage:
     python scripts/run_phase1_scoring.py \\
-        [--panel out_panel/main_panel.parquet] \\
+        [--panel data/panels/main_panel.parquet] \\
         [--out out_phase1] \\
         [--device cuda:6] \\
         [--stride 6] \\
@@ -798,7 +798,7 @@ def _write_report(
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--panel", type=Path, default=REPO_ROOT / "out_panel/main_panel.parquet")
+    p.add_argument("--panel", type=Path, default=REPO_ROOT / "data/panels/main_panel.parquet")
     p.add_argument("--out", type=Path, default=REPO_ROOT / "out_phase1")
     p.add_argument(
         "--device",

@@ -31,7 +31,7 @@ def resolve_data_path(relative_subpath: str) -> Path:
     ----------
     relative_subpath
         Path **relative to the repo root**, e.g.
-        ``"out_panel/main_panel.parquet"`` or
+        ``"data/panels/main_panel.parquet"`` or
         ``"data/audits/models.json"``.
 
     Raises

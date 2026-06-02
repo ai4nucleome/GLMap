@@ -139,7 +139,7 @@ def main() -> None:
 
     # GLMap pipeline (on combined 123-model matrix; pairwise distances
     # are invariant to whether column means were computed on AR-only or
-    # the combined matrix — see /docs/, but clip threshold differs).
+    # the combined matrix, but clip threshold differs).
     L_clipped, threshold = clip_lower(L, q=0.02)
     Q, _, _, _ = double_center(L_clipped)
     print(f"[fig4a-table] clip threshold = {threshold:.2f}; Q shape {Q.shape}",

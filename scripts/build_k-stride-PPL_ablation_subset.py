@@ -38,9 +38,9 @@ canonical element sizes (150 .. 1500), this yields:
 
 Output
 ------
-  out_panel/MLM_k1ablation_1000_main_panel.parquet    full ProbeRow schema
+  data/panels/MLM_k1ablation_1000_main_panel.parquet    full ProbeRow schema
                                                       with N_subset = 1000
-  out_panel/MLM_k1ablation_1000_manifest.json         sampling provenance:
+  data/panels/MLM_k1ablation_1000_manifest.json         sampling provenance:
                                                       seed, per-element counts,
                                                       timestamp, ablation purpose
 
@@ -74,7 +74,7 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("--panel", type=Path,
-                   default=REPO_ROOT / "out_panel" / "main_panel.parquet",
+                   default=REPO_ROOT / "data/panels" / "main_panel.parquet",
                    help="Source full panel parquet.")
     p.add_argument("--n-subset", type=int, default=1000,
                    help="Target subset size. Per-element counts are "
@@ -84,12 +84,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--seed", type=int, default=42,
                    help="RNG seed for reproducibility.")
     p.add_argument("--out-parquet", type=Path,
-                   default=REPO_ROOT / "out_panel"
+                   default=REPO_ROOT / "data/panels"
                    / "MLM_k1ablation_1000_main_panel.parquet",
                    help="Output parquet path for the subset (same schema "
                         "as the source panel).")
     p.add_argument("--out-manifest", type=Path,
-                   default=REPO_ROOT / "out_panel"
+                   default=REPO_ROOT / "data/panels"
                    / "MLM_k1ablation_1000_manifest.json",
                    help="Output JSON path for sampling manifest "
                         "(seed, per-element counts, timestamp).")

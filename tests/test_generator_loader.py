@@ -43,7 +43,7 @@ def test_pad_appends_1_to_5_A_bases() -> None:
 
 
 def test_pad_panel_lengths() -> None:
-    """Spot-check the lengths that actually appear in out_panel/main_panel.parquet."""
+    """Spot-check the lengths that actually appear in data/panels/main_panel.parquet."""
     cases = {
         199: 204,    # 199 + 5
         200: 204,    # 200 + 4

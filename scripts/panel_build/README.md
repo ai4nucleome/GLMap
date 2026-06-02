@@ -1,7 +1,7 @@
 # scripts/panel_build/
 
 Panel construction code. Reads raw benchmark CSV/FASTA files and produces
-the canonical 10,000-probe panel (`out_panel/main_panel.parquet`).
+the canonical 10,000-probe panel (`data/panels/main_panel.parquet`).
 
 The prebuilt panel is already committed to this repository, so you only
 need this directory if you want to:
@@ -44,9 +44,9 @@ can reuse them.
    ```
 
    Produces:
-   - `out_panel/main_panel.parquet` (10,000 probes × 11 columns)
-   - `out_panel/panel_manifest.json` (per-element / per-dataset counts + sub-seeds)
-   - `out_panel/panel_summary.{md,tsv}` (human-readable summaries)
+   - `data/panels/main_panel.parquet` (10,000 probes × 11 columns)
+   - `data/panels/panel_manifest.json` (per-element / per-dataset counts + sub-seeds)
+   - `data/panels/panel_summary.{md,tsv}` (human-readable summaries)
 
 Build is deterministic given `seed: 42` in `panel_sources.yaml`.
 
@@ -113,11 +113,11 @@ the 6 downstream classification tasks (see
 
 ## License attribution for the built panel
 
-Because `out_panel/main_panel.parquet` contains 1,600 probes drawn from
+Because `data/panels/main_panel.parquet` contains 1,600 probes drawn from
 PGB (CC-BY-NC-SA-4.0), the panel parquet itself is licensed under
 **CC-BY-NC-SA-4.0** (the most restrictive upstream license, via
 ShareAlike). The GLMap **code** in this repository remains under
-Apache-2.0; only the data artefacts in `out_panel/` and downstream
+Apache-2.0; only the data artefacts in `data/panels/` and downstream
 matrices in `out_phase1/matrices/` are CC-BY-NC-SA-4.0. See
 [`LICENSE-DATA`](../../LICENSE-DATA) at the repo root.
 

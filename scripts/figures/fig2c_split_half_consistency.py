@@ -608,7 +608,7 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "data/audits/models.json",
                    help="Models audit JSON (provides the model roster).")
     p.add_argument("--panel", type=Path,
-                   default=REPO_ROOT / "out_panel/main_panel.parquet",
+                   default=REPO_ROOT / "data/panels/main_panel.parquet",
                    help="Main panel parquet (provides functional_element strata).")
     p.add_argument("--scores-dir", type=Path,
                    default=REPO_ROOT / "out_phase1/scores",

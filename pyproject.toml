@@ -41,7 +41,7 @@ classifiers = [
 # Scoring (running GLMs to obtain raw likelihood responses) requires
 # the `scoring` extra, since torch/transformers are heavy and many
 # model families need extra family-specific dependencies described
-# in docs/env_routing.md.
+# in models/env_routing.md.
 dependencies = [
     "numpy",
     "pandas",

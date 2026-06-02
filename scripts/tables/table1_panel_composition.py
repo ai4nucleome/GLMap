@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate Table 1: GLMap probe panel composition.
 
-Reads out_panel/main_panel.parquet, aggregates per (biological category,
+Reads data/panels/main_panel.parquet, aggregates per (biological category,
 functional element), and emits two formats:
 
   - Markdown to stdout (for visual review)
@@ -20,7 +20,7 @@ from pathlib import Path
 import pyarrow.parquet as pq
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PANEL_PQ = REPO_ROOT / "out_panel" / "main_panel.parquet"
+PANEL_PQ = REPO_ROOT / "data/panels" / "main_panel.parquet"
 TEX_OUT = REPO_ROOT / "tables" / "table1_panel_composition.tex"
 
 GROUP_ORDER = ["Human", "Plant", "Fungi", "Virus"]
