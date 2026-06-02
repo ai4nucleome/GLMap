@@ -15,34 +15,44 @@
 # After cloning, see docs/env_routing.md for which micromamba environment
 # each family requires.
 
-set -euo pipefail
+# Note: no `set -e` — one repo failing (network, deleted upstream, bad
+# SHA) should not abort the remaining clones. Failures are collected and
+# reported at the end.
+set -uo pipefail
 
 DEST="${1:-models/modelsHFNoInfo}"
 mkdir -p "$DEST"
+
+failed=()
 
 clone_at() {
     local name="$1" url="$2" sha="$3"
     if [ -d "$DEST/$name/.git" ]; then
         echo "[skip] $name already cloned"
-        return
+        return 0
     fi
-    # Directory may exist with only weight files (e.g. megaDNA weight
-    # downloaded before code clone). Clone into a temp dir then merge.
-    if [ -d "$DEST/$name" ]; then
-        echo "[clone] $name from $url @ $sha (merging into existing dir)"
-        local tmpdir
-        tmpdir=$(mktemp -d)
-        git clone --quiet "$url" "$tmpdir/$name"
-        git -C "$tmpdir/$name" checkout --quiet "$sha"
-        # Move .git and code into existing dir, preserving existing files
-        cp -rn "$tmpdir/$name/." "$DEST/$name/"
-        mv "$tmpdir/$name/.git" "$DEST/$name/.git"
+
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    if ! git clone --quiet "$url" "$tmpdir/$name" \
+        || ! git -C "$tmpdir/$name" checkout --quiet "$sha"; then
+        echo "[FAILED] $name ($url @ $sha)" >&2
+        failed+=("$name")
         rm -rf "$tmpdir"
-    else
-        echo "[clone] $name from $url @ $sha"
-        git clone --quiet "$url" "$DEST/$name"
-        git -C "$DEST/$name" checkout --quiet "$sha"
+        return 1
     fi
+
+    if [ -d "$DEST/$name" ]; then
+        # Directory already exists with non-git files (e.g. the megaDNA
+        # weight downloaded before this clone). Merge the clone — code +
+        # .git — into it without overwriting existing files.
+        echo "[clone] $name @ $sha (merging into existing dir)"
+        cp -rn "$tmpdir/$name/." "$DEST/$name/"
+    else
+        echo "[clone] $name @ $sha"
+        mv "$tmpdir/$name" "$DEST/$name"
+    fi
+    rm -rf "$tmpdir"
     echo "[done] $name"
 }
 
@@ -56,6 +66,13 @@ clone_at PlantBiMoE     https://github.com/HUST-Keep-Lin/PlantBiMoE.git     e3b6
 clone_at PlantCaduceus  https://github.com/kuleshov-group/PlantCaduceus.git  f0d18ac
 
 echo ""
+if [ ${#failed[@]} -gt 0 ]; then
+    echo "WARNING: ${#failed[@]} repo(s) failed to clone:" >&2
+    printf '  - %s\n' "${failed[@]}" >&2
+    echo "Re-run the script to retry the failed ones (completed repos are skipped)." >&2
+    exit 1
+fi
+
 echo "All 8 repos cloned into $DEST/"
 echo "Next steps:"
 echo "  1. See docs/env_routing.md for per-family environment setup."
