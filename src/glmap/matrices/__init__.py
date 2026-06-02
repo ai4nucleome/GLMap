@@ -16,8 +16,8 @@ still kept on the model side for downstream diagnostic loadings, but
 they no longer gate matrix membership.
 
 Never merge AR and MLM matrices (`log p(x)` and `PLL(x)` are different
-probability objects); cross-branch analysis is rank-based only (see
-`src/analysis/cross_branch_rank`).
+probability objects) at the scoring layer; the V / V_d / D matrices are
+built per branch.
 """
 
 from __future__ import annotations

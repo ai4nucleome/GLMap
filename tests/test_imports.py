@@ -24,7 +24,6 @@ PACKAGES = [
     "glmap.loaders.plasmidgpt",
     "glmap.scoring",
     "glmap.matrices",
-    "glmap.analysis",
 ]
 
 

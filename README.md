@@ -103,16 +103,13 @@ python scripts/run_sweep.py --mode scoring --audit data/audits/models.json
 # 2. Build V/Vd/D matrices (CPU, after all scoring workers finish)
 python scripts/run_phase1_scoring.py --from-audit --strict-aggregate
 
-# 3. (Optional) Downstream diagnostics / PCA / GC-axis reports
-python scripts/run_phase1_analysis.py
-
-# 4. Parallel downstream embedding extraction (requires benchmark CSVs)
+# 3. Parallel downstream embedding extraction (requires benchmark CSVs)
 python scripts/run_sweep.py --mode embed --audit data/audits/models.json
 
-# 5. Train linear probes and compute AUCs
+# 4. Train linear probes and compute AUCs
 python scripts/run_downstream_classify.py
 
-# 6. Generate paper figures
+# 5. Generate paper figures
 python scripts/figures/fig2c_split_half_consistency.py --seed 123
 python scripts/figures/fig3a_model_map_family.py
 # ... (see scripts/figures/ for all figure scripts)
