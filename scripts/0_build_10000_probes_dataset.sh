@@ -3,8 +3,10 @@
 # (override with $GLMAP_ENV_CONFIG).
 #
 # Step 0 (data prep): build the frozen 10,000-probe GLMap panel from the
-# benchmark sources declared in scripts/panel_build/panel_sources.yaml.
+# benchmark sources declared in scripts/panel_build/panel_sources.yaml, then
+# write its composition summary.
 #   -> data/panels/main_panel.parquet   (10,000 probes x 14 functional elements)
+#   -> data/panels/panel_summary.md     (composition summary; paper Table 1 / S1)
 #
 # This is CPU-only (pandas/pyarrow); no GPU or model weights needed, but the
 # benchmark source datasets must be present (see scripts/panel_build/README.md
@@ -38,9 +40,21 @@ if [[ -z "${PY}" ]]; then
 fi
 
 echo "===================================================================="
-echo "Building the 10,000-probe GLMap panel"
+echo "Step 1/2 — building the 10,000-probe GLMap panel"
 echo "  Config: scripts/panel_build/panel_sources.yaml"
 echo "  Output: data/panels/main_panel.parquet"
 echo "  Args  : ${*:-(none)}"
 echo "===================================================================="
-exec "${PY}" scripts/panel_build/build_panel.py "$@"
+"${PY}" scripts/panel_build/build_panel.py "$@"
+rc=$?
+if [[ "${rc}" -ne 0 ]]; then
+    echo "[0_build] panel build failed (rc=${rc}); skipping the summary." >&2
+    exit "${rc}"
+fi
+
+echo ""
+echo "===================================================================="
+echo "Step 2/2 — panel composition summary"
+echo "  Output: data/panels/panel_summary.md"
+echo "===================================================================="
+"${PY}" scripts/panel_build/build_panel_summary_table.py

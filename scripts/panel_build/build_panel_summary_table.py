@@ -15,7 +15,7 @@ Output (regenerated; tracked for the paper write-up):
                                                paper Table 1 + Supplementary S1
 
 Run:
-  $PY scripts/build_panel_summary_table.py [--panel data/panels/main_panel.parquet]
+  $PY scripts/panel_build/build_panel_summary_table.py [--panel data/panels/main_panel.parquet]
                                             [--out-md data/panels]
 """
 
@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 # Benchmark name → (short label, citation). Used to fill the "Source" column
