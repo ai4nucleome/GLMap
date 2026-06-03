@@ -229,7 +229,7 @@ def main() -> None:
     }
     args.out_json.parent.mkdir(parents=True, exist_ok=True)
     args.out_json.write_text(json.dumps(out_payload, indent=2))
-    print(f"[done] wrote {args.out_json.relative_to(REPO_ROOT)}")
+    print(f"[done] wrote {args.out_json}")
 
     # ── plot ── #
     figsize = _parse_figsize(args.figsize)
@@ -390,7 +390,7 @@ def main() -> None:
         fig.savefig(args.out_fig, dpi=300, bbox_inches="tight",
                     pad_inches=0.1)
         plt.close(fig)
-        print(f"[done] wrote {args.out_fig.relative_to(REPO_ROOT)}")
+        print(f"[done] wrote {args.out_fig}")
 
 
 if __name__ == "__main__":

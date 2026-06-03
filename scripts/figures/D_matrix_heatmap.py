@@ -128,7 +128,7 @@ def main() -> None:
     fig.tight_layout()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, bbox_inches="tight")
-    print(f"[D-heatmap] wrote {args.out.relative_to(REPO_ROOT)} ({M}x{M}, "
+    print(f"[D-heatmap] wrote {args.out} ({M}x{M}, "
           f"{len(set(fam))} families)")
 
 

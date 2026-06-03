@@ -339,7 +339,7 @@ def _run_one(experiment: str, use_pipeline: bool, clip_q: float,
             spec["probe_filter_parquet"], columns=["probe_id"]
         ).to_pandas()["probe_id"].tolist()
         print(f"[preview-FigS3] probe filter: {len(probe_filter)} probes from "
-              f"{spec['probe_filter_parquet'].relative_to(REPO_ROOT)}",
+              f"{spec['probe_filter_parquet']}",
               flush=True)
     else:
         probe_filter = None

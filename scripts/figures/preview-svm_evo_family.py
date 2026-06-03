@@ -552,7 +552,7 @@ def main() -> None:
 
     rows = _load_label_csv(args.labels_csv)
     print(f"[preview-svm_evo_family] {len(rows)} labeled pairs from "
-          f"{args.labels_csv.relative_to(REPO_ROOT)}", flush=True)
+          f"{args.labels_csv}", flush=True)
 
     F, y, partners, anchor = _load_pair_features(rows, args.scores_dir)
     # Alias so the downstream code that uses L / hf_ids still works.
