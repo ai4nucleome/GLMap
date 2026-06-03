@@ -82,6 +82,7 @@ ENV_PYTHON = {
     "evo":       "/nvme-data3/yusen/micomamba/envs/evo/bin/python",
     "evo2":      "/nvme-data3/yusen/micomamba/envs/evo2/bin/python",
     "hyena-dna": "/nvme-data3/yusen/micomamba/envs/hyena-dna/bin/python",
+    "megadna":   "/nvme-data3/yusen/micomamba/envs/megadna/bin/python",
 }
 
 _PLANTCAD_LIB    = "/nvme-data3/yusen/micomamba/envs/PlantCAD/lib"
@@ -148,6 +149,12 @@ def route_model(
     # HyenaDNA × 7
     if hf_id.startswith("LongSafari/hyenadna-"):
         return RouteSpec(env="hyena-dna")
+
+    # megaDNA — dedicated env; the upstream `megaDNA` package (+ its
+    # MEGABYTE_pytorch dep) for unpickling the .pt checkpoint is only
+    # installed in envs/megadna, not in base.
+    if hf_id == "lingxusb/megaDNA":
+        return RouteSpec(env="megadna")
 
     # DNABERT-2 / DNABERT-S — dedicated env w/o triton or flash_attn
     if hf_id in ("zhihan1996/DNABERT-2-117M", "zhihan1996/DNABERT-S"):
