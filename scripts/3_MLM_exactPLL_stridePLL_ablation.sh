@@ -3,26 +3,28 @@
 # (override with $GLMAP_ENV_CONFIG); GPU ids in models/env_routing.md. Adjust
 # those for a new machine before running.
 #
-# Launch the MLM stride-PLL k=1 ablation: re-score ALL 56 MLM models on a
-# 1000-probe stratified subset of the panel at stride k=1 (the exact
-# per-token PLL), so it can be compared against the primary k=6 stride PLL.
+# Launch the MLM representation-stability ablation: re-score ALL 56 MLM
+# models on a 1000-probe stratified subset of the panel with the EXACT
+# leave-one-out PLL (--method exact), so it can be compared against the
+# primary k=6 stride PLL.
 #
-#   ALL 56 MLM models × 1000-probe stratified subset × k=1
+#   ALL 56 MLM models × 1000-probe stratified subset × exact PLL
 #     → results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/MLM_true-PLL_scores/<slug>/probes.parquet
 #     → ~5-7 h on 8 GPUs
 #
-# Downstream analysis: per-model Pearson r between the k=1 and k=6
-# sum_log_p vectors (Fig S2 / Fig S3).
+# Downstream analysis: per-model Pearson r between the exact (k=1) and the
+# k=6 stride sum_log_p vectors (Fig S2 / Fig S3).
 #
 # Usage:
-#   bash scripts/run_kmer_ablation.sh             # run the ablation
-#   bash scripts/run_kmer_ablation.sh --dry-run   # show routing, don't run
+#   bash scripts/3_MLM_exactPLL_stridePLL_ablation.sh             # run the exact-PLL ablation
+#   bash scripts/3_MLM_exactPLL_stridePLL_ablation.sh --dry-run   # show routing, don't run
 #
-# Override the stride for sensitivity sweeps (default --stride 1):
-#   STRIDE=4 bash scripts/run_kmer_ablation.sh      # k=4 ablation
+# Default runs the exact PLL (METHOD=exact). For a k-stride sensitivity
+# sweep instead:
+#   METHOD=stride STRIDE=4 bash scripts/3_MLM_exactPLL_stridePLL_ablation.sh   # k=4 stride PLL
 #
 # Override GPU pool:
-#   GPU_IDS=4,5,6,7 bash scripts/run_kmer_ablation.sh
+#   GPU_IDS=4,5,6,7 bash scripts/3_MLM_exactPLL_stridePLL_ablation.sh
 
 set -uo pipefail
 
@@ -36,8 +38,18 @@ if [[ -z "${PY}" ]]; then
     echo "       set \$PY, or fix the config / \$GLMAP_ENV_CONFIG." >&2
     exit 1
 fi
-STRIDE="${STRIDE:-1}"
+METHOD="${METHOD:-exact}"      # 'exact' = true leave-one-out PLL; 'stride' for k-sensitivity
+STRIDE="${STRIDE:-6}"          # only used when METHOD=stride
 GPU_IDS="${GPU_IDS:-0,1,2,3,4,5,6,7}"
+
+# Translate METHOD/STRIDE into scoring-worker args.
+if [[ "${METHOD}" == "exact" ]]; then
+    METHOD_ARGS=(--method exact)
+    run_desc="exact leave-one-out PLL"
+else
+    METHOD_ARGS=(--method stride --stride "${STRIDE}")
+    run_desc="stride PLL k=${STRIDE}"
+fi
 
 # Pre-built 1000-probe stratified subset.
 SUBSET_PANEL="${REPO_ROOT}/data/panels/MLM_k1ablation_1000_main_panel.parquet"
@@ -55,7 +67,7 @@ for arg in "$@"; do
         --dry-run) DRY_RUN_ARGS=(--dry-run) ;;
         *)
             echo "unknown arg: ${arg}"
-            echo "usage: bash scripts/run_kmer_ablation.sh [--dry-run]"
+            echo "usage: bash scripts/3_MLM_exactPLL_stridePLL_ablation.sh [--dry-run]"
             exit 1
             ;;
     esac
@@ -67,7 +79,7 @@ mkdir -p "${log_dir}"
 
 echo ""
 echo "===================================================================="
-echo "MLM stride-PLL k=1 ablation — 56 MLM × 1000 probes × stride=${STRIDE}"
+echo "MLM stability ablation — 56 MLM × 1000 probes × ${run_desc}"
 echo "  Panel : ${SUBSET_PANEL#${REPO_ROOT}/}"
 echo "  Output: results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/"
 echo "  Logs  : ${log_dir}"
@@ -77,7 +89,7 @@ echo "===================================================================="
 "${PY}" scripts/score/run_scoring_sweep.py \
     --branch mlm \
     --panel "${SUBSET_PANEL}" \
-    --stride "${STRIDE}" \
+    "${METHOD_ARGS[@]}" \
     --out results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples \
     --scores-subdir MLM_true-PLL_scores \
     --gpu-ids "${GPU_IDS}" \

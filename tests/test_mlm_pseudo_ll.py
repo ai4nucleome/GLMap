@@ -122,11 +122,34 @@ def test_stride_pll_requires_mask_token() -> None:
         stride_pll_forward(FakeMaskedLM(), NoMaskTokenizer(), "ACGT", stride=6)
 
 
-def test_stride_pll_rejects_empty_and_zero_stride() -> None:
+def test_stride_pll_rejects_empty_and_bad_stride() -> None:
     with pytest.raises(ValueError, match="empty sequence"):
         stride_pll_forward(FakeMaskedLM(), FakeTokenizer(), "", stride=6)
-    with pytest.raises(ValueError, match="stride must be"):
+    # method="stride" needs k >= 2; stride 0/1 must be rejected with a hint
+    # to use method="exact".
+    with pytest.raises(ValueError, match="requires stride >= 2"):
         stride_pll_forward(FakeMaskedLM(), FakeTokenizer(), "ACGT", stride=0)
+    with pytest.raises(ValueError, match="requires stride >= 2"):
+        stride_pll_forward(FakeMaskedLM(), FakeTokenizer(), "ACGT", stride=1)
+
+
+def test_stride_pll_rejects_unknown_method() -> None:
+    with pytest.raises(ValueError, match="method must be"):
+        stride_pll_forward(FakeMaskedLM(), FakeTokenizer(), "ACGT", method="nope")
+
+
+def test_exact_method_runs_true_leave_one_out() -> None:
+    """method='exact' masks each content position individually (true PLL),
+    ignores the stride arg, and records stride=1."""
+    model, tok, seq = _build_test_inputs("AAAAAA")
+    rec = stride_pll_forward(model, tok, seq, stride=6, method="exact")
+    assert rec.stride == 1                       # recorded as the canonical exact marker
+    assert rec.masked_position_count == 6        # one mask event per content position
+    assert math.isclose(rec.sum_log_p, 6 * math.log(0.5), rel_tol=1e-6)
+    # exact ignores stride: same result whatever stride is passed
+    rec2 = stride_pll_forward(model, tok, seq, stride=999, method="exact")
+    assert rec2.stride == 1
+    assert math.isclose(rec2.sum_log_p, rec.sum_log_p, rel_tol=1e-6)
 
 
 def test_stride_pll_only_masks_content_positions() -> None:

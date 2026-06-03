@@ -182,7 +182,13 @@ def _parse_args() -> argparse.Namespace:
         help="cuda:N or cpu. Default auto-picks cuda:0 when CUDA is available.",
     )
     p.add_argument("--stride", type=int, default=6,
-                   help="MLM stride k (phase_1.md primary k=6).")
+                   help="MLM stride k for --method stride (phase_1.md primary k=6).")
+    p.add_argument("--method", type=str, default="stride",
+                   choices=["stride", "exact"],
+                   help="MLM PLL algorithm: 'stride' (default, k-pass "
+                        "approximation using --stride) or 'exact' (true "
+                        "leave-one-out PLL; --stride ignored, recorded stride "
+                        "is 1). AR models ignore this.")
     p.add_argument("--force", action="store_true",
                    help="Re-score every model even if its parquet exists.")
     p.add_argument("--max-probes", type=int, default=None,
@@ -317,13 +323,21 @@ def main() -> None:
             "loader_kind": spec.loader_kind,
             "length_multiple": spec.length_multiple,
             "slug": spec.slug,
-            "stride_primary": args.stride if spec.branch == "mlm" else None,
+            "stride_primary": (
+                (1 if args.method == "exact" else args.stride)
+                if spec.branch == "mlm" else None
+            ),
             "scoring_protocol": (
                 "AR forward sum_log_p (raw nats, no length norm, no sign flip; "
                 "ModelMap convention)"
                 if spec.branch == "ar"
-                else f"MLM stride pseudo-log-likelihood, k={args.stride} "
-                     "(raw nats, no length norm, no sign flip)"
+                else (
+                    "MLM exact leave-one-out pseudo-log-likelihood "
+                    "(raw nats, no length norm, no sign flip)"
+                    if args.method == "exact"
+                    else f"MLM stride pseudo-log-likelihood, k={args.stride} "
+                         "(raw nats, no length norm, no sign flip)"
+                )
             ),
         }, indent=2))
 
@@ -363,7 +377,8 @@ def main() -> None:
         loader = None
         try:
             df, loader = _score_model(
-                spec=spec, panel=panel, device=args.device, stride=args.stride
+                spec=spec, panel=panel, device=args.device,
+                stride=args.stride, method=args.method,
             )
             df.to_parquet(score_path, index=False)
             print(
@@ -454,7 +469,7 @@ def main() -> None:
         "three-matrix split (R_pan_DNA / R_coding_only / R_nucleotide_only) "
         "is retired."
     )
-    matrices_meta["scoring_stride_mlm"] = args.stride
+    matrices_meta["scoring_stride_mlm"] = 1 if args.method == "exact" else args.stride
     (args.out / "matrices" / "matrix_metadata.json").write_text(
         json.dumps(matrices_meta, indent=2)
     )

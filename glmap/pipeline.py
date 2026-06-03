@@ -108,10 +108,10 @@ def _score_ar_one_probe(loader: HFCausalLMLoader, probe: dict) -> dict:
 
 
 def _score_mlm_one_probe(
-    loader: HFMaskedLMLoader, probe: dict, stride: int
+    loader: HFMaskedLMLoader, probe: dict, stride: int, method: str = "stride"
 ) -> dict:
     try:
-        rec = loader.score_record(probe["sequence"], stride=stride)
+        rec = loader.score_record(probe["sequence"], stride=stride, method=method)
         return {
             "probe_id": probe["probe_id"],
             "functional_element": probe["functional_element"],
@@ -150,6 +150,7 @@ def _score_model(
     panel: pd.DataFrame,
     device: str,
     stride: int,
+    method: str = "stride",
     progress_every: int = 100,
 ):
     """Load `spec`, score every probe in `panel`. Returns (DataFrame, loader).
@@ -277,7 +278,7 @@ def _score_model(
         if spec.branch == "ar":
             rows.append(_score_ar_one_probe(loader, probe))
         else:
-            rows.append(_score_mlm_one_probe(loader, probe, stride=stride))
+            rows.append(_score_mlm_one_probe(loader, probe, stride=stride, method=method))
         if i % progress_every == 0 or i == len(probes):
             err_count = sum(1 for r in rows if r["scoring_error"])
             # Surface a sample of the actual exception so a "100/100 errors"

@@ -185,20 +185,20 @@ class HFMaskedLMLoader:
             model = AutoModelForMaskedLM.from_pretrained(self.hf_id, **model_kwargs)
         self._model = model.to(self.device).eval()
 
-    def score(self, sequence: str, stride: int = 6) -> float:
+    def score(self, sequence: str, stride: int = 6, method: str = "stride") -> float:
         """Return stride PLL ell per base (in nats). Primary stride k=6 per
         phase_1.md '打分协议 § MLM/Encoder'; pass stride=4 for the sensitivity
         supplement.
         """
-        return self.score_record(sequence, stride=stride).ell_per_base
+        return self.score_record(sequence, stride=stride, method=method).ell_per_base
 
-    def score_record(self, sequence: str, stride: int = 6):
+    def score_record(self, sequence: str, stride: int = 6, method: str = "stride"):
         from glmap.scoring.mlm_pseudo_ll import stride_pll_forward
 
         if self._model is None:
             self.load()
         return stride_pll_forward(
-            self.model, self.tokenizer, sequence, stride=stride, device=self.device
+            self.model, self.tokenizer, sequence, stride=stride, method=method, device=self.device
         )
 
 

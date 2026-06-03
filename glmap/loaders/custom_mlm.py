@@ -66,16 +66,16 @@ class BotanicLoader:
         model = AutoModel.from_pretrained(self.hf_id, **kwargs)
         self._model = model.to(self.device).eval()
 
-    def score(self, sequence: str, stride: int = 6) -> float:
-        return self.score_record(sequence, stride=stride).ell_per_base
+    def score(self, sequence: str, stride: int = 6, method: str = "stride") -> float:
+        return self.score_record(sequence, stride=stride, method=method).ell_per_base
 
-    def score_record(self, sequence: str, stride: int = 6):
+    def score_record(self, sequence: str, stride: int = 6, method: str = "stride"):
         from glmap.scoring.mlm_pseudo_ll import stride_pll_forward
 
         if self._model is None:
             self.load()
         return stride_pll_forward(
-            self.model, self.tokenizer, sequence, stride=stride, device=self.device
+            self.model, self.tokenizer, sequence, stride=stride, method=method, device=self.device
         )
 
 
@@ -124,16 +124,16 @@ class PlantBiMoELoader:
         model = AutoModelForMaskedLM.from_pretrained(self.hf_id, **kwargs)
         self._model = model.to(self.device).eval()
 
-    def score(self, sequence: str, stride: int = 6) -> float:
-        return self.score_record(sequence, stride=stride).ell_per_base
+    def score(self, sequence: str, stride: int = 6, method: str = "stride") -> float:
+        return self.score_record(sequence, stride=stride, method=method).ell_per_base
 
-    def score_record(self, sequence: str, stride: int = 6):
+    def score_record(self, sequence: str, stride: int = 6, method: str = "stride"):
         from glmap.scoring.mlm_pseudo_ll import stride_pll_forward
 
         if self._model is None:
             self.load()
         return stride_pll_forward(
-            self.model, self.tokenizer, sequence, stride=stride, device=self.device
+            self.model, self.tokenizer, sequence, stride=stride, method=method, device=self.device
         )
 
 
@@ -248,16 +248,16 @@ class MutBERTLoader:
         wrapped = _MutBERTInputWrap(inner, vocab_size=int(inner.config.vocab_size))
         self._model = wrapped.to(self.device).eval()
 
-    def score(self, sequence: str, stride: int = 6) -> float:
-        return self.score_record(sequence, stride=stride).ell_per_base
+    def score(self, sequence: str, stride: int = 6, method: str = "stride") -> float:
+        return self.score_record(sequence, stride=stride, method=method).ell_per_base
 
-    def score_record(self, sequence: str, stride: int = 6):
+    def score_record(self, sequence: str, stride: int = 6, method: str = "stride"):
         from glmap.scoring.mlm_pseudo_ll import stride_pll_forward
 
         if self._model is None:
             self.load()
         return stride_pll_forward(
-            self.model, self.tokenizer, sequence, stride=stride, device=self.device
+            self.model, self.tokenizer, sequence, stride=stride, method=method, device=self.device
         )
 
 

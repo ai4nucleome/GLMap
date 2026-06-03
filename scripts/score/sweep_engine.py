@@ -364,6 +364,7 @@ def build_command(
     mode: str = "scoring",
     force: bool = False,
     stride: int | None = None,
+    method: str | None = None,
     out_dir: str | None = None,
     scores_subdir: str = "AR_MLM_scores",
     audit_path: str | None = None,
@@ -408,11 +409,14 @@ def build_command(
             args.extend(["--panel", panel])
         if force:
             args.append("--force")
-        # MLM stride pass-through for the k=1 vs k=6 ablation.  When not
-        # set, scoring_worker.py uses its own default (k=6 per
+        # MLM stride pass-through for the stride-sensitivity sweeps.  When
+        # not set, scoring_worker.py uses its own default (k=6 per
         # phase_1.md primary).
         if stride is not None:
             args.extend(["--stride", str(stride)])
+        # MLM PLL method pass-through ('stride' default / 'exact' true PLL).
+        if method is not None:
+            args.extend(["--method", str(method)])
         # Output dir pass-through.  Necessary when running an ablation
         # that must not overwrite the canonical results/scores/AR_MLM_scores/ tree.
         if out_dir is not None:
@@ -526,6 +530,7 @@ def run_sweep(
     mode: str = "scoring",
     force: bool = False,
     stride: int | None = None,
+    method: str | None = None,
     out_dir: str | None = None,
     scores_subdir: str = "AR_MLM_scores",
     panel_ids: set[str] | None = None,
@@ -673,7 +678,7 @@ def run_sweep(
                 continue
             args, env = build_command(hf_id, route, gpus, panel,
                                       mode=mode, force=force,
-                                      stride=stride, out_dir=out_dir,
+                                      stride=stride, method=method, out_dir=out_dir,
                                       scores_subdir=scores_subdir,
                                       audit_path=audit_path,
                                       benchmark_dir=benchmark_dir)
@@ -733,8 +738,14 @@ def build_arg_parser(mode: str) -> argparse.ArgumentParser:
     p.add_argument("--stride", type=int, default=None,
                    help="MLM stride pass-through to scoring_worker.py "
                         "(scoring mode only). Default: child uses its own "
-                        "default (k=6 per phase_1.md primary). Set to 1 "
-                        "for the k=1 ablation experiment.")
+                        "default (k=6 per phase_1.md primary). Use with "
+                        "--method stride for k=4/8/12 sensitivity sweeps.")
+    p.add_argument("--method", type=str, default=None,
+                   choices=["stride", "exact"],
+                   help="MLM PLL method pass-through to scoring_worker.py "
+                        "(scoring mode only). 'exact' runs the true "
+                        "leave-one-out PLL (the k=1 stability ablation); "
+                        "default lets the child use 'stride'.")
     p.add_argument("--out", type=str, default=None,
                    help="Output directory pass-through to "
                         "scoring_worker.py (scoring mode only). "
@@ -1053,6 +1064,7 @@ def run(mode: str) -> None:
         mode=mode,
         force=args.force,
         stride=args.stride,
+        method=args.method,
         out_dir=args.out,
         scores_subdir=args.scores_subdir,
         panel_ids=panel_ids,

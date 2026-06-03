@@ -3,27 +3,27 @@
 Implements the MLM side of the scoring contract defined in phase_1.md
 section "打分协议 § MLM / Encoder".
 
-Two regimes
------------
-* **stride k = 1** — true (Salazar et al. 2020) leave-one-out
+Two methods (selected explicitly via `method=`, not by a magic stride value)
+----------------------------------------------------------------------------
+* **method="exact"** — true (Salazar et al. 2020) leave-one-out
   pseudo-log-likelihood. For each content position p, one forward pass
   with EXACTLY that position masked; the rest of the sequence remains
   visible context. `content_position_count` forward passes total. Slow
-  (≈ L× more forward passes than k=6) but the canonical PLL definition.
+  (≈ L× more forward passes than stride k=6) but the canonical PLL
+  definition. The `stride` argument is ignored; the recorded stride is 1.
 
-* **stride k >= 2** — k-pass stride approximation:
+* **method="stride"** (default) — k-pass stride approximation with stride k:
     for offset in 0..k-1:
       mask all content token positions p where p mod k == offset
       forward; accumulate log p(true_token | masked input) at masked positions
-  k forward passes total. Each masked position has its k-1 nearest
-  neighbours visible (no two masked tokens are within distance < k of
-  each other), so the conditional approximates leave-one-out as k → 1.
+  k forward passes total (requires k >= 2). Each masked position has its
+  k-1 nearest neighbours visible (no two masked tokens are within distance
+  < k), so the conditional approximates leave-one-out as k → 1.
 
-The earlier implementation routed stride=1 through the k-pass branch,
-which collapsed to a single "all-content-masked" forward pass — that is
-not PLL (it conditions each token on zero visible context, and produced
-NaN logits on the NT v1 family with 6-mer tokenizer). The true k=1
-branch above is now the explicit special case.
+These are two genuinely different computations, so the caller states which
+one via `method`. (Historically `stride==1` overloaded "stride" to mean the
+exact method, which also masked nothing useful when mis-routed through the
+k-pass branch — that magic-value coupling is now removed.)
 
 Per-base output
 ---------------
@@ -47,7 +47,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 import torch
 
@@ -75,6 +75,7 @@ def stride_pll_forward(
     tokenizer: Any,
     sequence: str,
     stride: int = 6,
+    method: Literal["stride", "exact"] = "stride",
     device: str | torch.device = "cpu",
     content_length: int | None = None,
 ) -> MLMScore:
@@ -91,12 +92,14 @@ def stride_pll_forward(
     sequence :
         Cleaned uppercase ACGT[N] string. Length must be > 0.
     stride :
-        Stride k. **k = 1** runs true leave-one-out PLL (one forward
-        pass per content position, `content_position_count` total).
-        **k >= 2** runs the k-pass stride approximation (k forward
-        passes, each masking every k-th position). Primary signature
-        uses k=6; supplementary sensitivity reports k=4 / 8 / 12. Must
-        be a positive integer.
+        Stride k for the k-pass approximation (used only when
+        method="stride"; must be >= 2). Primary signature uses k=6;
+        supplementary sensitivity reports k=4 / 8 / 12. Ignored when
+        method="exact".
+    method :
+        "stride" (default) → k-pass stride approximation with the given
+        `stride`. "exact" → true Salazar leave-one-out PLL (one forward
+        pass per content position; `stride` ignored, recorded stride = 1).
     device :
         Where to run forward passes.
     content_length :
@@ -127,8 +130,19 @@ def stride_pll_forward(
     """
     if not sequence:
         raise ValueError("stride_pll_forward: empty sequence is not scoreable")
-    if stride < 1:
-        raise ValueError(f"stride must be >= 1, got {stride}")
+    if method not in ("stride", "exact"):
+        raise ValueError(
+            f"method must be 'stride' or 'exact', got {method!r}"
+        )
+    if method == "stride" and stride < 2:
+        raise ValueError(
+            f"method='stride' requires stride >= 2 (got {stride}); for the "
+            "exact leave-one-out PLL use method='exact' (the stride arg is "
+            "then ignored and the recorded stride is 1)."
+        )
+    # In exact mode the recorded stride is the canonical 1 regardless of the
+    # passed stride (which is ignored); in stride mode it is the k used.
+    recorded_stride = 1 if method == "exact" else stride
     if getattr(tokenizer, "mask_token_id", None) is None:
         raise ValueError(
             f"stride_pll_forward: tokenizer {type(tokenizer).__name__} "
@@ -218,7 +232,7 @@ def stride_pll_forward(
             ".prediction_logits — can't extract MLM head."
         )
 
-    if stride == 1:
+    if method == "exact":
         # ───────────────── True leave-one-out PLL ────────────────── #
         # Salazar et al. 2020: for each content position, run one
         # forward pass with ONLY that position masked. Slow (L× more
@@ -226,11 +240,8 @@ def stride_pll_forward(
         # definition. Used as the gold-standard reference in the
         # stride-PLL sensitivity supplement.
         #
-        # The earlier implementation routed stride=1 through the k-pass
-        # branch below, which collapsed to a single all-content-masked
-        # forward pass — that conditions each token on zero visible
-        # context (≠ PLL) and produced NaN logits on the NT v1 6-mer
-        # family. Fix: explicit single-mask loop here.
+        # Selected explicitly via method="exact" (not by stride==1) so the
+        # two algorithms are a stated choice, not a magic integer value.
         for pos in content_positions:
             true_id = int(input_ids[0, pos].item())
             masked_input = input_ids.clone()
@@ -243,7 +254,7 @@ def stride_pll_forward(
             position_log_p[pos] = lp
             masked_position_count += 1
     else:
-        # ──────────────── k-pass stride approximation (k >= 2) ───────────── #
+        # ─────────── method="stride": k-pass stride approximation ─────────── #
         for offset in range(stride):
             # Mask every stride-th content position (indexed within the
             # content subsequence, not absolute token positions).
@@ -288,7 +299,7 @@ def stride_pll_forward(
         base_length=base_length,
         token_length=token_length,
         token_length_no_special=token_length_no_special,
-        stride=stride,
+        stride=recorded_stride,
         content_position_count=content_position_count,
         masked_position_count=masked_position_count,
         sum_log_p=sum_log_p,
