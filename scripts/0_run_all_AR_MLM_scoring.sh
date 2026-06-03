@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# ⚠ WARNING: This script contains hardcoded paths (micromamba envs / GPU ids
+# live in scripts/score/sweep_engine.py + models/env_routing.md). Review
+# before running on another machine.
+#
+# Step 0 of the GLMap reproduction: score all AR + MLM models on the
+# 10,000-probe panel and build the per-branch GLMap matrices. Produces the
+# entire results/scores/ tree:
+#
+#   1. Parallel scoring sweep across the 123-model audit roster
+#        scripts/score/run_scoring_sweep.py
+#      → results/scores/AR_MLM_scores/<slug>/probes.parquet   (per-model)
+#
+#   2. CPU aggregate pass over every per-model parquet
+#        scripts/score/scoring_worker.py --from-audit --strict-aggregate
+#      → results/scores/matrices/{V,V_d,D}_{AR,MLM}.npy + matrix_metadata.json
+#
+# Needs: multiple micromamba envs + GPUs (see models/env_routing.md), the
+# frozen panel at data/panels/main_panel.parquet, and the model weights
+# (scripts/download_models/ + models/setup_external_models.sh).
+#
+# Usage:
+#     bash scripts/0_run_all_AR_MLM_scoring.sh                    # full run
+#     bash scripts/0_run_all_AR_MLM_scoring.sh --gpu-ids 0,5,6,7  # pick GPUs
+#     bash scripts/0_run_all_AR_MLM_scoring.sh --only evo         # subset (sweep only)
+#     bash scripts/0_run_all_AR_MLM_scoring.sh --dry-run          # show routing, no run
+#
+# Any extra args are forwarded to the scoring sweep. With --dry-run the
+# aggregate step is skipped. The aggregate is --strict-aggregate, so it
+# expects the FULL roster to be scored; use it only after a full sweep.
+#
+# Env overrides:
+#     PY    python interpreter (default /nvme-data3/yusen/micomamba/bin/python)
+
+set -uo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+PY="${PY:-/nvme-data3/yusen/micomamba/bin/python}"
+
+# Detect --dry-run among forwarded args so we can skip the aggregate.
+DRY_RUN=0
+for arg in "$@"; do
+    [[ "${arg}" == "--dry-run" ]] && DRY_RUN=1
+done
+
+echo "===================================================================="
+echo "Step 1/2 — parallel scoring sweep (123 models × 10,000 probes)"
+echo "  Output: results/scores/AR_MLM_scores/<slug>/probes.parquet"
+echo "  Args  : ${*:-(none)}"
+echo "===================================================================="
+"${PY}" scripts/score/run_scoring_sweep.py "$@"
+
+if [[ "${DRY_RUN}" -eq 1 ]]; then
+    echo ""
+    echo "[0_run_all] --dry-run: skipping the aggregate step."
+    exit 0
+fi
+
+echo ""
+echo "===================================================================="
+echo "Step 2/2 — aggregate per-model parquets into V/V_d/D matrices (CPU)"
+echo "  Output: results/scores/matrices/"
+echo "===================================================================="
+"${PY}" scripts/score/scoring_worker.py --from-audit --strict-aggregate
+
+echo ""
+echo "[0_run_all] done. results/scores/ is built (AR_MLM_scores + matrices)."
