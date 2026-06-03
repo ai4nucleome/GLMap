@@ -50,8 +50,8 @@ can read it without modification.
 
 Usage
 -----
-  $PY scripts/build_k-stride-PPL_ablation_subset.py
-  $PY scripts/build_k-stride-PPL_ablation_subset.py --n-subset 500 --seed 7
+  $PY scripts/MLM_representation_stability/build_k-stride-PPL_ablation_subset.py
+  $PY scripts/MLM_representation_stability/build_k-stride-PPL_ablation_subset.py --n-subset 500 --seed 7
 """
 
 from __future__ import annotations
@@ -65,7 +65,7 @@ from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def parse_args() -> argparse.Namespace:

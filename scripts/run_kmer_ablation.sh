@@ -43,7 +43,7 @@ GPU_IDS="${GPU_IDS:-0,1,2,3,4,5,6,7}"
 SUBSET_PANEL="${REPO_ROOT}/data/panels/MLM_k1ablation_1000_main_panel.parquet"
 if [[ ! -f "${SUBSET_PANEL}" ]]; then
     echo "subset panel missing — run:"
-    echo "  ${PY} scripts/build_k-stride-PPL_ablation_subset.py"
+    echo "  ${PY} scripts/MLM_representation_stability/build_k-stride-PPL_ablation_subset.py"
     exit 1
 fi
 
