@@ -40,7 +40,7 @@ can reuse them.
 3. **Run the build**:
 
    ```bash
-   python scripts/build_panel.py
+   bash scripts/0_build_10000_probes_dataset.sh
    ```
 
    Produces:

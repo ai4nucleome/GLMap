@@ -11,8 +11,8 @@ Emits under --out-dir (default `data/panels/`):
     panel_summary.md           human-readable element × species cross-tab + GC stats
 
 Run modes:
-    full:   python scripts/build_panel.py
-    fast:   python scripts/build_panel.py --fast    (1/10 size, ~ 1K probes)
+    full:   python scripts/panel_build/build_panel.py
+    fast:   python scripts/panel_build/build_panel.py --fast    (1/10 size, ~ 1K probes)
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ import argparse
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 # Panel construction code lives outside the library at scripts/panel_build/

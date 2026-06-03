@@ -1,4 +1,4 @@
-"""Main biological panel construction (10K probes, Stage 2 of GOAL.md).
+"""Main biological panel construction (10K probes).
 
 ProbeRow schema (11 fields):
     probe_id          str   "human_promoter_0001" — deterministic, panel-wide unique
