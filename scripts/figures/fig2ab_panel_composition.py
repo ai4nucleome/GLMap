@@ -162,7 +162,7 @@ def _build_features(
     k=2 and k=3 are read directly from the panel parquet's precomputed
     `dinuc_vec` / `trinuc_vec` columns. k=1, k=4, and higher are computed
     on the fly from the sequence using the shared `_kmer_counts` helper in
-    src.panel.composition.
+    scripts.panel_build.composition.
 
     Dropping k=1 (k_min=2) removes the explicit mononucleotide
     features, but does NOT remove the GC signal: dinuc/trinuc marginal
@@ -179,7 +179,7 @@ def _build_features(
     would discard signal we care about.
     """
     from sklearn.preprocessing import StandardScaler
-    from panel_build.composition import _kmer_counts
+    from scripts.panel_build.composition import _kmer_counts
 
     if k_min < 1:
         raise ValueError(f"k_min must be >= 1, got {k_min}")
