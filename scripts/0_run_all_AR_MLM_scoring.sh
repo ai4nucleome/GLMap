@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# ⚠ WARNING: This script contains hardcoded paths (micromamba envs / GPU ids
-# live in scripts/score/sweep_engine.py + models/env_routing.md). Review
-# before running on another machine.
+# ⚠ Machine-specific paths: the per-family micromamba env locations live in
+# env_paths.yaml (override with $GLMAP_ENV_CONFIG); GPU ids /
+# runtime knobs are documented in models/env_routing.md. Adjust those for a
+# new machine before running.
 #
 # Step 0 of the GLMap reproduction: score all AR + MLM models on the
 # 10,000-probe panel and build the per-branch GLMap matrices. Produces the
@@ -30,14 +31,19 @@
 # expects the FULL roster to be scored; use it only after a full sweep.
 #
 # Env overrides:
-#     PY    python interpreter (default /nvme-data3/yusen/micomamba/bin/python)
+#     PY                python interpreter (default: env_python.base from the
+#                       env-paths config below)
+#     GLMAP_ENV_CONFIG  path to the micromamba env-paths YAML
+#                       (default: env_paths.yaml)
 
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-PY="${PY:-/nvme-data3/yusen/micomamba/bin/python}"
+GLMAP_ENV_CONFIG="${GLMAP_ENV_CONFIG:-${REPO_ROOT}/env_paths.yaml}"
+_cfg_base="$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)"
+PY="${PY:-${_cfg_base:-/nvme-data3/yusen/micomamba/bin/python}}"
 
 # Detect --dry-run among forwarded args so we can skip the aggregate.
 DRY_RUN=0

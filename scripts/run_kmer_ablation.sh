@@ -28,7 +28,9 @@ set -uo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-PY="${PY:-/nvme-data3/yusen/micomamba/bin/python}"
+GLMAP_ENV_CONFIG="${GLMAP_ENV_CONFIG:-${REPO_ROOT}/env_paths.yaml}"
+_cfg_base="$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)"
+PY="${PY:-${_cfg_base:-/nvme-data3/yusen/micomamba/bin/python}}"
 STRIDE="${STRIDE:-1}"
 GPU_IDS="${GPU_IDS:-0,1,2,3,4,5,6,7}"
 

@@ -37,7 +37,11 @@ let the runner dispatch.
 | `plantbimoe` | 1.2.0 | — | — | 4.38 | 2.2 (py 3.8) | An installed env supplied for PlantBiMoE; in practice we route PlantBiMoE through `PlantCAD` env because its loader needs only `mamba_ssm` (no causal_conv1d). Leaving the entry here for completeness; the routing table doesn't currently dispatch to it. |
 | `gf_dnabert2` | 2.2.2 | — | 2.7.2 | 4.49 (upgraded) | 2.1 | Reserved for any future model that wants mamba_ssm 2.x without the full PlantCAD stack. **Not currently dispatched to** — Jamba moved to PlantCAD env after we found `causal_conv1d` wheel build fails here. Kept installed because Jamba's first working route was found here before. |
 
-Absolute python paths are under `<CONDA_PREFIX>/envs/<env>/bin/python`.
+Absolute python paths are under `<CONDA_PREFIX>/envs/<env>/bin/python`. The
+concrete per-machine locations (and the evo2/PlantCAD `LD_LIBRARY_PATH`
+entries) live in **`env_paths.yaml`** — the single config the
+sweep engine reads. Edit it for your machine, or point `$GLMAP_ENV_CONFIG`
+at a copy; the env names + their package stacks stay fixed by this table.
 
 ## Runtime knobs
 

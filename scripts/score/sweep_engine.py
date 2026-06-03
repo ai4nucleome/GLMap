@@ -66,6 +66,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import yaml
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -73,21 +75,25 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # Routing
 # --------------------------------------------------------------------- #
 
-ENV_PYTHON = {
-    "base":      "/nvme-data3/yusen/micomamba/bin/python",
-    "caduceus":  "/nvme-data3/yusen/micomamba/envs/caduceus/bin/python",
-    "PlantCAD":  "/nvme-data3/yusen/micomamba/envs/PlantCAD/bin/python",
-    "dnabert2":  "/nvme-data3/yusen/micomamba/envs/dnabert2/bin/python",
-    "gf":        "/nvme-data3/yusen/micomamba/envs/gf/bin/python",
-    "evo":       "/nvme-data3/yusen/micomamba/envs/evo/bin/python",
-    "evo2":      "/nvme-data3/yusen/micomamba/envs/evo2/bin/python",
-    "hyena-dna": "/nvme-data3/yusen/micomamba/envs/hyena-dna/bin/python",
-    "megadna":   "/nvme-data3/yusen/micomamba/envs/megadna/bin/python",
-}
+# Machine-specific micromamba env locations live in a config file (the only
+# hardcoded absolute paths in the pipeline). Override with $GLMAP_ENV_CONFIG
+# to relocate without editing code. The env NAMES + their package stacks are
+# fixed by models/env_routing.md; only the paths are machine-specific.
+ENV_CONFIG_PATH = Path(
+    os.environ.get("GLMAP_ENV_CONFIG", REPO_ROOT / "env_paths.yaml")
+)
+if not ENV_CONFIG_PATH.exists():
+    raise SystemExit(
+        f"env paths config not found: {ENV_CONFIG_PATH}\n"
+        "Edit env_paths.yaml for your machine, or set "
+        "$GLMAP_ENV_CONFIG to a copy."
+    )
+_env_cfg = yaml.safe_load(ENV_CONFIG_PATH.read_text())
 
-_PLANTCAD_LIB    = "/nvme-data3/yusen/micomamba/envs/PlantCAD/lib"
-_EVO2_LIB        = "/nvme-data3/yusen/micomamba/envs/evo2/lib"
-_EVO2_TORCH_LIB  = "/nvme-data3/yusen/micomamba/envs/evo2/lib/python3.12/site-packages/torch/lib"
+ENV_PYTHON: dict[str, str] = dict(_env_cfg["env_python"])
+_PLANTCAD_LIB    = _env_cfg["ld_library_path"]["plantcad"]
+_EVO2_LIB        = _env_cfg["ld_library_path"]["evo2"]
+_EVO2_TORCH_LIB  = _env_cfg["ld_library_path"]["evo2_torch"]
 
 
 @dataclass

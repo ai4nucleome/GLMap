@@ -35,7 +35,9 @@ set -uo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-PY="${PY:-/nvme-data3/yusen/micomamba/bin/python}"
+GLMAP_ENV_CONFIG="${GLMAP_ENV_CONFIG:-${REPO_ROOT}/env_paths.yaml}"
+_cfg_base="$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)"
+PY="${PY:-${_cfg_base:-/nvme-data3/yusen/micomamba/bin/python}}"
 N_WORKERS="${N_WORKERS:-8}"
 N_JOBS_PER_WORKER="${N_JOBS_PER_WORKER:-8}"
 LOG_DIR="${LOG_DIR:-scripts/logs/classify/parallel_$(date +%Y%m%d_%H%M%S)}"

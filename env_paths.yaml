@@ -1,0 +1,31 @@
+# Per-machine micromamba environment paths for the scoring/embedding sweep
+# (read by scripts/score/sweep_engine.py).
+#
+# The sweep dispatches each model family to the right env per
+# models/env_routing.md; THIS file only says where those envs live on disk.
+# Edit the paths for your machine, or point $GLMAP_ENV_CONFIG at a copy:
+#     export GLMAP_ENV_CONFIG=/path/to/my_env_paths.yaml
+#
+# The env names (keys below) and the package stack each one must contain are
+# fixed by the routing table in models/env_routing.md — only the absolute
+# locations are machine-specific. Keys under env_python must match the
+# `env=` values returned by sweep_engine.route_model().
+
+# python interpreter per env
+env_python:
+  base:       /nvme-data3/yusen/micomamba/bin/python
+  caduceus:   /nvme-data3/yusen/micomamba/envs/caduceus/bin/python
+  PlantCAD:   /nvme-data3/yusen/micomamba/envs/PlantCAD/bin/python
+  dnabert2:   /nvme-data3/yusen/micomamba/envs/dnabert2/bin/python
+  gf:         /nvme-data3/yusen/micomamba/envs/gf/bin/python
+  evo:        /nvme-data3/yusen/micomamba/envs/evo/bin/python
+  evo2:       /nvme-data3/yusen/micomamba/envs/evo2/bin/python
+  hyena-dna:  /nvme-data3/yusen/micomamba/envs/hyena-dna/bin/python
+  megadna:    /nvme-data3/yusen/micomamba/envs/megadna/bin/python
+
+# extra LD_LIBRARY_PATH entries prepended for specific families
+# (see models/env_routing.md "Runtime knobs")
+ld_library_path:
+  plantcad:    /nvme-data3/yusen/micomamba/envs/PlantCAD/lib
+  evo2:        /nvme-data3/yusen/micomamba/envs/evo2/lib
+  evo2_torch:  /nvme-data3/yusen/micomamba/envs/evo2/lib/python3.12/site-packages/torch/lib

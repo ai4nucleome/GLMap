@@ -30,7 +30,10 @@ import pytest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-PY = "/nvme-data3/yusen/micomamba/bin/python"
+# Base-env python from the single source of truth (env_paths.yaml,
+# overridable via $GLMAP_ENV_CONFIG), not a second hardcoded copy.
+from scripts.score.sweep_engine import ENV_PYTHON  # noqa: E402
+PY = ENV_PYTHON["base"]
 
 
 # ─────────────────────── parquet_complete contract ───────────────────────
