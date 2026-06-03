@@ -16,10 +16,10 @@ Inputs
 
 Outputs (standalone PDFs under results/figures/)
 ----------------------------------------
-  FigS2-a-raw_V_score_scale.pdf     raw V per-(model, probe) score distributions
-  FigS2-b-Vd_row_std.pdf            V_d row-std distributions after centering
-  FigS2-c-raw_V_metadata_eta2.pdf   eta^2 of branch/family/org in raw V
-  FigS2-d-Vd_metadata_eta2.pdf      eta^2 of branch/family/org in V_d
+  FigS4-a-raw_V_score_scale.pdf     raw V per-(model, probe) score distributions
+  FigS4-b-Vd_row_std.pdf            V_d row-std distributions after centering
+  FigS4-c-raw_V_metadata_eta2.pdf   eta^2 of branch/family/org in raw V
+  FigS4-d-Vd_metadata_eta2.pdf      eta^2 of branch/family/org in V_d
 
 Empirical checks
 ----------------
@@ -30,8 +30,8 @@ Empirical checks
 
 Usage
 -----
-  $PY scripts/analysis/ar_mlm_merge_diagnostic.py
-  $PY scripts/analysis/ar_mlm_merge_diagnostic.py --no-figure   # numbers only
+  $PY scripts/figures/figS4_ar_mlm_merge.py
+  $PY scripts/figures/figS4_ar_mlm_merge.py --no-figure   # numbers only
 """
 
 from __future__ import annotations
@@ -142,7 +142,7 @@ def _make_individual_figures(
     t1: dict, t2: dict, t3: dict, t3_raw: dict,
     out_dir: Path,
 ) -> None:
-    """Draw the four standalone Fig. S2 diagnostic panels as PDFs."""
+    """Draw the four standalone Fig. S4 diagnostic panels as PDFs."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -174,7 +174,7 @@ def _make_individual_figures(
         plt.close(fig)
 
     with plt.rc_context(local_rc):
-        # FigS2-a: raw V score scale.
+        # FigS4-a: raw V score scale.
         fig, ax = plt.subplots(figsize=(4.8, 3.7))
         _style(ax)
         ar_L = L[branches == "ar_or_generative"].ravel()
@@ -201,9 +201,9 @@ def _make_individual_figures(
             f"median ratio AR/MLM = {t1['median_ratio']:.2f}"
         )
         ax.legend(loc="upper left", frameon=False)
-        _save(fig, out_dir / "FigS2-a-raw_V_score_scale.pdf")
+        _save(fig, out_dir / "FigS4-a-raw_V_score_scale.pdf")
 
-        # FigS2-b: V_d row standard deviations.
+        # FigS4-b: V_d row standard deviations.
         fig, ax = plt.subplots(figsize=(4.8, 3.7))
         _style(ax)
         ar_Q = Q[branches == "ar_or_generative"]
@@ -223,21 +223,21 @@ def _make_individual_figures(
             f"std ratio AR/MLM = {t2['std_ratio']:.2f}"
         )
         ax.legend(loc="upper right", frameon=False)
-        _save(fig, out_dir / "FigS2-b-Vd_row_std.pdf")
+        _save(fig, out_dir / "FigS4-b-Vd_row_std.pdf")
 
-        # FigS2-c/d: metadata variance explained (eta^2) in raw V and V_d.
+        # FigS4-c/d: metadata variance explained (eta^2) in raw V and V_d.
         eta_labels = ["branch", "family", "organization"]
         eta_colors = [PALETTE["red_strong"], PALETTE["blue_secondary"], PALETTE["teal"]]
         for filename, panel, title, stats, figsize in (
             (
-                "FigS2-c-raw_V_metadata_eta2.pdf",
+                "FigS4-c-raw_V_metadata_eta2.pdf",
                 "(c)",
                 r"Metadata variance explained in raw $V$",
                 t3_raw,
                 (4.2, 3.7),
             ),
             (
-                "FigS2-d-Vd_metadata_eta2.pdf",
+                "FigS4-d-Vd_metadata_eta2.pdf",
                 "(d)",
                 r"Metadata variance explained in $V_d$",
                 t3,
@@ -278,7 +278,7 @@ def parse_args() -> argparse.Namespace:
                    help="Print the diagnostic numbers only; skip the PDFs.")
     p.add_argument("--out-dir", type=Path,
                    default=REPO_ROOT / "results/figures",
-                   help="Directory for the FigS2-{a,b,c,d}*.pdf panels.")
+                   help="Directory for the FigS4-{a,b,c,d}*.pdf panels.")
     return p.parse_args()
 
 
@@ -326,7 +326,7 @@ def main() -> None:
             t1, t2, t3, t3_raw,
             args.out_dir,
         )
-        print(f"[done] wrote FigS2-{{a,b,c,d}} panel PDFs to {args.out_dir}",
+        print(f"[done] wrote FigS4-{{a,b,c,d}} panel PDFs to {args.out_dir}",
               flush=True)
 
 

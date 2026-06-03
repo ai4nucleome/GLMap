@@ -8,7 +8,7 @@ discussion — see paper.md), this module assembles a 123-model
 matrix on-the-fly and applies the canonical clip + double-center
 pipeline once across both branches. The empirical justification for
 showing AR + MLM in one centered-response GLMap is produced by
-`scripts/analysis/ar_mlm_merge_diagnostic.py` (Fig. S2): raw scores are
+`scripts/figures/figS4_ar_mlm_merge.py` (Fig. S4): raw scores are
 not treated as commensurate probabilities, but branch effects are small
 in total V_d-space variance relative to model family.
 
