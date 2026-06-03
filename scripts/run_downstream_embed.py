@@ -168,7 +168,7 @@ def save_embed_parquet(arr: np.ndarray, labels: np.ndarray, path: Path) -> None:
     pd.DataFrame(cols).to_parquet(path, index=False)
 
 
-# Re-export for back-compat; canonical home is now src/glmap/formats_check/embed_schema.py
+# Re-export for back-compat; canonical home is now glmap/formats_check/embed_schema.py
 # (a CPU-only module — keeping the classify script transitively light).
 from glmap.formats_check.embed_schema import validate_embed_columns   # noqa: E402,F401
 

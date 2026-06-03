@@ -133,7 +133,7 @@ def load_embed_split(path: Path) -> tuple[np.ndarray, np.ndarray, int, int]:
     df = pd.read_parquet(path)
     label_col = "label"
     # Schema validation is shared with parquet_complete() (sweep resume).
-    # Both consumers call validate_embed_columns from src/glmap/formats_check/embed_schema.py
+    # Both consumers call validate_embed_columns from glmap/formats_check/embed_schema.py
     # so the load and resume layers enforce IDENTICAL contracts: if resume
     # accepts a parquet as complete, classify must accept; if classify
     # rejects, resume must too. The validator lives in a CPU-only module

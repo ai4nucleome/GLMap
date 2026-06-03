@@ -114,12 +114,11 @@ setup required by the parallel sweep.
 
 ```
 GLMap/
-├── src/glmap/              Python package (pip install -e .)
-│   ├── loaders/            12 loader families (HF, evo, genslm, ...)
+├── glmap/                  Python package (importable; `pip install -e .`)
+│   ├── loaders/            Per-family model loaders (HF, evo, genslm, ...) + dispatch
 │   ├── scoring/            AR log-likelihood + MLM stride PLL
 │   ├── matrices/           clip + double-center + pairwise distances
-│   ├── analysis/           PCA, GC-axis, heterozygosity
-│   └── io/                 Parquet schema helpers
+│   └── formats_check/      Embedding-parquet schema validation
 ├── scripts/                CLI entry points for paper reproduction
 │   ├── panel_build/        Panel construction + panel_sources.yaml spec
 │   ├── figures/            One script per paper figure
