@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Figure 4: predicting downstream phenotype from GLMap signatures.
+"""Phenotype prediction (compute): predict downstream AUC from GLMap signatures.
 
-This script follows the ModelMap Section 5 logic in the GLMap setting:
-use per-model likelihood-response signatures as features and predict each
-model's downstream linear-probe AUC profile with out-of-fold RidgeCV.
+The computation behind Figure 4 — no plotting here. Following ModelMap
+Section 5 in the GLMap setting: use each model's 10,000-probe likelihood-
+response signature (V / V_d, from results/scores/) as features and predict
+its downstream linear-probe AUC profile with out-of-fold RidgeCV (random
+K-fold + family GroupKFold). The cached CSVs are consumed by the plotting /
+table scripts:
+  scripts/figures/fig4b_phenotype_prediction_scatter.py   (predictions.csv)
+  scripts/tables/table4_phenotype_prediction_metrics.py   (metrics_summary.csv)
+Run all three from scripts/6_phenotype_prediction.sh.
 
 Inputs
 ------
@@ -21,7 +27,7 @@ Outputs
 
 Usage
 -----
-  $PY scripts/figures/fig4_phenotype_prediction.py
+  $PY scripts/downstream_tasks/run_phenotype_prediction.py
 """
 
 from __future__ import annotations

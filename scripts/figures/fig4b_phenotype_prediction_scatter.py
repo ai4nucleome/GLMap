@@ -2,7 +2,7 @@
 """Fig4b: predicted-vs-observed downstream AUC scatter.
 
 This plotting script intentionally does not rerun RidgeCV. It only reads
-cached outputs from `fig4_phenotype_prediction.py`, so figure styling can be
+cached outputs from `scripts/downstream_tasks/run_phenotype_prediction.py`, so figure styling can be
 iterated quickly.
 
 Inputs
@@ -99,7 +99,7 @@ def main() -> None:
     if not args.predictions.exists():
         raise FileNotFoundError(
             f"{args.predictions} does not exist. Run "
-            "scripts/figures/fig4_phenotype_prediction.py first."
+            "scripts/downstream_tasks/run_phenotype_prediction.py first."
         )
 
     predictions = pd.read_csv(args.predictions)

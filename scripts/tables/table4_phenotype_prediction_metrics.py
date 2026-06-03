@@ -131,7 +131,7 @@ def main() -> None:
     if not METRICS_PATH.exists():
         raise FileNotFoundError(
             f"{METRICS_PATH} does not exist. Run "
-            "scripts/figures/fig4_phenotype_prediction.py first."
+            "scripts/downstream_tasks/run_phenotype_prediction.py first."
         )
     df = pd.read_csv(METRICS_PATH)
     TABLE_DIR.mkdir(parents=True, exist_ok=True)
