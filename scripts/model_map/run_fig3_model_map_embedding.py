@@ -22,7 +22,7 @@ Outputs
 
 Usage
 -----
-  $PY scripts/analysis/run_fig3_model_map_embedding.py
+  $PY scripts/model_map/run_fig3_model_map_embedding.py
 """
 
 from __future__ import annotations
@@ -185,7 +185,7 @@ def _write_embedding(
     df.insert(4, "method", method)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_path, index=False)
-    print(f"[done] wrote {out_path.relative_to(REPO_ROOT)}")
+    print(f"[done] wrote {out_path}")
 
 
 def main() -> None:
@@ -264,7 +264,7 @@ def main() -> None:
     (args.out_dir / "fig3_embedding_config.json").write_text(
         json.dumps(config, indent=2) + "\n"
     )
-    print(f"[done] wrote {(args.out_dir / 'fig3_embedding_config.json').relative_to(REPO_ROOT)}")
+    print(f"[done] wrote {(args.out_dir / 'fig3_embedding_config.json')}")
 
 
 if __name__ == "__main__":

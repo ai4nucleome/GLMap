@@ -8,7 +8,7 @@ standalone panel scripts:
   fig3b_model_map_model_weight.py  (colored by model parameter count)
   fig3c_model_map_6task_mean.py    (colored by mean downstream AUC)
 
-Coordinates come from scripts/analysis/run_fig3_model_map_embedding.py
+Coordinates come from scripts/model_map/run_fig3_model_map_embedding.py
 (cached t-SNE / MDS), so the panels only restyle, never re-embed.
 
 (Formerly fig3_model_map.py, which also drew a monolithic 1×4 combined
@@ -151,7 +151,7 @@ def _draw_family_map(
 def _load_coords(path: Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(
-            f"{path} does not exist. Run scripts/analysis/"
+            f"{path} does not exist. Run scripts/model_map/"
             "run_fig3_model_map_embedding.py first."
         )
     df = pd.read_csv(path)

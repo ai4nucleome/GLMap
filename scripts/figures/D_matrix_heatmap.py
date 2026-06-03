@@ -11,7 +11,7 @@ What it draws
 -------------
 The full per-pair distance matrix D[i, j] = ||V_d,i - V_d,j||^2 across all
 123 models (built on-the-fly from the combined GLMap representation, the
-same object used by scripts/analysis/run_fig3_model_map_embedding.py).
+same object used by scripts/model_map/run_fig3_model_map_embedding.py).
 Models are ordered by family (largest family first); rows/cols are the
 123 model names, colored by branch (AR vs MLM). A log color scale is used
 because a few outlier models (e.g. Genos-10B) span ~3 orders of magnitude
