@@ -73,20 +73,20 @@ scripts/logs/
 .DS_Store
 Thumbs.db
 
-# Project-specific: large vendored data not tracked
+# Project-specific: large raw benchmark corpora the user downloads
+# (see data/README.md) — never committed
 data/GUE/
 data/PGB/
 data/dna_foundation_benchmark/
-data/dnabert-s_eval/
-data/genomic-benchmarks/
-data/panel_sources/
 data/audits/tokenization_calibration.csv
+
+# Local non-HF model weights (megaDNA / PlasmidGPT / GenSLM / evo .pt etc.)
 models/modelsHFNoInfo/
-dna_foundation_benchmark/data_processed/
-dna_foundation_benchmark/attention_weights/
-dna_foundation_benchmark/embeddings/
-dna_foundation_benchmark/activations_debug.log
-out_phase2/embeddings/
+
+# Regenerable bulk outputs. The rest of results/ IS tracked (scored
+# matrices + per-model parquets) so the figures reproduce; only the heavy
+# per-model × per-task embeddings (step 4) are left out.
+results/analysis/embeddings/
 
 # Internal / Claude Code agent state
 .claude/
