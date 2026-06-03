@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# ⚠ WARNING: This script contains hardcoded paths (e.g. micromamba envs,
+# ⚠ Machine-specific paths: the base python comes from env_paths.yaml
+# (override with $GLMAP_ENV_CONFIG).
+#
 # Fan out scripts/run_downstream_classify.py across N parallel workers,
 # splitting the 123-model audit set round-robin via --hf-ids.
 #
@@ -25,7 +27,8 @@
 #     N_JOBS_PER_WORKER=4 bash scripts/run_classify_parallel.sh
 #
 # Env overrides:
-#     PY               python interpreter (default /nvme-data3/yusen/micomamba/bin/python)
+#     PY               python interpreter (default: env_python.base from env_paths.yaml)
+#     GLMAP_ENV_CONFIG env-paths YAML (default: env_paths.yaml)
 #     N_WORKERS        parallel classify processes (default 8; safe on 80-free-core box)
 #     N_JOBS_PER_WORKER  sklearn n_jobs per worker (default 8; >5 wasted since cv=5)
 #     LOG_DIR          per-worker stdout/stderr dir (default scripts/logs/classify/parallel_<ts>)
@@ -36,8 +39,12 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
 GLMAP_ENV_CONFIG="${GLMAP_ENV_CONFIG:-${REPO_ROOT}/env_paths.yaml}"
-_cfg_base="$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)"
-PY="${PY:-${_cfg_base:-/nvme-data3/yusen/micomamba/bin/python}}"
+PY="${PY:-$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)}"
+if [[ -z "${PY}" ]]; then
+    echo "error: could not read env_python.base from ${GLMAP_ENV_CONFIG}" >&2
+    echo "       set \$PY, or fix the config / \$GLMAP_ENV_CONFIG." >&2
+    exit 1
+fi
 N_WORKERS="${N_WORKERS:-8}"
 N_JOBS_PER_WORKER="${N_JOBS_PER_WORKER:-8}"
 LOG_DIR="${LOG_DIR:-scripts/logs/classify/parallel_$(date +%Y%m%d_%H%M%S)}"

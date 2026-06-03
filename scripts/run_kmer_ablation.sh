@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# ⚠ WARNING: This script contains hardcoded paths (e.g. micromamba envs,
-# GPU ids). Review before running on another machine.
+# ⚠ Machine-specific paths: micromamba env locations live in env_paths.yaml
+# (override with $GLMAP_ENV_CONFIG); GPU ids in models/env_routing.md. Adjust
+# those for a new machine before running.
 #
 # Launch the MLM stride-PLL k=1 ablation: re-score ALL 56 MLM models on a
 # 1000-probe stratified subset of the panel at stride k=1 (the exact
@@ -29,8 +30,12 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
 GLMAP_ENV_CONFIG="${GLMAP_ENV_CONFIG:-${REPO_ROOT}/env_paths.yaml}"
-_cfg_base="$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)"
-PY="${PY:-${_cfg_base:-/nvme-data3/yusen/micomamba/bin/python}}"
+PY="${PY:-$(sed -n 's/^[[:space:]]*base:[[:space:]]*//p' "${GLMAP_ENV_CONFIG}" 2>/dev/null | head -1)}"
+if [[ -z "${PY}" ]]; then
+    echo "error: could not read env_python.base from ${GLMAP_ENV_CONFIG}" >&2
+    echo "       set \$PY, or fix the config / \$GLMAP_ENV_CONFIG." >&2
+    exit 1
+fi
 STRIDE="${STRIDE:-1}"
 GPU_IDS="${GPU_IDS:-0,1,2,3,4,5,6,7}"
 
