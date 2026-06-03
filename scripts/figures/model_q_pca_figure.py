@@ -101,13 +101,13 @@ def _short_name(hf_id: str) -> str:
 
 
 def _load_branch(matrices_dir: Path, branch: str) -> tuple[np.ndarray, list[str]]:
-    """Load Q_{branch}.npy + the model_ids for that branch."""
-    Q = np.load(matrices_dir / f"Q_{branch.upper()}.npy")
+    """Load V_d_{branch}.npy (the double-centered matrix) + its model_ids."""
+    Q = np.load(matrices_dir / f"V_d_{branch.upper()}.npy")
     actual = json.loads((matrices_dir / "scored_models_actual.json").read_text())
     model_ids = actual[branch.lower()]["scored_models"]
     if Q.shape[0] != len(model_ids):
         raise ValueError(
-            f"Q_{branch} has {Q.shape[0]} rows but scored_models_actual.json "
+            f"V_d_{branch} has {Q.shape[0]} rows but scored_models_actual.json "
             f"lists {len(model_ids)} {branch} models"
         )
     return Q, model_ids
@@ -316,7 +316,7 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--matrices-dir", type=Path,
                    default=REPO_ROOT / "results/scores" / "matrices",
-                   help="Directory holding Q_{AR,MLM}.npy + "
+                   help="Directory holding V_d_{AR,MLM}.npy + "
                         "scored_models_actual.json.")
     p.add_argument("--out-dir", type=Path, default=REPO_ROOT / "results/figures",
                    help="Output directory for the figure.")
