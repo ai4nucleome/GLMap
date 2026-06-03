@@ -1,9 +1,9 @@
 """Tests for the Stage 4 scoring entry: run_sweep.py --mode scoring +
-run_phase1_scoring.py --from-audit.
+scoring_worker.py --from-audit.
 
 Verifies the two-mode dispatch shape and the audit-roster loading path
 without needing real model weights. The heavy scoring path is exercised
-end-to-end by scripts/run_sweep.py + scripts/run_phase1_scoring.py at
+end-to-end by scripts/run_sweep.py + scripts/score/scoring_worker.py at
 Stage 4 launch time.
 """
 
@@ -22,7 +22,7 @@ def test_scoring_mode_dispatches_to_phase1_scoring_from_audit() -> None:
         "arcinstitute/evo2_7b", route, gpus=[0, 1, 2, 3],
         panel=None, mode="scoring",
     )
-    assert args[1].endswith("run_phase1_scoring.py")
+    assert args[1].endswith("scoring_worker.py")
     assert "--from-audit" in args
     # Uses --hf-ids (exact match), NOT --only (substring) — substring would
     # collide with evo2_7b_base / evo2_7b_262k in the audit and cause
@@ -42,7 +42,7 @@ def test_scoring_mode_uses_physical_gpu_ids() -> None:
         "arcinstitute/evo2_20b", route, gpus=[0, 5, 6, 7],
         panel=None, mode="scoring",
     )
-    assert args[1].endswith("run_phase1_scoring.py")
+    assert args[1].endswith("scoring_worker.py")
     assert env["CUDA_VISIBLE_DEVICES"] == "0,5,6,7"
 
 
@@ -213,7 +213,7 @@ def test_scoring_mode_uses_exact_match_to_avoid_substring_collisions() -> None:
     assert "arcinstitute/evo2_7b_base" in hf_ids
     # Build the scoring command for the prefix and confirm it would not
     # match the longer variants (because --hf-ids is consumed by
-    # run_phase1_scoring's exact-match path).
+    # scoring_worker's exact-match path).
     route = RouteSpec(env="evo2", gpus_needed=4)
     args, _env = build_command(
         "arcinstitute/evo2_7b", route, gpus=[0, 1, 2, 3],
@@ -363,7 +363,7 @@ def test_max_gpus_per_model_filters_out_large_models(tmp_path) -> None:
 # ─────────────────────── --from-audit roster ───────────────────────
 
 def test_phase1_scoring_from_audit_picks_up_full_roster() -> None:
-    """run_phase1_scoring.py --from-audit must load the full roster that
+    """scoring_worker.py --from-audit must load the full roster that
     glmap.loaders.dispatch.specs_from_audit produces, so a Stage 4 sweep
     sees the full 123-model audit set (122 original + 3 HuggingFaceBio/
     Carbon − 2 gena-lm-bigbird-base-sparse{,t2t} excluded as their

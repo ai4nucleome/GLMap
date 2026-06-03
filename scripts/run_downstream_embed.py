@@ -352,7 +352,7 @@ def main() -> None:
 def _build_loader_only(spec: ModelSpec, device: str):
     """Build and load the loader for one spec, without doing any scoring.
 
-    Mirrors the dispatch in `scripts.run_phase1_scoring._score_model` but
+    Mirrors the dispatch in `glmap.pipeline._score_model` but
     stops at `loader.load()`. We import the loader factories lazily so
     the env-specific deps don't get pulled in for models we won't run.
     """

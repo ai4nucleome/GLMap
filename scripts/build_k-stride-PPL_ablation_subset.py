@@ -45,7 +45,7 @@ Output
                                                       timestamp, ablation purpose
 
 The subset parquet has the same column schema as main_panel.parquet so
-the existing scoring pipeline (run_phase1_scoring.py --panel <path>)
+the existing scoring pipeline (scoring_worker.py --panel <path>)
 can read it without modification.
 
 Usage

@@ -79,7 +79,7 @@ and benchmark data. See the sections below for setup.
 **Quick example** (single model, single GPU):
 
 ```bash
-python scripts/run_phase1_scoring.py --from-audit \
+python scripts/score/scoring_worker.py --from-audit \
     --hf-ids zhihan1996/DNABERT-2-117M --device cuda:0
 ```
 
@@ -91,7 +91,7 @@ see [models/env_routing.md](models/env_routing.md)):
 python scripts/run_sweep.py --mode scoring --audit data/audits/models.json
 
 # 2. Build V/Vd/D matrices (CPU, after all scoring workers finish)
-python scripts/run_phase1_scoring.py --from-audit --strict-aggregate
+python scripts/score/scoring_worker.py --from-audit --strict-aggregate
 
 # 3. Parallel downstream embedding extraction (requires benchmark CSVs)
 python scripts/run_sweep.py --mode embed --audit data/audits/models.json

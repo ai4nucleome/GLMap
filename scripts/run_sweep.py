@@ -5,14 +5,14 @@ micromamba env + runtime knobs per models/env_routing.md, then dispatch a
 per-model subprocess on a pool of GPUs. Two modes are supported:
 
   --mode scoring (default)
-      Dispatches `scripts/run_phase1_scoring.py --from-audit
+      Dispatches `scripts/score/scoring_worker.py --from-audit
       --hf-ids=<hf_id> --skip-aggregate`. Uses --hf-ids (exact match)
       not --only (substring) so collision-prone prefixes like
       'arcinstitute/evo2_7b' do not match evo2_7b_base / evo2_7b_262k
       and cause parallel subprocesses to race on the same parquet.
       Each subprocess writes only its own
       results/scores/AR_MLM_scores/<slug>/probes.parquet. After the parallel sweep,
-      run a single aggregate pass (`run_phase1_scoring.py --from-audit
+      run a single aggregate pass (`scoring_worker.py --from-audit
       --strict-aggregate`) to build results/scores/matrices/{L,Q,D}_{AR,MLM}.npy.
       Resume criterion: skip when results/scores/AR_MLM_scores/<slug>/probes.parquet
       has the panel's full probe_id set AND every sum_log_p is finite
@@ -31,7 +31,7 @@ Usage
     # frozen panel + all audit-listed models, currently 123). Run this,
     # then run a final aggregate:
     python scripts/run_sweep.py                        # --mode scoring (default)
-    python scripts/run_phase1_scoring.py --from-audit --strict-aggregate  # CPU OK, builds L/Q/D
+    python scripts/score/scoring_worker.py --from-audit --strict-aggregate  # CPU OK, builds L/Q/D
 
     python scripts/run_sweep.py --only evo             # substring filter on hf_id
     python scripts/run_sweep.py --n-gpus 8 --force     # rerun everything
@@ -365,7 +365,7 @@ def build_command(
 ) -> tuple[list[str], dict[str, str]]:
     """Construct argv + env for subprocess.Popen.
 
-    mode='scoring' (default) — dispatches to scripts/run_phase1_scoring.py with
+    mode='scoring' (default) — dispatches to scripts/score/scoring_worker.py with
         --from-audit + --hf-ids=<hf_id> + --skip-aggregate so each parallel
         subprocess writes only its own results/scores/AR_MLM_scores/<slug>/probes.parquet.
         force=True propagates as --force to the child, so the worker also
@@ -390,7 +390,7 @@ def build_command(
         # same parquet.
         args = [
             py,
-            "scripts/run_phase1_scoring.py",
+            "scripts/score/scoring_worker.py",
             "--from-audit",
             "--hf-ids", hf_id,
             "--skip-aggregate",
@@ -403,7 +403,7 @@ def build_command(
         if force:
             args.append("--force")
         # MLM stride pass-through for the k=1 vs k=6 ablation.  When not
-        # set, run_phase1_scoring.py uses its own default (k=6 per
+        # set, scoring_worker.py uses its own default (k=6 per
         # phase_1.md primary).
         if stride is not None:
             args.extend(["--stride", str(stride)])
@@ -471,7 +471,7 @@ def classify_log(log_path: Path, rc: int, mode: str = "scoring") -> str:
     """Tag the result of one model run by reading its log tail.
 
     The two sweep modes print different verdict markers:
-      scoring   worker (run_phase1_scoring.py)  → "[done] --skip-aggregate ..."
+      scoring   worker (scoring_worker.py)  → "[done] --skip-aggregate ..."
                                                    ("wrote scores -> ..." per probe)
       embed     worker (run_downstream_embed.py)→ no explicit success banner;
                                                    each (task, split) prints
@@ -725,13 +725,13 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--panel", type=str, default=None,
                    help="Override panel parquet for the worker (default: worker default).")
     p.add_argument("--stride", type=int, default=None,
-                   help="MLM stride pass-through to run_phase1_scoring.py "
+                   help="MLM stride pass-through to scoring_worker.py "
                         "(scoring mode only). Default: child uses its own "
                         "default (k=6 per phase_1.md primary). Set to 1 "
                         "for the k=1 ablation experiment.")
     p.add_argument("--out", type=str, default=None,
                    help="Output directory pass-through to "
-                        "run_phase1_scoring.py (scoring mode only). "
+                        "scoring_worker.py (scoring mode only). "
                         "Default: child writes to results/scores/AR_MLM_scores. Set "
                         "to e.g. results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples "
                         "for an ablation that must not overwrite the "
@@ -740,7 +740,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--scores-subdir", dest="scores_subdir", type=str,
                    default="AR_MLM_scores",
                    help="Per-model score subdir under --out passed through to "
-                        "run_phase1_scoring.py (<out>/<scores-subdir>/<slug>/). "
+                        "scoring_worker.py (<out>/<scores-subdir>/<slug>/). "
                         "Default 'AR_MLM_scores'; the k=1 true-PLL ablation uses "
                         "'MLM_true-PLL_scores'. Resume/DONE checks honor it too.")
     p.add_argument("--only", type=str, default=None,
@@ -790,7 +790,7 @@ def parse_args() -> argparse.Namespace:
                    "to avoid pushing their latency to the end.")
     p.add_argument("--mode", type=str, default="scoring",
                    choices=["scoring", "embed"],
-                   help="scoring (default): dispatch run_phase1_scoring.py --from-audit "
+                   help="scoring (default): dispatch scoring_worker.py --from-audit "
                    "--hf-ids <hf_id> --skip-aggregate so each subprocess writes "
                    "its results/scores/AR_MLM_scores/<slug>/probes.parquet; a final "
                    "aggregate pass (--from-audit --strict-aggregate, CPU OK) "
@@ -921,7 +921,7 @@ def main() -> None:
     #                     the full panel with finite sum_log_p in every row.
     #                     Set-equality alone would accept all-NaN parquets
     #                     produced by per-probe failures, so we delegate to
-    #                     scripts.run_phase1_scoring.parquet_covers_panel.
+    #                     glmap.pipeline.parquet_covers_panel.
     #   embed mode     -> results/analysis/embeddings/<slug>/<task>/{train,test}
     #                     .parquet present for all 6 tasks × 2 splits AND
     #                     each passes parquet_complete(): row count matches

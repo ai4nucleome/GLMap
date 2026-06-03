@@ -17,5 +17,5 @@ construction and all downstream analyses reported in the paper.
 To regenerate per-token vectors, re-run the scoring pipeline:
 
 ```bash
-python scripts/run_phase1_scoring.py --from-audit --device cuda:0
+python scripts/score/scoring_worker.py --from-audit --device cuda:0
 ```

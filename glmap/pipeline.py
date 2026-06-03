@@ -2,7 +2,7 @@
 
 Reusable building blocks that wire glmap's loaders / scoring / matrix code
 into the per-model scoring + per-branch aggregation steps, factored out of
-``scripts/run_phase1_scoring.py`` so the sweep driver, the downstream
+``scripts/score/scoring_worker.py`` so the sweep driver, the downstream
 embedding extractor, and the tests can import them directly:
 
   parquet_covers_panel    resume-integrity check on a cached probes.parquet

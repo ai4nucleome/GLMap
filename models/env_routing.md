@@ -124,7 +124,7 @@ spread across.
 
 `glmap.loaders.dispatch.audit_entry_to_spec` maps each
 audit-listed hf_id to a `ModelSpec` with a `loader_kind`. Dispatch
-chain in `scripts/run_phase1_scoring.py:_score_model` is:
+chain in `scripts/score/scoring_worker.py:_score_model` is:
 
 ```
 hf_id                                       -> loader_kind   -> loader class                        in env
@@ -163,7 +163,7 @@ The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, whi
    PreTrainedModel-style class by hand around a non-AutoModel
    checkpoint) depending on what's actually missing.
 6. **Verify by scoring a few probes on the new model**
-   (`python scripts/run_phase1_scoring.py --hf-ids "<id>" --max-probes 5`)
+   (`python scripts/score/scoring_worker.py --hf-ids "<id>" --max-probes 5`)
    and confirming the written `probes.parquet` has finite `sum_log_p`
    before adding it to any production sweep. Triton/CUDA kernels are
    silent failures waiting to happen — a quick smoke catches "loaded but
@@ -173,7 +173,7 @@ The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, whi
 
 `scripts/run_sweep.py` is the orchestrator. It reads the audit, routes
 each model to its env via `route_model`, schedules onto a GPU pool
-respecting per-task `gpus_needed`, launches `scripts/run_phase1_scoring.py`
+respecting per-task `gpus_needed`, launches `scripts/score/scoring_worker.py`
 as a subprocess per model, aggregates results, and is resume-safe.
 
 ```bash
@@ -188,7 +188,7 @@ python scripts/run_sweep.py --force --dry-run
 # the final aggregate step (no --skip-aggregate) builds the matrices on cpu.
 # --strict-aggregate makes the aggregate fail-fast on any missing/partial model.
 python scripts/run_sweep.py --mode scoring
-python scripts/run_phase1_scoring.py --from-audit --strict-aggregate  # final L/Q/D aggregate
+python scripts/score/scoring_worker.py --from-audit --strict-aggregate  # final L/Q/D aggregate
 
 # Cap the GPU pool (e.g. when sharing the box). Note: the full roster
 # contains two 8-GPU models (evo2_40b, evo2_40b_base), so --n-gpus < 8
@@ -426,7 +426,7 @@ PY
 ### E. Verify
 
 After redoing whichever sections above apply, smoke-test by running
-`scripts/run_phase1_scoring.py --hf-ids "<canonical_id>" --device cuda:0 --max-probes 5`
+`scripts/score/scoring_worker.py --hf-ids "<canonical_id>" --device cuda:0 --max-probes 5`
 through the appropriate env's python, and confirm the written
 `probes.parquet` has finite `sum_log_p`. One canary per family is enough
 to catch most regressions:
