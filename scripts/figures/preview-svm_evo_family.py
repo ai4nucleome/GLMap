@@ -49,7 +49,7 @@ Pipeline
 
 Output
 ------
-  results/figures/preview-svm_evo_family_LOO-AUC[_{kernel}][_{projection}].pdf
+  results/figures/preview-svm_evo_family[_{kernel}][_{projection}].pdf
 
 Methodology rationale
 ---------------------
@@ -592,7 +592,7 @@ def main() -> None:
     # Filename encodes kernel + projection so different runs don't
     # overwrite each other; linear PCA stays untagged for backward
     # compatibility.
-    parts = ["preview-svm_evo_family_LOO-AUC"]
+    parts = ["preview-svm_evo_family"]
     if args.kernel != "linear":
         parts.append(args.kernel)
     if args.projection != "pca":
