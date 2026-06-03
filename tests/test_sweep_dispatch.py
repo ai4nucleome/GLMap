@@ -141,7 +141,7 @@ def test_parquet_covers_panel_rejects_nan_rows(tmp_path) -> None:
     is NaN — the per-probe failure path writes such rows."""
     import numpy as np
     import pandas as pd
-    from scripts.run_phase1_scoring import parquet_covers_panel
+    from glmap.pipeline import parquet_covers_panel
 
     panel_ids = {f"probe_{i:04d}" for i in range(5)}
     score = tmp_path / "probes.parquet"
@@ -181,7 +181,7 @@ def test_parquet_covers_panel_rejects_missing_rows(tmp_path) -> None:
     """probe_id subset of panel — must be rejected (the smoke --max-probes=1
     failure mode)."""
     import pandas as pd
-    from scripts.run_phase1_scoring import parquet_covers_panel
+    from glmap.pipeline import parquet_covers_panel
 
     panel_ids = {f"probe_{i:04d}" for i in range(5)}
     score = tmp_path / "probes.parquet"

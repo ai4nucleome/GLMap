@@ -553,7 +553,7 @@ def run_sweep(
     parquet_covers_panel = None
     if mode == "scoring" and panel_ids is not None:
         sys.path.insert(0, str(REPO_ROOT))
-        from scripts.run_phase1_scoring import parquet_covers_panel as _pcp
+        from glmap.pipeline import parquet_covers_panel as _pcp
         parquet_covers_panel = _pcp
 
     if order == "small-first":
@@ -866,7 +866,7 @@ def main() -> None:
             )
         # Lazy import the shared check
         sys.path.insert(0, str(REPO_ROOT))
-        from scripts.run_phase1_scoring import parquet_covers_panel
+        from glmap.pipeline import parquet_covers_panel
 
     # Same pattern for embed mode: pre-compute expected row counts per
     # (task, split) from the dna_foundation_benchmark CSVs, and import

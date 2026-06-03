@@ -53,7 +53,7 @@ if str(REPO_ROOT) not in sys.path:
 # the likelihood-scoring runner so we have a single source of truth for
 # how each of the 123 models is loaded.
 from glmap.loaders.dispatch import ModelSpec, specs_from_audit  # noqa: E402
-from scripts.run_phase1_scoring import _score_model  # noqa: E402
+from glmap.pipeline import _score_model  # noqa: E402
 from glmap.scoring.embeddings import compute_pooled_embedding  # noqa: E402
 
 

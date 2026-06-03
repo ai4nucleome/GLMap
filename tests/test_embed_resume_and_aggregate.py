@@ -345,7 +345,7 @@ def test_aggregate_safe_read_handles_corrupt_parquet(tmp_path: Path) -> None:
     corrupt parquet (truncated bytes, missing columns, duplicated
     probe_id) as 'model unavailable' rather than aborting the whole
     aggregate."""
-    from glmap.loaders.dispatch import ModelSpec; from scripts.run_phase1_scoring import _build_branch_matrices
+    from glmap.loaders.dispatch import ModelSpec; from glmap.pipeline import _build_branch_matrices
     import pandas as pd
 
     panel = pd.DataFrame({
@@ -847,7 +847,7 @@ def test_aggregate_safe_read_rejects_extra_probes(tmp_path: Path) -> None:
     build). Previously reindex would silently drop the extras and
     accept the model; now it must be classified as corrupt so the
     user re-scores against the current panel."""
-    from glmap.loaders.dispatch import ModelSpec; from scripts.run_phase1_scoring import _build_branch_matrices
+    from glmap.loaders.dispatch import ModelSpec; from glmap.pipeline import _build_branch_matrices
     import pandas as pd
 
     panel = pd.DataFrame({
