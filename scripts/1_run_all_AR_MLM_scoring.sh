@@ -21,10 +21,10 @@
 # (scripts/download_models/ + models/setup_external_models.sh).
 #
 # Usage:
-#     bash scripts/0_run_all_AR_MLM_scoring.sh                    # full run
-#     bash scripts/0_run_all_AR_MLM_scoring.sh --gpu-ids 0,5,6,7  # pick GPUs
-#     bash scripts/0_run_all_AR_MLM_scoring.sh --only evo         # subset (sweep only)
-#     bash scripts/0_run_all_AR_MLM_scoring.sh --dry-run          # show routing, no run
+#     bash scripts/1_run_all_AR_MLM_scoring.sh                    # full run
+#     bash scripts/1_run_all_AR_MLM_scoring.sh --gpu-ids 0,5,6,7  # pick GPUs
+#     bash scripts/1_run_all_AR_MLM_scoring.sh --only evo         # subset (sweep only)
+#     bash scripts/1_run_all_AR_MLM_scoring.sh --dry-run          # show routing, no run
 #
 # Any extra args are forwarded to the scoring sweep. With --dry-run the
 # aggregate step is skipped. The aggregate is --strict-aggregate, so it
@@ -64,7 +64,7 @@ echo "===================================================================="
 
 if [[ "${DRY_RUN}" -eq 1 ]]; then
     echo ""
-    echo "[0_run_all] --dry-run: skipping the aggregate step."
+    echo "[1_run_all] --dry-run: skipping the aggregate step."
     exit 0
 fi
 
@@ -76,4 +76,4 @@ echo "===================================================================="
 "${PY}" scripts/score/scoring_worker.py --from-audit --strict-aggregate
 
 echo ""
-echo "[0_run_all] done. results/scores/ is built (AR_MLM_scores + matrices)."
+echo "[1_run_all] done. results/scores/ is built (AR_MLM_scores + matrices)."
