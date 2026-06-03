@@ -11,28 +11,18 @@ GLMap is a training-free, architecture-agnostic framework for representing and c
 
 ## Installation
 
-**From source** (recommended for development and full reproducibility):
+GLMap is a research repository, not a published package — clone it and
+install in editable mode. `pip install -e .` makes the `glmap` library
+importable (and wires up the test/script imports); it is **not** a PyPI
+distribution.
 
 ```bash
 git clone https://github.com/ai4nucleome/GLMap.git
 cd GLMap
-pip install -e .            # core: analysis, matrix loading, figures
+pip install -e .            # core: matrix loading, analysis, figures
 pip install -e .[scoring]   # adds torch + transformers for model scoring
-pip install -e .[dev]       # adds pytest, build, twine
+pip install -e .[dev]       # adds pytest
 ```
-
-**After PyPI release** (forthcoming with the paper):
-
-```bash
-pip install ai4nucleome-glmap            # core
-pip install ai4nucleome-glmap[scoring]   # + torch/transformers
-```
-
-> **PyPI package note**: The PyPI distribution contains the `glmap` library
-> code only. Precomputed artefacts (panel, matrices, scores, figures) are
-> included in the **source repository**, not in the PyPI wheel. To use
-> `glmap.load_panel()` etc. after `pip install`, either clone this repo or
-> set `GLMAP_DATA_DIR` to a directory containing the artefacts.
 
 > **Note**: `import glmap` does not trigger `import torch` or
 > `import transformers`. Heavy dependencies are loaded on demand inside
