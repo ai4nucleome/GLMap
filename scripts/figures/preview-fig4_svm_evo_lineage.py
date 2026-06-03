@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Figure 4a: SVM separability of evo lineage relationships on GLMap.
+"""Preview figure (companion to Fig4): SVM separability of evo lineage
+relationships on GLMap.
+
+Not a numbered figure — written to results/figures/_preview/ as an
+illustrative diagnostic (the 2D PCA contour is for display only). Fig4a
+is the downstream-AUC distribution; this is a separate provenance-recovery
+check that GLMap distances encode training lineage.
 
 Tests whether the GLMap L-vector DIFFERENCE between two models encodes
 their lineage relationship to a fixed anchor. Pair-feature framing:
@@ -42,7 +48,7 @@ Pipeline
 
 Output
 ------
-  results/figures/Fig4a-SVM_evo-lineage_LOO-AUC[_{kernel}][_{projection}].pdf
+  results/figures/preview-fig4-SVM_evo-lineage_LOO-AUC[_{kernel}][_{projection}].pdf
 
 Methodology rationale
 ---------------------
@@ -61,8 +67,8 @@ Methodology rationale
 
 Usage
 -----
-  $PY scripts/figures/fig4a_svm_evo_lineage.py
-  $PY scripts/figures/fig4a_svm_evo_lineage.py \\
+  $PY scripts/figures/preview-fig4_svm_evo_lineage.py
+  $PY scripts/figures/preview-fig4_svm_evo_lineage.py \\
       --labels-csv models/evo-family-relationship.csv \\
       --out figures \\
       --figsize 7,6 \\
@@ -488,7 +494,7 @@ def parse_args() -> argparse.Namespace:
                    default=REPO_ROOT / "results/scores/AR_MLM_scores",
                    help="Directory containing <slug>/probes.parquet.")
     p.add_argument("--out", dest="out_dir", type=Path,
-                   default=REPO_ROOT / "results/figures",
+                   default=REPO_ROOT / "results/figures/_preview",
                    help="Output directory.")
     p.add_argument("--figsize", type=str, default="7,6",
                    help='Inches, "W,H". Default "7,6".')
@@ -544,14 +550,14 @@ def main() -> None:
     args = parse_args()
 
     rows = _load_label_csv(args.labels_csv)
-    print(f"[fig4a] {len(rows)} labeled pairs from "
+    print(f"[preview-fig4] {len(rows)} labeled pairs from "
           f"{args.labels_csv.relative_to(REPO_ROOT)}", flush=True)
 
     F, y, partners, anchor = _load_pair_features(rows, args.scores_dir)
     # Alias so the downstream code that uses L / hf_ids still works.
     L, hf_ids = F, partners
-    print(f"[fig4a] anchor: {anchor}", flush=True)
-    print(f"[fig4a] pair-feature matrix: {F.shape}  (label balance: "
+    print(f"[preview-fig4] anchor: {anchor}", flush=True)
+    print(f"[preview-fig4] pair-feature matrix: {F.shape}  (label balance: "
           f"{int((y==0).sum())} unrelated / {int((y==1).sum())} derived)",
           flush=True)
 
@@ -561,31 +567,31 @@ def main() -> None:
         L, y, c_grid,
         kernel=args.kernel, gamma=gamma, seed=args.seed,
     )
-    print(f"[fig4a] kernel={args.kernel}"
+    print(f"[preview-fig4] kernel={args.kernel}"
           + (f", γ={gamma}" if args.kernel == "rbf" else ""),
           flush=True)
-    print(f"[fig4a] LOO-CV AUC sweep:",
+    print(f"[preview-fig4] LOO-CV AUC sweep:",
           ", ".join(f"C={c:g}: {info[c]['auc']:.3f}" for c in c_grid),
           flush=True)
-    print(f"[fig4a] best LOO AUC = {loo_auc:.3f}  at C = {best_C:g}", flush=True)
+    print(f"[preview-fig4] best LOO AUC = {loo_auc:.3f}  at C = {best_C:g}", flush=True)
 
     if args.projection == "pca":
         emb, var_ratio = _pca_2d(L)
-        print(f"[fig4a] PCA explained variance: PC1={var_ratio[0]*100:.1f}%, "
+        print(f"[preview-fig4] PCA explained variance: PC1={var_ratio[0]*100:.1f}%, "
               f"PC2={var_ratio[1]*100:.1f}% (cumulative {sum(var_ratio[:2])*100:.1f}%)",
               flush=True)
     else:  # umap
         emb = _umap_2d(L, n_neighbors=args.umap_n_neighbors,
                        min_dist=args.umap_min_dist, seed=args.seed)
         var_ratio = None
-        print(f"[fig4a] UMAP n_neighbors={args.umap_n_neighbors}, "
+        print(f"[preview-fig4] UMAP n_neighbors={args.umap_n_neighbors}, "
               f"min_dist={args.umap_min_dist:g}, seed={args.seed} "
               f"(layout is stochastic — fixed by --seed)", flush=True)
 
     # Filename encodes kernel + projection so different runs don't
     # overwrite each other; linear PCA stays untagged for backward
     # compatibility.
-    parts = ["Fig4a-SVM_evo-lineage_LOO-AUC"]
+    parts = ["preview-fig4-SVM_evo-lineage_LOO-AUC"]
     if args.kernel != "linear":
         parts.append(args.kernel)
     if args.projection != "pca":
