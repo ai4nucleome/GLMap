@@ -148,7 +148,7 @@ def _make_individual_figures(
     import matplotlib.pyplot as plt
 
     sys.path.insert(0, str(REPO_ROOT))
-    from scripts.figures.phase1_main_figure import PALETTE, RCPARAMS  # noqa
+    from scripts.figures._figure_style import PALETTE, RCPARAMS  # noqa
 
     BRANCH_COLOR = {
         "ar_or_generative": PALETTE["blue_main"],

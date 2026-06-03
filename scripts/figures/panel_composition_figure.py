@@ -107,8 +107,8 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 # Reuse the repo's publication style + 14-element color/order convention
-# so this figure matches phase1_main_figure.py.
-from scripts.figures.phase1_main_figure import (  # noqa: E402
+# so this figure matches _figure_style.py.
+from scripts.figures._figure_style import (  # noqa: E402
     PALETTE,
     CLASS_ORDER,
     CLASS_COLORS,

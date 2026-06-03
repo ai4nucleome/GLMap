@@ -41,7 +41,7 @@ BENCHMARK_LABELS: dict[str, tuple[str, str]] = {
 }
 
 # Display order for the 14 functional_elements: grouped by species_group
-# (Human → Plant → Fungi → Virus). Matches phase1_main_figure.CLASS_ORDER.
+# (Human → Plant → Fungi → Virus). Matches _figure_style.CLASS_ORDER.
 ELEMENT_ORDER = (
     # Human (4 elements)
     "promoter",

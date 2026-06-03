@@ -43,7 +43,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.figures._combined_q_loader import load_combined_glmap  # noqa: E402
-from scripts.figures.phase1_main_figure import RCPARAMS  # noqa: E402
+from scripts.figures._figure_style import RCPARAMS  # noqa: E402
 
 
 OTHER_COLOR = "#B8B8B8"

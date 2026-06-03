@@ -50,7 +50,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.figures._combined_q_loader import load_combined_glmap  # noqa: E402
-from scripts.figures.phase1_main_figure import PALETTE, RCPARAMS    # noqa: E402
+from scripts.figures._figure_style import PALETTE, RCPARAMS    # noqa: E402
 
 AR_COLOR = PALETTE["blue_main"]
 MLM_COLOR = PALETTE["red_strong"]

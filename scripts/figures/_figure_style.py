@@ -3,13 +3,12 @@
 
 Defines the common color palette, functional-element class order / colors,
 per-branch model shades, and matplotlib rcParams imported by the
-``fig*`` / ``figS*`` / ``panel_composition`` figure scripts.
+``fig*`` / ``figS*`` / ``panel_composition`` figure scripts. Import-only —
+this module produces no figure of its own (hence the ``_`` prefix).
 
-(This module previously also built a legacy phase-1 summary figure that
-depended on ``run_phase1_analysis.py`` outputs / ``glmap.analysis``. That
-exploratory pipeline was retired; only the shared styling constants below
-remain. The filename is kept so existing ``from scripts.figures.
-phase1_main_figure import ...`` statements continue to work.)
+(Formerly ``phase1_main_figure.py``, which also built a legacy phase-1
+summary figure off the now-retired ``run_phase1_analysis.py`` /
+``glmap.analysis`` pipeline. Only the shared styling constants remain.)
 """
 
 from __future__ import annotations
