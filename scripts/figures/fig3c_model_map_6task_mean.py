@@ -29,7 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.figures.fig3_model_map import (  # noqa: E402
+from scripts.figures._model_map_base import (  # noqa: E402
     RCPARAMS,
     _load_coords,
     _parse_figsize,
@@ -86,7 +86,7 @@ def main() -> None:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(args.out, dpi=300)
         plt.close(fig)
-    print(f"[done] wrote {args.out.relative_to(REPO_ROOT)}")
+    print(f"[done] wrote {args.out}")
 
 
 if __name__ == "__main__":

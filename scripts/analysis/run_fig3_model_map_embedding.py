@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Compute cached Fig3 model-map embeddings.
 
-This script only computes coordinates. Figure styling is handled by
-``scripts/figures/fig3_model_map.py`` so the map can be redrawn without
+This script only computes coordinates. Figure styling is handled by the
+``scripts/figures/fig3{a,b,c}_model_map_*.py`` panel scripts (sharing
+``scripts/figures/_model_map_base.py``) so the map can be redrawn without
 rerunning t-SNE / MDS.
 
 Inputs
