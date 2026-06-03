@@ -2,7 +2,7 @@
 """Downstream-embedding sweep entry point.
 
 Extract pooled embeddings for the model roster on the 6 downstream tasks:
-dispatch ``scripts/run_downstream_embed.py`` per model across the GPU pool
+dispatch ``scripts/downstream_tasks/run_downstream_embed.py`` per model across the GPU pool
 with per-family env routing, writing
 ``results/analysis/embeddings/<slug>/<task>/{train,test}.parquet``
 (6 tasks x train/test). Full-volume only — for a subsampled smoke, invoke

@@ -41,7 +41,7 @@ PY = ENV_PYTHON["base"]
 def test_parquet_complete_rejects_missing_file(tmp_path: Path) -> None:
     """run_embed_sweep.py parent calls this for embed resume; missing file must
     flip resume back to "re-run"."""
-    from scripts.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
     assert parquet_complete(tmp_path / "missing.parquet", expected_n=100) is False
 
 
@@ -49,7 +49,7 @@ def test_parquet_complete_rejects_wrong_row_count(tmp_path: Path) -> None:
     """Half-written parquets (process killed mid-write OR --max-train
     subsample written under the resume directory) must NOT be accepted
     as complete by the parent resume."""
-    from scripts.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
 
     path = tmp_path / "short.parquet"
     df = pd.DataFrame({
@@ -65,7 +65,7 @@ def test_parquet_complete_rejects_mostly_nan_embed(tmp_path: Path) -> None:
     """Parquet where >5% of embed_0 is NaN must not pass the integrity
     check (catches the embed_split fallback where every row was an
     error → all-NaN row written)."""
-    from scripts.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
 
     path = tmp_path / "nan_heavy.parquet"
     e0 = np.full(100, np.nan, dtype=np.float32)
@@ -116,7 +116,7 @@ def test_classify_aggregate_builds_matrix(tmp_path: Path) -> None:
     # loop is a no-op, but the aggregate pass at the end must still run
     # and pick up the 5 fixture result.json files.
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--hf-ids", "no-such-model"],
@@ -155,7 +155,7 @@ def test_parquet_complete_catches_nan_in_non_first_dim(tmp_path: Path) -> None:
     accepted, then the downstream classifier would silently drop those
     rows. New check matches the classifier's row-drop logic exactly:
     a row is "valid" iff ALL embed dims are finite, then ≥95% rows valid."""
-    from scripts.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
 
     path = tmp_path / "nan_in_dim17.parquet"
     n = 100
@@ -172,7 +172,7 @@ def test_parquet_complete_catches_nan_in_non_first_dim(tmp_path: Path) -> None:
 
 def test_parquet_complete_accepts_high_finite_fraction(tmp_path: Path) -> None:
     """Sanity: when every row has every dim finite, parquet passes."""
-    from scripts.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
 
     path = tmp_path / "clean.parquet"
     n = 100
@@ -184,7 +184,7 @@ def test_parquet_complete_accepts_high_finite_fraction(tmp_path: Path) -> None:
 
 def test_parquet_complete_requires_at_least_one_embed_col(tmp_path: Path) -> None:
     """A parquet with only a `label` column (no embed_*) is invalid."""
-    from scripts.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
 
     path = tmp_path / "label_only.parquet"
     pd.DataFrame({"label": np.zeros(10, dtype=np.int64)}).to_parquet(path, index=False)
@@ -216,7 +216,7 @@ def test_classify_result_records_drop_counts(tmp_path: Path) -> None:
     _write_fixture_embed_parquet(emb / "test.parquet",  n=80,  n_dropped=8)
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -272,7 +272,7 @@ def test_classify_aggregate_skips_corrupt_and_reports_count(tmp_path: Path) -> N
 
     (out_phase2 / "embeddings").mkdir()
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--hf-ids", "no-such-model"],
@@ -322,7 +322,7 @@ def test_classify_load_split_uses_only_embed_columns(tmp_path: Path) -> None:
     (sequence_id, source, split, etc.), load_embed_split must keep only
     `embed_*` as features so the classifier doesn't get text columns
     cast to float or extra dims polluting the feature space."""
-    from scripts.run_downstream_classify import load_embed_split
+    from scripts.downstream_tasks.run_downstream_classify import load_embed_split
 
     path = tmp_path / "with_extras.parquet"
     n = 50
@@ -433,7 +433,7 @@ def test_classify_class_gate_records_skip_reason(tmp_path: Path) -> None:
     _write_class_imbalanced_parquet(emb / "test.parquet",  n_pos=10, n_neg=10)
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -501,7 +501,7 @@ def test_aggregate_axes_include_skip_only_models(tmp_path: Path) -> None:
 
     (out_phase2 / "embeddings").mkdir()
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--hf-ids", "no-such-model"],
@@ -566,7 +566,7 @@ def test_classify_gate_catches_multiclass_test_missing_classes(tmp_path: Path) -
     )
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -592,7 +592,7 @@ def test_load_embed_split_orders_features_by_numeric_suffix(tmp_path: Path) -> N
     regenerated via pandas concat/merge could land columns shuffled,
     and the classifier would silently use mis-aligned features between
     train and test."""
-    from scripts.run_downstream_classify import load_embed_split
+    from scripts.downstream_tasks.run_downstream_classify import load_embed_split
 
     path = tmp_path / "shuffled_cols.parquet"
     n = 30
@@ -622,7 +622,7 @@ def test_load_embed_split_rejects_embed_column_without_numeric_suffix(
 ) -> None:
     """A bogus column `embed_garbage` must be flagged loudly rather than
     silently sorted to a random position."""
-    from scripts.run_downstream_classify import load_embed_split
+    from scripts.downstream_tasks.run_downstream_classify import load_embed_split
 
     path = tmp_path / "bad_suffix.parquet"
     pd.DataFrame({
@@ -639,7 +639,7 @@ def test_load_embed_split_rejects_missing_intermediate_dim(tmp_path: Path) -> No
     """embed_0, embed_2 with NO embed_1 must be rejected: the matrix
     that comes out would lie about its feature dimensionality, and the
     classifier would silently use a non-contiguous feature axis."""
-    from scripts.run_downstream_classify import load_embed_split
+    from scripts.downstream_tasks.run_downstream_classify import load_embed_split
 
     path = tmp_path / "missing_dim.parquet"
     pd.DataFrame({
@@ -657,7 +657,7 @@ def test_load_embed_split_rejects_duplicate_semantic_suffix(tmp_path: Path) -> N
     """embed_01 and embed_1 both parse to suffix 1 — duplicate semantic
     dimension. Must reject so the classifier doesn't silently merge or
     pick one arbitrarily."""
-    from scripts.run_downstream_classify import load_embed_split
+    from scripts.downstream_tasks.run_downstream_classify import load_embed_split
 
     path = tmp_path / "dup_suffix.parquet"
     pd.DataFrame({
@@ -683,8 +683,8 @@ def test_parquet_complete_and_load_embed_split_share_schema_contract(
     then fail classify ("ValueError mid-fit") — the worst kind of bug
     because the sweep summary lies. This test plants three bad
     parquets and verifies both layers reject each one."""
-    from scripts.run_downstream_embed import parquet_complete
-    from scripts.run_downstream_classify import load_embed_split
+    from scripts.downstream_tasks.run_downstream_embed import parquet_complete
+    from scripts.downstream_tasks.run_downstream_classify import load_embed_split
 
     cases = {
         # (filename, columns dict with N=10 rows, what's wrong)
@@ -748,7 +748,7 @@ def test_classify_refits_corrupt_cached_result(tmp_path: Path) -> None:
     bad_path.write_text("{not valid json")
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -771,7 +771,7 @@ def test_classify_refits_on_param_fingerprint_change(tmp_path: Path) -> None:
 
     # First run with seed=42
     proc1 = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--seed", "42"],
@@ -784,7 +784,7 @@ def test_classify_refits_on_param_fingerprint_change(tmp_path: Path) -> None:
 
     # Same command, same seed → must [skip]
     proc2 = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--seed", "42"],
@@ -795,7 +795,7 @@ def test_classify_refits_on_param_fingerprint_change(tmp_path: Path) -> None:
 
     # Different seed → must [refit] with fit_params change reason
     proc3 = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--seed", "7"],
@@ -827,7 +827,7 @@ def test_classify_load_fail_writes_structured_result(tmp_path: Path) -> None:
     }).to_parquet(emb / "test.parquet", index=False)
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -930,7 +930,7 @@ def test_classify_refit_then_fit_fail_overwrites_stale_auc(tmp_path: Path) -> No
     wrapper.write_text(f"""
 import sys
 sys.path.insert(0, {repr(str(REPO_ROOT))})
-import scripts.run_downstream_classify as rc
+import scripts.downstream_tasks.run_downstream_classify as rc
 def _boom(*a, **kw):
     raise RuntimeError("synthetic fit failure")
 rc.fit_and_score = _boom
@@ -990,7 +990,7 @@ def test_classify_skip_records_include_fit_params(tmp_path: Path) -> None:
 
     # First run with n_cv=5: both pairs get skipped
     proc1 = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--n-cv", "5"],
@@ -1012,7 +1012,7 @@ def test_classify_skip_records_include_fit_params(tmp_path: Path) -> None:
     # Tiny still blocked by aggregate size; class_gate now passes
     # (smallest class = 3 ≥ n_cv=3) and produces a real AUC.
     proc2 = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--n-cv", "3"],
@@ -1064,7 +1064,7 @@ def test_aggregate_separates_deliberate_from_pipeline_error_skips(
 
     (out_phase2 / "embeddings").mkdir()
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--hf-ids", "no-such-model"],
@@ -1106,7 +1106,7 @@ def test_classify_auto_retries_pipeline_error_on_rerun(tmp_path: Path) -> None:
     # Same params as the cached record — without auto-retry this would
     # [skip]. With the new default, must [refit] and produce a real AUC.
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -1145,7 +1145,7 @@ def test_classify_no_retry_pipeline_errors_keeps_failure(tmp_path: Path) -> None
     os.utime(cached_path, None)
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--no-retry-pipeline-errors"],
@@ -1187,7 +1187,7 @@ def test_classify_no_retry_still_refits_on_embed_mtime(tmp_path: Path) -> None:
     os.utime(emb / "test.parquet",  (future, future))
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--no-retry-pipeline-errors"],
@@ -1225,7 +1225,7 @@ def test_classify_deleting_result_json_does_not_freeze_pair(tmp_path: Path) -> N
     cached_path.unlink()
 
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2)],
         capture_output=True, text=True, timeout=120,
@@ -1340,7 +1340,7 @@ def test_classify_no_retry_still_refits_on_param_change(tmp_path: Path) -> None:
 
     # Run with --n-cv 3 (vs cached n_cv=5) + --no-retry-pipeline-errors.
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--n-cv", "3",
@@ -1381,7 +1381,7 @@ def test_aggregate_unknown_error_type_counted_separately(tmp_path: Path) -> None
 
     (out_phase2 / "embeddings").mkdir()
     proc = subprocess.run(
-        [PY, str(REPO_ROOT / "scripts/run_downstream_classify.py"),
+        [PY, str(REPO_ROOT / "scripts/downstream_tasks/run_downstream_classify.py"),
          "--embeddings-dir", str(out_phase2 / "embeddings"),
          "--out", str(out_phase2),
          "--hf-ids", "no-such-model"],

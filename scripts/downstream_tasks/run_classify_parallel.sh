@@ -2,7 +2,7 @@
 # ⚠ Machine-specific paths: the base python comes from env_paths.yaml
 # (override with $GLMAP_ENV_CONFIG).
 #
-# Fan out scripts/run_downstream_classify.py across N parallel workers,
+# Fan out scripts/downstream_tasks/run_downstream_classify.py across N parallel workers,
 # splitting the 123-model audit set round-robin via --hf-ids.
 #
 # Strategy:
@@ -22,9 +22,9 @@
 #      matrix in <1 min.
 #
 # Usage:
-#     bash scripts/run_classify_parallel.sh
-#     N_WORKERS=12 bash scripts/run_classify_parallel.sh
-#     N_JOBS_PER_WORKER=4 bash scripts/run_classify_parallel.sh
+#     bash scripts/downstream_tasks/run_classify_parallel.sh
+#     N_WORKERS=12 bash scripts/downstream_tasks/run_classify_parallel.sh
+#     N_JOBS_PER_WORKER=4 bash scripts/downstream_tasks/run_classify_parallel.sh
 #
 # Env overrides:
 #     PY               python interpreter (default: env_python.base from env_paths.yaml)
@@ -35,7 +35,7 @@
 
 set -uo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${REPO_ROOT}"
 
 GLMAP_ENV_CONFIG="${GLMAP_ENV_CONFIG:-${REPO_ROOT}/env_paths.yaml}"
@@ -92,7 +92,7 @@ for w in $(seq 0 $((N_WORKERS - 1))); do
     log="${LOG_DIR}/worker${w}.log"
     echo "[worker ${w}] ${n_models} models -> ${log}"
     OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-        "${PY}" scripts/run_downstream_classify.py \
+        "${PY}" scripts/downstream_tasks/run_downstream_classify.py \
             --hf-ids "${chunk}" \
             --n-jobs "${N_JOBS_PER_WORKER}" \
         > "${log}" 2>&1 &
@@ -120,7 +120,7 @@ echo ""
 echo "[parallel-classify] all workers finished. ${fail} failures."
 echo "[parallel-classify] running ONE final aggregate pass to ensure clean auc_matrix.npy..."
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-    "${PY}" scripts/run_downstream_classify.py --n-jobs "${N_JOBS_PER_WORKER}" \
+    "${PY}" scripts/downstream_tasks/run_downstream_classify.py --n-jobs "${N_JOBS_PER_WORKER}" \
     > "${LOG_DIR}/final_aggregate.log" 2>&1
 
 if [[ $? -eq 0 ]]; then

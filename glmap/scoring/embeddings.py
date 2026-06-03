@@ -2,7 +2,7 @@
 
 This is the embedding analog of `src.scoring.{ar_likelihood, mlm_pseudo_ll}`:
 it takes any loaded `*Loader` instance and a DNA sequence, and returns a
-1-D numpy embedding vector. Used by `scripts/run_downstream_embed.py` to
+1-D numpy embedding vector. Used by `scripts/downstream_tasks/run_downstream_embed.py` to
 feed a linear-probe downstream evaluation.
 
 The pooling protocol per loader family:

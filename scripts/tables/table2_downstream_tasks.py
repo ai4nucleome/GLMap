@@ -34,7 +34,7 @@ BENCH_ROOT = REPO_ROOT / "data" / "dna_foundation_benchmark"
 TEX_OUT = REPO_ROOT / "results/tables" / "table2_downstream_tasks.tex"
 
 # Canonical task list — the 6 binary classification tasks used by
-# scripts/run_downstream_classify.py. Each entry carries
+# scripts/downstream_tasks/run_downstream_classify.py. Each entry carries
 # human-readable metadata; the numeric statistics come directly from
 # the curated dna_foundation_benchmark CSVs.
 TASKS = [

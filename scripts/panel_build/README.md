@@ -105,7 +105,7 @@ data/dna_foundation_benchmark/data_processed/
 └── enhancers/enhancer/{train,test}.csv
 ```
 
-The same directory is also used by `scripts/run_downstream_embed.py` for
+The same directory is also used by `scripts/downstream_tasks/run_downstream_embed.py` for
 the 6 downstream classification tasks (see
 `data/benchmark_manifests/downstream_tasks.json`).
 

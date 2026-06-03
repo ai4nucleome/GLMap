@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Phase 5 (downstream eval): linear probe AUC for each (model, task) pair.
 
-Reads embeddings written by `scripts/run_downstream_embed.py`
+Reads embeddings written by `scripts/downstream_tasks/run_downstream_embed.py`
 (results/analysis/embeddings/<model>/<task>/{train,test}.parquet), fits an L2
 logistic regression with C grid via 5-fold CV on train, evaluates on
 test, and writes a result JSON per (model, task) to
@@ -44,9 +44,9 @@ patches the matrix in place without orphaning the rest. Consumers
 needing "this run only" results should read per-pair result.json.
 
 Usage:
-    $PY scripts/run_downstream_classify.py                       # all available
-    $PY scripts/run_downstream_classify.py --hf-ids X,Y,Z        # subset
-    $PY scripts/run_downstream_classify.py --tasks "5mC,Yeast"   # task subset
+    $PY scripts/downstream_tasks/run_downstream_classify.py                       # all available
+    $PY scripts/downstream_tasks/run_downstream_classify.py --hf-ids X,Y,Z        # subset
+    $PY scripts/downstream_tasks/run_downstream_classify.py --tasks "5mC,Yeast"   # task subset
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 

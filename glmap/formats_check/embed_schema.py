@@ -2,9 +2,9 @@
 
 Single source of truth for what counts as a valid embedding parquet.
 Used by:
-  - `scripts/run_downstream_embed.py:parquet_complete` (sweep resume
+  - `scripts/downstream_tasks/run_downstream_embed.py:parquet_complete` (sweep resume
     integrity check)
-  - `scripts/run_downstream_classify.py:load_embed_split` (per-pair fit)
+  - `scripts/downstream_tasks/run_downstream_classify.py:load_embed_split` (per-pair fit)
 
 Keeping the contract in a tiny CPU-only module (no torch / loader
 imports) means the classify script — which is pure sklearn CPU work —
@@ -31,7 +31,7 @@ def validate_embed_columns(columns: Iterable[str]) -> list[str]:
         duplicate semantic dims like embed_1 + embed_01 both → 1).
 
     The "dense [0..D-1]" contract matches what
-    `scripts/run_downstream_embed.save_embed_parquet` writes today.
+    `scripts/downstream_tasks/run_downstream_embed.save_embed_parquet` writes today.
     """
     def _key(c: str) -> int:
         try:

@@ -97,7 +97,7 @@ python scripts/score/scoring_worker.py --from-audit --strict-aggregate
 python scripts/downstream_tasks/run_embed_sweep.py --audit data/audits/models.json
 
 # 4. Train linear probes and compute AUCs
-python scripts/run_downstream_classify.py
+python scripts/downstream_tasks/run_downstream_classify.py
 
 # 5. Generate paper figures
 python scripts/figures/fig2c_split_half_consistency.py --seed 123

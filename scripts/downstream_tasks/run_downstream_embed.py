@@ -26,9 +26,9 @@ The 6 task selection is (panel-aligned + length + species diverse):
     EMP/Yeast_H4                         500 bp  15K   fungi histone (panel ✓)
 
 Usage:
-    $PY scripts/run_downstream_embed.py --hf-ids zhihan1996/DNABERT-2-117M
-    $PY scripts/run_downstream_embed.py --from-audit
-    $PY scripts/run_downstream_embed.py --from-audit --only "DNABERT,GROVER" --force
+    $PY scripts/downstream_tasks/run_downstream_embed.py --hf-ids zhihan1996/DNABERT-2-117M
+    $PY scripts/downstream_tasks/run_downstream_embed.py --from-audit
+    $PY scripts/downstream_tasks/run_downstream_embed.py --from-audit --only "DNABERT,GROVER" --force
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 

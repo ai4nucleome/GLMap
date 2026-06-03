@@ -25,7 +25,7 @@ its resume/done check differ:
       that does not count as done). --force propagates to the child.
 
   embed
-      Dispatches `scripts/run_downstream_embed.py --hf-ids=<hf_id>` to
+      Dispatches `scripts/downstream_tasks/run_downstream_embed.py --hf-ids=<hf_id>` to
       extract pooled embeddings for the 6 downstream tasks. Output under
       results/analysis/embeddings/<slug>/<task>/{train,test}.parquet.
 
@@ -381,7 +381,7 @@ def build_command(
         without --force the child would no-op on a cached parquet).
         A final aggregate pass on cpu (run_sweep emits the command, doesn't
         run it inline) builds results/scores/matrices/{L,Q,D}_{AR,MLM}.npy.
-    mode='embed' — dispatches to scripts/run_downstream_embed.py with
+    mode='embed' — dispatches to scripts/downstream_tasks/run_downstream_embed.py with
         --hf-ids=<hf_id> (--from-audit/--hf-ids are mutually exclusive in
         the embed script), which extracts pooled embeddings for all 6
         selected downstream tasks (see that script's task list) and writes
@@ -441,7 +441,7 @@ def build_command(
         # forever re-deciding the partial parquet is "incomplete".
         args = [
             py,
-            "scripts/run_downstream_embed.py",
+            "scripts/downstream_tasks/run_downstream_embed.py",
             "--hf-ids", hf_id,
             "--device", "cuda:0",
         ]
@@ -877,7 +877,7 @@ def run(mode: str) -> None:
     parquet_complete_fn = None
     if mode == "embed":
         sys.path.insert(0, str(REPO_ROOT))
-        from scripts.run_downstream_embed import (
+        from scripts.downstream_tasks.run_downstream_embed import (
             TASKS as _EMBED_TASKS,
             parquet_complete as parquet_complete_fn,
             load_task_split,
