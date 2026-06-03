@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
-"""Figure S2: Mantel-style stability of pairwise model distances under
-the k=6 → k=1 stride-PLL ablation.
+"""Preview figure (companion to Fig S3): Mantel-style stability of pairwise
+model distances under the k=6 → k=1 stride-PLL ablation.
+
+Not a numbered supplementary figure. Fig S3 already shows k=6 ≈ k=1 at the
+score level (per-model r + pooled per-probe scatter); this is the distance-
+matrix-level companion (pairwise model distances under the full clip +
+double-center pipeline). It is written to results/figures/_preview/ as a
+diagnostic, not shipped as its own S-number.
 
 Analogous to Fig 2c (split-half stability), but the perturbation
 dimension is now the MLM scoring stride: instead of splitting probes
@@ -31,9 +37,9 @@ matches the no-pipeline arm of Fig 2c.
 
 Usage
 -----
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py --no-pipeline
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py --all   # both pipeline modes
+  $PY scripts/figures/preview-FigS3_kmer_ablation_mantel.py
+  $PY scripts/figures/preview-FigS3_kmer_ablation_mantel.py --no-pipeline
+  $PY scripts/figures/preview-FigS3_kmer_ablation_mantel.py --all   # both pipeline modes
 """
 
 from __future__ import annotations
@@ -103,7 +109,7 @@ def _build_subset_matrices(k1_dir: Path, k6_dir: Path,
     Fail-fast on probe_id mis-alignment or missing parquets. Models
     whose k=1 parquet has >``nan_threshold`` fraction of NaN
     sum_log_p are reported and SKIPPED (separate ablation-scoring bug;
-    see Fig S2 notes — affects NT v1 family with 6-mer tokenizer
+    see this file's notes — affects NT v1 family with 6-mer tokenizer
     under --stride 1). Returns (L_k1, L_k6, kept_hf_ids, skipped_hf_ids).
     """
     slugs = sorted([d.name for d in k1_dir.iterdir() if d.is_dir()])
@@ -117,9 +123,9 @@ def _build_subset_matrices(k1_dir: Path, k6_dir: Path,
         k1_pq = k1_dir / slug / "probes.parquet"
         k6_pq = k6_dir / slug / "probes.parquet"
         if not k1_pq.exists():
-            sys.exit(f"[figS2] FATAL: missing k=1 parquet for {slug}: {k1_pq}")
+            sys.exit(f"[preview-FigS3] FATAL: missing k=1 parquet for {slug}: {k1_pq}")
         if not k6_pq.exists():
-            sys.exit(f"[figS2] FATAL: missing k=6 parquet for {slug}: {k6_pq}")
+            sys.exit(f"[preview-FigS3] FATAL: missing k=6 parquet for {slug}: {k6_pq}")
 
         df_k1 = _load_vec(k1_pq, probe_filter)
         df_k6 = _load_vec(k6_pq, probe_filter)
@@ -132,7 +138,7 @@ def _build_subset_matrices(k1_dir: Path, k6_dir: Path,
         ).reset_index(drop=True)
         if df_k6["probe_id"].tolist() != df_k1["probe_id"].tolist():
             sys.exit(
-                f"[figS2] FATAL: probe_id alignment failed for {slug}; "
+                f"[preview-FigS3] FATAL: probe_id alignment failed for {slug}; "
                 f"k=1 has {len(df_k1)} rows, aligned k=6 has {len(df_k6)}."
             )
 
@@ -140,14 +146,14 @@ def _build_subset_matrices(k1_dir: Path, k6_dir: Path,
             probe_order = df_k1["probe_id"].tolist()
         elif df_k1["probe_id"].tolist() != probe_order:
             sys.exit(
-                f"[figS2] FATAL: probe_id order mismatch in {slug} vs "
+                f"[preview-FigS3] FATAL: probe_id order mismatch in {slug} vs "
                 f"the first model. Re-score against the canonical panel."
             )
 
         v1 = df_k1["sum_log_p"].to_numpy()
         v6 = df_k6["sum_log_p"].to_numpy()
         if np.isnan(v6).any():
-            sys.exit(f"[figS2] FATAL: NaN in k=6 sum_log_p for {slug}")
+            sys.exit(f"[preview-FigS3] FATAL: NaN in k=6 sum_log_p for {slug}")
 
         # k=1 may have partial-NaN due to a separate ablation-scoring
         # bug (NT v1 / 6-mer tokenizer × --stride 1). Skip those.
@@ -309,7 +315,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--clip-q", type=float, default=0.02,
                    help="GLMap pipeline clip quantile (default 0.02).")
     p.add_argument("--out", dest="out_dir", type=Path,
-                   default=REPO_ROOT / "results/figures",
+                   default=REPO_ROOT / "results/figures/_preview",
                    help="Output directory.")
     p.add_argument("--figsize", type=str, default="6,6",
                    help='Inches, "W,H". Default "6,6".')
@@ -324,7 +330,7 @@ def _figsize(s: str) -> tuple[float, float]:
 def _run_one(experiment: str, use_pipeline: bool, clip_q: float,
              out_dir: Path, figsize: tuple[float, float]) -> None:
     spec = EXPERIMENTS[experiment]
-    print(f"\n[figS2] === {experiment} :: "
+    print(f"\n[preview-FigS3] === {experiment} :: "
           f"{'with-pipeline' if use_pipeline else 'no-pipeline'} ===",
           flush=True)
 
@@ -332,22 +338,22 @@ def _run_one(experiment: str, use_pipeline: bool, clip_q: float,
         probe_filter = pq.read_table(
             spec["probe_filter_parquet"], columns=["probe_id"]
         ).to_pandas()["probe_id"].tolist()
-        print(f"[figS2] probe filter: {len(probe_filter)} probes from "
+        print(f"[preview-FigS3] probe filter: {len(probe_filter)} probes from "
               f"{spec['probe_filter_parquet'].relative_to(REPO_ROOT)}",
               flush=True)
     else:
         probe_filter = None
-        print(f"[figS2] probe filter: none (full panel)", flush=True)
+        print(f"[preview-FigS3] probe filter: none (full panel)", flush=True)
 
     L_k1, L_k6, hf_ids, skipped_hf_ids = _build_subset_matrices(
         spec["k1_dir"], spec["k6_dir"], probe_filter
     )
     M = L_k1.shape[0]
-    print(f"[figS2] subset matrix: M={M} models, N={L_k1.shape[1]} probes  "
+    print(f"[preview-FigS3] subset matrix: M={M} models, N={L_k1.shape[1]} probes  "
           f"(expected M={spec['expected_models']}; skipped "
           f"{len(skipped_hf_ids)} NaN-affected)", flush=True)
     if skipped_hf_ids:
-        print(f"[figS2] skipped models (k=1 NaN bug):", flush=True)
+        print(f"[preview-FigS3] skipped models (k=1 NaN bug):", flush=True)
         for h in skipped_hf_ids:
             print(f"    - {h}", flush=True)
 
@@ -360,12 +366,12 @@ def _run_one(experiment: str, use_pipeline: bool, clip_q: float,
 
     r, p = pearsonr(d_k6, d_k1)
     slope, intercept = np.polyfit(d_k6, d_k1, deg=1)
-    print(f"[figS2] Mantel: r = {r:.4f}, slope = {slope:.3f}, "
+    print(f"[preview-FigS3] Mantel: r = {r:.4f}, slope = {slope:.3f}, "
           f"N pairs = {len(d_k6)} (= C({M}, 2))", flush=True)
 
     pipeline_tag = "with-pipeline" if use_pipeline else "no-pipeline"
     out_path = out_dir / (
-        f"FigS2-k1-vs-k6-mantel_{spec['tag']}_{pipeline_tag}.pdf"
+        f"preview-FigS3-k1-vs-k6-mantel_{spec['tag']}_{pipeline_tag}.pdf"
     )
     out_dir.mkdir(parents=True, exist_ok=True)
     _make_figure(
