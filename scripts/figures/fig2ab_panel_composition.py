@@ -75,13 +75,13 @@ Usage:
                                                   [--n-neighbors 50] [--min-dist 0.3]
                                                   [--seed 42]
 
-Main figure command (paper, locked):
-  python scripts/figures/fig2ab_panel_composition.py \\
-      --k-min 1 --k-max 3 --feature-transform hellinger \\
-      --n-neighbors 50 --min-dist 0.3
+Main figure command (paper, locked): the defaults ARE the locked config
+(k=1..3, hellinger, n_neighbors=50, min_dist=0.3), so the bare command
+reproduces the paper figures:
+  python scripts/figures/fig2ab_panel_composition.py
   → results/figures/Fig2a-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
   → results/figures/FigS1-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-element.pdf
-  → results/figures/Fig2b-GC-content_by-element.pdf
+  → results/figures/Fig2b-GC-content_hellinger_by-element.pdf
 
 Outputs (regenerated, not git-tracked): pdf only. Methodological
 parameters (k range, transform, UMAP n_neighbors / min_dist) are
@@ -443,22 +443,22 @@ def parse_args() -> argparse.Namespace:
                    "(default 3 → 4+16+64 = 84-D, pure composition). Set 4 "
                    "for 4+16+64+256 = 340-D sensitivity figure that includes "
                    "short motifs (TATA, GTAA, CAAT, ...).")
-    p.add_argument("--feature-transform", type=str, default="none",
+    p.add_argument("--feature-transform", type=str, default="hellinger",
                    choices=["none", "hellinger"], dest="feature_transform",
                    help="Per-feature transform applied after k-mer frequency "
-                   "computation. 'none' (default): StandardScaler z-score per "
-                   "column. 'hellinger': sqrt(p_kmer), no further scaling — "
-                   "the L2 embedding of probability distributions whose "
-                   "Euclidean distance is proportional to the Hellinger "
-                   "distance, a standard distance choice for compositional "
-                   "histograms.")
-    p.add_argument("--n-neighbors", type=int, default=15, dest="n_neighbors",
-                   help="UMAP n_neighbors (default 15, evo2 default). "
+                   "computation. 'hellinger' (default, paper-locked): "
+                   "sqrt(p_kmer), no further scaling — the L2 embedding of "
+                   "probability distributions whose Euclidean distance is "
+                   "proportional to the Hellinger distance, a standard distance "
+                   "choice for compositional histograms. 'none': StandardScaler "
+                   "z-score per column.")
+    p.add_argument("--n-neighbors", type=int, default=50, dest="n_neighbors",
+                   help="UMAP n_neighbors (default 50, paper-locked). "
                    "Composition-figure sweet spot is 30-50 for a 10k-probe "
-                   "panel; low values (<15) bias toward visually clustered "
-                   "layouts that can be artefacts.")
-    p.add_argument("--min-dist", type=float, default=0.5, dest="min_dist",
-                   help="UMAP min_dist (default 0.5, evo2 default). "
+                   "panel; low values (<15, e.g. evo2's default) bias toward "
+                   "visually clustered layouts that can be artefacts.")
+    p.add_argument("--min-dist", type=float, default=0.3, dest="min_dist",
+                   help="UMAP min_dist (default 0.3, paper-locked). "
                    "Composition-figure sweet spot is 0.3-0.5; very low "
                    "(<0.1) packs points tightly into apparent clusters.")
     p.add_argument("--seed", type=int, default=42,
