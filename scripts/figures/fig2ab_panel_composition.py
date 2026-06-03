@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figure 3 + Figure S1: GLMap probe panel composition (model-free).
+"""Figure 2 (a, b) + Figure S1: GLMap probe panel composition (model-free).
 
 Visualizes the 10,000-probe panel BEFORE any gLM enters the picture. The
 goal is to motivate the panel design (diversity, balance across
@@ -8,9 +8,9 @@ sequence statistics; subsequent figures show how gLMs perceive this
 panel.
 
 Three separate PDFs (per paper.md §2.2 plan, 2026-05-21 revision):
-  Fig 3  panel a:  UMAP of k-mer composition, colored by biological
+  Fig 2  panel a:  UMAP of k-mer composition, colored by biological
                    category (Human / Plant / Fungi / Virus).
-                   → Fig3-UMAP_kmer-composition_k{...}_by-category.pdf
+                   → Fig2a-UMAP_kmer-composition_k{...}_by-category.pdf
 
   Fig S1 (panel b): Same UMAP, colored by functional_element (14 hues
                    from the repo's CLASS_COLORS, ordered Human → Plant →
@@ -18,11 +18,11 @@ Three separate PDFs (per paper.md §2.2 plan, 2026-05-21 revision):
                    legend would dominate a main-text figure.
                    → FigS1-UMAP_kmer-composition_k{...}_by-element.pdf
 
-  Fig 3  panel c:  GC content distribution by functional element
+  Fig 2  panel b:  GC content distribution by functional element
                    (box + strip overlay). GC is NOT in the UMAP feature
                    stack; it is shown separately here because it is
                    already implicit in the k=1 mononucleotide vector.
-                   → Fig3-GC-content_by-element.pdf
+                   → Fig2b-GC-content_by-element.pdf
 
 The original 2x2 layout included a fourth probe-length panel; per the
 2026-05-21 revision it was removed since the same information lives in
@@ -68,7 +68,7 @@ Methodology rationale:
   composition figure cannot be accidentally label-amplified.
 
 Usage:
-  $PY scripts/figures/panel_composition_figure.py [--panel main_panel.parquet]
+  $PY scripts/figures/fig2ab_panel_composition.py [--panel main_panel.parquet]
                                                   [--out figures]
                                                   [--k-min 1] [--k-max 3]
                                                   [--feature-transform {none,hellinger}]
@@ -76,12 +76,12 @@ Usage:
                                                   [--seed 42]
 
 Main figure command (paper, locked):
-  python scripts/figures/panel_composition_figure.py \\
+  python scripts/figures/fig2ab_panel_composition.py \\
       --k-min 1 --k-max 3 --feature-transform hellinger \\
       --n-neighbors 50 --min-dist 0.3
-  → results/figures/Fig3-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
+  → results/figures/Fig2a-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
   → results/figures/FigS1-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-element.pdf
-  → results/figures/Fig3-GC-content_by-element.pdf
+  → results/figures/Fig2b-GC-content_by-element.pdf
 
 Outputs (regenerated, not git-tracked): pdf only. Methodological
 parameters (k range, transform, UMAP n_neighbors / min_dist) are
@@ -502,7 +502,7 @@ def _umap_filename(
     variants from the filename alone:
       {prefix}-UMAP_kmer-composition_k{kmin}-{kmax}[_<transform>]_nn{nn}_md{md}_by-{by}.pdf
 
-    Example: Fig3-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
+    Example: Fig2a-UMAP_kmer-composition_k1-3_hellinger_nn50_md0.3_by-category.pdf
     """
     parts = [
         f"{prefix}-UMAP_kmer-composition",
@@ -522,13 +522,13 @@ def _gc_filename(out_dir: Path, prefix: str, feature_transform: str) -> Path:
     The GC plot itself is independent of the k-mer / UMAP pipeline
     (it uses the precomputed ``GC_content`` column directly), but we
     tag the filename with the transform of the co-emitted UMAP figures
-    so the 3 PDFs of a single ``panel_composition_figure.py`` run can
+    so the 3 PDFs of a single ``fig2ab_panel_composition.py`` run can
     be matched as a set without ambiguity across re-runs that vary
     ``--feature-transform``.
 
     Example:
-      Fig3-GC-content_hellinger_by-element.pdf  (transform=hellinger)
-      Fig3-GC-content_by-element.pdf            (transform=none, untagged)
+      Fig2b-GC-content_hellinger_by-element.pdf  (transform=hellinger)
+      Fig2b-GC-content_by-element.pdf            (transform=none, untagged)
     """
     parts = [f"{prefix}-GC-content"]
     if feature_transform != "none":
@@ -569,11 +569,11 @@ def main() -> None:
     GC_FIGSIZE = _parse_figsize(args.gc_figsize)
 
     with plt.rc_context(RCPARAMS):
-        # ─── Fig 3 (a): UMAP × biological category ────────────────── #
+        # ─── Fig 2 (a): UMAP × biological category ────────────────── #
         fig_a, ax_a = plt.subplots(figsize=UMAP_FIGSIZE)
         _panel_umap_by_category(ax_a, embed, panel)
         out_a = _umap_filename(
-            args.out_dir, prefix="Fig3", by="category",
+            args.out_dir, prefix="Fig2a", by="category",
             k_min=args.k_min, k_max=args.k_max,
             feature_transform=args.feature_transform,
             n_neighbors=args.n_neighbors, min_dist=args.min_dist,
@@ -598,11 +598,11 @@ def main() -> None:
         plt.close(fig_b)
         written.append(out_b)
 
-        # ─── Fig 3 (c): GC content × functional element ────────────── #
+        # ─── Fig 2 (b): GC content × functional element ────────────── #
         # Figsize controlled by --gc-figsize so the 14 box-plots + their
         # rotated x-tick labels can be tuned independently of the UMAP
         # figures. Default keeps the figure visually paired with
-        # Fig 3 (a) while leaving extra room for x-tick labels.
+        # Fig 2 (a) while leaving extra room for x-tick labels.
         fig_c, ax_c = plt.subplots(figsize=GC_FIGSIZE)
         _panel_distribution(
             ax_c, panel, column="GC_content",
@@ -612,7 +612,7 @@ def main() -> None:
             show_n_in_xlabel=False,
         )
         out_c = _gc_filename(
-            args.out_dir, prefix="Fig3",
+            args.out_dir, prefix="Fig2b",
             feature_transform=args.feature_transform,
         )
         fig_c.savefig(out_c, dpi=300, bbox_inches="tight", pad_inches=0.08)

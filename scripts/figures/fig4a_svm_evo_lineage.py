@@ -273,7 +273,7 @@ def _umap_2d(
 
     UMAP is nonlinear; the relative position of two points in 2D does
     NOT have a closed-form interpretation in the full L space. Style
-    matches scripts/figures/panel_composition_figure.py (Fig 3) so
+    matches scripts/figures/fig2ab_panel_composition.py (Fig 3) so
     Fig 4(a) and Fig 3 share a visual vocabulary.
 
     With N=8 samples, ``n_neighbors`` must be < N (UMAP requirement).
