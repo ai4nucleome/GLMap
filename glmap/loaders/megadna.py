@@ -128,7 +128,7 @@ class MegaDNALoader:
                 raise FileNotFoundError(
                     f"MegaDNALoader: weight file missing at {self.weight_path}. "
                     "To fix, run one of:\n"
-                    "  1. bash scripts/download_models/download_models_from_list.sh\n"
+                    "  1. bash scripts/0_download_models_from_list.sh\n"
                     "  2. bash models/setup_external_models.sh  (clones code package)\n"
                     "  3. hf download lingxusb/megaDNA_updated megaDNA_phage_145M.pt "
                     f"--local-dir {self.weight_path.parent}\n"

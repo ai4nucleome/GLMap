@@ -76,4 +76,4 @@ fi
 echo "All 8 repos cloned into $DEST/"
 echo "Next steps:"
 echo "  1. See models/env_routing.md for per-family environment setup."
-echo "  2. Download HuggingFace models: bash scripts/download_models/download_models_from_list.sh"
+echo "  2. Download HuggingFace models: bash scripts/0_download_models_from_list.sh"

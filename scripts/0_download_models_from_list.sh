@@ -3,8 +3,8 @@
 # Requires: pip install -U huggingface_hub (provides the `hf` CLI).
 #
 # Usage:
-#   bash scripts/download_models/download_models_from_list.sh
-#   bash scripts/download_models/download_models_from_list.sh /path/to/list.txt
+#   bash scripts/0_download_models_from_list.sh
+#   bash scripts/0_download_models_from_list.sh /path/to/list.txt
 #
 # Environment variables (optional):
 #   HF_HOME      Override the huggingface_hub cache root.
@@ -13,7 +13,7 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LIST_FILE="${1:-${SCRIPT_DIR}/../../models/download_models_list.txt}"
+LIST_FILE="${1:-${SCRIPT_DIR}/../models/download_models_list.txt}"
 
 if ! command -v hf >/dev/null 2>&1; then
   echo "Error: 'hf' command not found. Install: pip install -U huggingface_hub" >&2
@@ -55,7 +55,7 @@ for repo_id in "${lines[@]}"; do
   # Download the weight from lingxusb/megaDNA_updated into the loader's
   # expected local path.
   if [[ "$repo_id" == "lingxusb/megaDNA" ]]; then
-    REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
     MEGA_DIR="$REPO_ROOT/models/modelsHFNoInfo/megaDNA"
     MEGA_PT="megaDNA_phage_145M.pt"
     if [[ -f "$MEGA_DIR/$MEGA_PT" ]]; then

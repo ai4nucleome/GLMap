@@ -32,7 +32,7 @@ Most models are hosted on the [Hugging Face Hub](https://huggingface.co/).
 Download all weights listed in `download_models_list.txt`:
 
 ```bash
-bash scripts/download_models/download_models_from_list.sh
+bash scripts/0_download_models_from_list.sh
 ```
 
 Set `HF_HOME` to control the download cache location.

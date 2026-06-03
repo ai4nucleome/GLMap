@@ -18,7 +18,7 @@
 #
 # Needs: multiple micromamba envs + GPUs (see models/env_routing.md), the
 # frozen panel at data/panels/main_panel.parquet, and the model weights
-# (scripts/download_models/ + models/setup_external_models.sh).
+# (scripts/0_download_models_from_list.sh + models/setup_external_models.sh).
 #
 # Usage:
 #     bash scripts/1_run_all_AR_MLM_scoring.sh                    # full run

@@ -124,7 +124,7 @@ GLMap/
 │   ├── figures/            One script per paper figure
 │   ├── tables/             One script per paper table
 │   ├── audits/             Model audit script + context overrides
-│   └── download_models/    HF model download helper
+│   └── 0_*.sh … 7_*.sh     Numbered pipeline drivers (audit → … → model map)
 ├── tests/                  pytest test suite
 ├── data/
 │   ├── audits/             123-model audit (models.json)
@@ -168,7 +168,7 @@ GLMap/
 **HuggingFace models** (119 of 123):
 
 ```bash
-bash scripts/download_models/download_models_from_list.sh
+bash scripts/0_download_models_from_list.sh
 ```
 
 **External models** (8 repos with custom loaders):
