@@ -18,16 +18,12 @@ experiment** — not on the full 123-model audit matrix. This isolates
 the effect of the stride change from any noise contribution induced
 by the surrounding (un-ablated) AR rows in the global matrix.
 
-Two ablation experiments, two pipeline modes → 4 single-panel PDFs:
+One ablation experiment, two pipeline modes → 2 single-panel PDFs:
 
   Experiment A : 56 MLM models × 1000-probe stratified subset
     out: results/analysis/MLM_stride-PLL_vs_true-PLL_1000samples/MLM_true-PLL_scores/<slug>/probes.parquet
     k=6 reference subset extracted from results/scores/AR_MLM_scores/<slug>/probes.parquet
     C(56, 2) = 1540 model pairs.
-
-  Experiment B : 10 representative MLM models × full 10000-probe panel
-    out: results/scores/MLM_k1_ablation_full_scores/AR_MLM_scores/<slug>/probes.parquet
-    C(10, 2) = 45 model pairs.
 
 Mode --no-pipeline switches off clip + double-center and computes the
 distance directly on the raw L sub-matrix — the sanity check that
@@ -35,10 +31,9 @@ matches the no-pipeline arm of Fig 2c.
 
 Usage
 -----
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py --experiment A
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py --experiment B
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py --experiment A --no-pipeline
-  $PY scripts/figures/figS2_kmer_ablation_mantel.py --all   # all 4 combos
+  $PY scripts/figures/figS2_kmer_ablation_mantel.py
+  $PY scripts/figures/figS2_kmer_ablation_mantel.py --no-pipeline
+  $PY scripts/figures/figS2_kmer_ablation_mantel.py --all   # both pipeline modes
 """
 
 from __future__ import annotations
@@ -79,14 +74,6 @@ EXPERIMENTS = {
         ),
         "expected_models": 56,
         "headline": "56 MLM models × 1000 probes (stratified subset)",
-    },
-    "B": {
-        "tag": "ExpB-10MLM-10000probes",
-        "k1_dir": REPO_ROOT / "results/scores/MLM_k1_ablation_full_scores/AR_MLM_scores",
-        "k6_dir": REPO_ROOT / "results/scores/AR_MLM_scores",
-        "probe_filter_parquet": None,    # full panel
-        "expected_models": 10,
-        "headline": "10 representative MLM × full 10000-probe panel",
     },
 }
 
@@ -311,16 +298,14 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--experiment", choices=list(EXPERIMENTS) + ["all"],
                    default="A",
-                   help="Which ablation experiment to render. 'A' = 56 "
-                        "MLM × 1000 probes; 'B' = 10 MLM × full panel; "
-                        "'all' = produce both, each in both pipeline / "
-                        "no-pipeline modes (4 PDFs total).")
+                   help="Ablation experiment to render (only 'A' = 56 MLM × "
+                        "1000 probes). 'all' = produce it in both pipeline / "
+                        "no-pipeline modes (2 PDFs total).")
     p.add_argument("--no-pipeline", action="store_true",
                    help="Skip clip + double-center; compute squared "
                         "Euclidean directly on the raw L sub-matrix. "
-                        "Used only when --experiment is A or B "
-                        "(ignored when --experiment all, which "
-                        "produces both modes).")
+                        "Ignored when --experiment all, which produces "
+                        "both modes.")
     p.add_argument("--clip-q", type=float, default=0.02,
                    help="GLMap pipeline clip quantile (default 0.02).")
     p.add_argument("--out", dest="out_dir", type=Path,
@@ -396,8 +381,8 @@ def main() -> None:
     args = parse_args()
     figsize = _figsize(args.figsize)
     if args.experiment == "all":
-        # Produce all 4 PDFs.
-        for exp in ("A", "B"):
+        # Produce both pipeline modes for the single experiment.
+        for exp in EXPERIMENTS:
             for use_pipeline in (True, False):
                 _run_one(exp, use_pipeline=use_pipeline,
                          clip_q=args.clip_q, out_dir=args.out_dir,
