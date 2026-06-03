@@ -363,7 +363,7 @@ def _build_branch_matrices(
         string.
 
         Mirrors the EXACT contract of parquet_covers_panel() (used by
-        the resume layer in run_sweep.py): row count must equal panel
+        the resume layer in sweep_engine.py): row count must equal panel
         N AND probe_id set must equal panel's. Otherwise a stale
         parquet from a different panel build could silently be re-
         indexed onto the current panel — losing the extra probes

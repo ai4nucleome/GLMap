@@ -1,43 +1,43 @@
-"""Full-roster parallel sweep across the audit-derived roster (123 models as of 2026-05-20).
+"""Shared parallel-sweep engine for the full audit-derived model roster.
+
+Library module behind the two thin entry points:
+  scripts/score/run_scoring_sweep.py          run("scoring")
+  scripts/downstream_tasks/run_embed_sweep.py run("embed")
 
 For each scorable model in `data/audits/models.json`, look up the correct
 micromamba env + runtime knobs per models/env_routing.md, then dispatch a
-per-model subprocess on a pool of GPUs. Two modes are supported:
+per-model subprocess on a pool of GPUs. The two modes share this whole
+scheduler (GPU pool + env routing + resume); only the dispatched child and
+its resume/done check differ:
 
-  --mode scoring (default)
+  scoring
       Dispatches `scripts/score/scoring_worker.py --from-audit
       --hf-ids=<hf_id> --skip-aggregate`. Uses --hf-ids (exact match)
       not --only (substring) so collision-prone prefixes like
       'arcinstitute/evo2_7b' do not match evo2_7b_base / evo2_7b_262k
       and cause parallel subprocesses to race on the same parquet.
       Each subprocess writes only its own
-      results/scores/AR_MLM_scores/<slug>/probes.parquet. After the parallel sweep,
+      results/scores/AR_MLM_scores/<slug>/probes.parquet. After the sweep,
       run a single aggregate pass (`scoring_worker.py --from-audit
-      --strict-aggregate`) to build results/scores/matrices/{L,Q,D}_{AR,MLM}.npy.
-      Resume criterion: skip when results/scores/AR_MLM_scores/<slug>/probes.parquet
-      has the panel's full probe_id set AND every sum_log_p is finite
-      (a per-probe failure writes the row with sum_log_p=NaN; that does
-      not count as done). --force propagates to the child so the worker
-      re-scores even if its own parquet exists.
+      --strict-aggregate`) to build results/scores/matrices/.
+      Resume: skip when the parquet has the panel's full probe_id set AND
+      every sum_log_p is finite (a per-probe failure writes sum_log_p=NaN;
+      that does not count as done). --force propagates to the child.
 
-  --mode embed
+  embed
       Dispatches `scripts/run_downstream_embed.py --hf-ids=<hf_id>` to
       extract pooled embeddings for the 6 downstream tasks. Output under
       results/analysis/embeddings/<slug>/<task>/{train,test}.parquet.
 
-Usage
------
-    # Full panel scoring sweep (Stage 4 / phase 2 entry; needs 10K-probe
-    # frozen panel + all audit-listed models, currently 123). Run this,
-    # then run a final aggregate:
-    python scripts/run_sweep.py                        # --mode scoring (default)
-    python scripts/score/scoring_worker.py --from-audit --strict-aggregate  # CPU OK, builds L/Q/D
+Public API: `build_arg_parser(mode)` (shared + mode flags, no --mode flag)
+and `run(mode)`; `route_model`, `GPUPool`, `build_command`, `classify_log`,
+`run_sweep` are the reusable engine pieces (and what the tests exercise).
 
-    python scripts/run_sweep.py --only evo             # substring filter on hf_id
-    python scripts/run_sweep.py --n-gpus 8 --force     # rerun everything
-    python scripts/run_sweep.py --gpu-ids 0,5,6,7      # use physical GPU ids
-    python scripts/run_sweep.py --max-gpus-per-model 1 # only 1-GPU models
-    python scripts/run_sweep.py --dry-run              # show routing decisions, exit
+Usage (via the entry points):
+    python scripts/score/run_scoring_sweep.py                  # full scoring sweep
+    python scripts/score/run_scoring_sweep.py --only evo --n-gpus 8 --force
+    python scripts/score/run_scoring_sweep.py --dry-run        # show routing, exit
+    python scripts/downstream_tasks/run_embed_sweep.py         # full embed sweep
 
 Scheduling
 ----------
@@ -66,7 +66,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 # --------------------------------------------------------------------- #
@@ -705,7 +705,7 @@ def run_sweep(
 SUPERVISED_BRANCH = {"supervised_or_annotation"}
 
 
-def parse_args() -> argparse.Namespace:
+def build_arg_parser(mode: str) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--audit", type=Path,
                    default=REPO_ROOT / "data/audits/models.json",
@@ -788,26 +788,11 @@ def parse_args() -> argparse.Namespace:
                    help="Schedule single-GPU tasks first (default) so 8-way "
                    "parallelism kicks in immediately, or multi-GPU tasks first "
                    "to avoid pushing their latency to the end.")
-    p.add_argument("--mode", type=str, default="scoring",
-                   choices=["scoring", "embed"],
-                   help="scoring (default): dispatch scoring_worker.py --from-audit "
-                   "--hf-ids <hf_id> --skip-aggregate so each subprocess writes "
-                   "its results/scores/AR_MLM_scores/<slug>/probes.parquet; a final "
-                   "aggregate pass (--from-audit --strict-aggregate, CPU OK) "
-                   "builds results/scores/matrices/. Scoring mode is the "
-                   "Stage 4 / phase 2 entry point. "
-                   "embed: dispatch run_downstream_embed.py "
-                   "--hf-ids <hf_id>; each subprocess writes results/analysis/"
-                   "embeddings/<slug>/<task>/{train,test}.parquet for the 6 "
-                   "downstream tasks (~48K seqs/model). Phase 5 entry point. "
-                   "**Full-volume only** — sweep never passes --max-train, "
-                   "and its resume check expects full-sized parquets. For a "
-                   "subsampled smoke, invoke run_downstream_embed.py directly.")
-    return p.parse_args()
+    return p
 
 
-def main() -> None:
-    args = parse_args()
+def run(mode: str) -> None:
+    args = build_arg_parser(mode).parse_args()
 
     if not args.audit.exists():
         sys.exit(f"audit not found at {args.audit}")
@@ -849,7 +834,7 @@ def main() -> None:
     # run_sweep() (always).
     panel_ids: set[str] | None = None
     parquet_covers_panel = None
-    if args.mode == "scoring":
+    if mode == "scoring":
         panel_path = (
             Path(args.panel) if args.panel
             else REPO_ROOT / "data/panels" / "main_panel.parquet"
@@ -873,7 +858,7 @@ def main() -> None:
     # parquet_complete from the child script for the integrity check.
     embed_expected_n: dict[tuple[str, str], int] | None = None
     parquet_complete_fn = None
-    if args.mode == "embed":
+    if mode == "embed":
         sys.path.insert(0, str(REPO_ROOT))
         from scripts.run_downstream_embed import (
             TASKS as _EMBED_TASKS,
@@ -946,7 +931,7 @@ def main() -> None:
         embeddings_dir = REPO_ROOT / "results/analysis" / "embeddings"
         for hf_id in candidates:
             slug = hf_id.replace("/", "__")
-            if args.mode == "scoring":
+            if mode == "scoring":
                 score_path = scores_dir / slug / "probes.parquet"
                 ok, _reason = parquet_covers_panel(
                     score_path, panel_ids, n_panel=len(panel_ids)
@@ -955,7 +940,7 @@ def main() -> None:
                     skipped.append(hf_id)
                     continue
                 # else: parquet missing / incomplete / has NaN rows — re-run
-            elif args.mode == "embed":
+            elif mode == "embed":
                 # Done iff all 12 expected parquets are intact: existence +
                 # row count match + ≥95% of rows with ALL embed dims
                 # finite + dense embed_* schema (via the shared
@@ -978,7 +963,7 @@ def main() -> None:
                 # else: at least one parquet missing or corrupt — re-run
             kept.append(hf_id)
         candidates = kept
-        print(f"[sweep mode={args.mode}] skipping {len(skipped)} already-done; "
+        print(f"[sweep mode={mode}] skipping {len(skipped)} already-done; "
               f"will run {len(candidates)}")
 
     all_tasks = [
@@ -1059,7 +1044,7 @@ def main() -> None:
         panel=args.panel,
         log_dir=args.log_dir,
         order=args.order,
-        mode=args.mode,
+        mode=mode,
         force=args.force,
         stride=args.stride,
         out_dir=args.out,
@@ -1091,6 +1076,3 @@ def main() -> None:
         for hf_id, status, rc, elapsed in fails:
             print(f"  {status:5s}  {hf_id:60s}  rc={rc}  elapsed={elapsed:.0f}s")
 
-
-if __name__ == "__main__":
-    main()

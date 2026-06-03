@@ -67,8 +67,7 @@ echo "  Logs  : ${log_dir}"
 echo "  GPUs  : ${GPU_IDS}"
 echo "  Dry   : ${DRY_RUN_ARGS[*]:-(actual run)}"
 echo "===================================================================="
-"${PY}" scripts/run_sweep.py \
-    --mode scoring \
+"${PY}" scripts/score/run_scoring_sweep.py \
     --branch mlm \
     --panel "${SUBSET_PANEL}" \
     --stride "${STRIDE}" \

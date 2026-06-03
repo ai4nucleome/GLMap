@@ -1,9 +1,9 @@
-"""Tests for the Stage 4 scoring entry: run_sweep.py --mode scoring +
+"""Tests for the Stage 4 scoring entry: run_scoring_sweep.py +
 scoring_worker.py --from-audit.
 
 Verifies the two-mode dispatch shape and the audit-roster loading path
 without needing real model weights. The heavy scoring path is exercised
-end-to-end by scripts/run_sweep.py + scripts/score/scoring_worker.py at
+end-to-end by scripts/score/run_scoring_sweep.py + scripts/score/scoring_worker.py at
 Stage 4 launch time.
 """
 
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from scripts.run_sweep import GPUPool, RouteSpec, build_command, resolve_pool_gpu_ids
+from scripts.score.sweep_engine import GPUPool, RouteSpec, build_command, resolve_pool_gpu_ids
 
 
 # ─────────────────────── build_command ───────────────────────
@@ -96,7 +96,7 @@ def test_unknown_mode_raises() -> None:
 def test_classify_log_scoring_success_does_not_report_as_unknown(tmp_path) -> None:
     """The scoring worker emits '[done] --skip-aggregate; ...' on success.
     classify_log in scoring mode must recognize this as DONE."""
-    from scripts.run_sweep import classify_log
+    from scripts.score.sweep_engine import classify_log
 
     log = tmp_path / "ok.log"
     log.write_text("[ar] loading lingxusb/megaDNA\n"
@@ -110,7 +110,7 @@ def test_classify_log_scoring_success_does_not_report_as_unknown(tmp_path) -> No
 def test_classify_log_scoring_traceback_overrides_done(tmp_path) -> None:
     """If the worker printed scoring lines AND a traceback (e.g. crash
     during aggregate), prefer the failure signal."""
-    from scripts.run_sweep import classify_log
+    from scripts.score.sweep_engine import classify_log
 
     log = tmp_path / "mixed.log"
     log.write_text("[ar] wrote scores -> /tmp/scores.parquet\n"
@@ -232,7 +232,7 @@ def test_run_sweep_scoring_demotes_done_when_parquet_has_nan_rows(tmp_path, monk
     fooled by the worker's '[done]' banner."""
     import numpy as np
     import pandas as pd
-    from scripts.run_sweep import run_sweep
+    from scripts.score.sweep_engine import run_sweep
 
     # Build a panel and the would-be parquet for a single fake model
     panel_ids = {f"probe_{i:04d}" for i in range(5)}
@@ -248,7 +248,7 @@ def test_run_sweep_scoring_demotes_done_when_parquet_has_nan_rows(tmp_path, monk
     df_nan.to_parquet(scores_dir / "probes.parquet", index=False)
 
     # Redirect REPO_ROOT used by the post-exit integrity check to tmp_path
-    monkeypatch.setattr("scripts.run_sweep.REPO_ROOT", tmp_path)
+    monkeypatch.setattr("scripts.score.sweep_engine.REPO_ROOT", tmp_path)
 
     # Fake Popen that "succeeds" (rc=0) and writes the DONE banner to the log
     class _FakePopen:
@@ -264,7 +264,7 @@ def test_run_sweep_scoring_demotes_done_when_parquet_has_nan_rows(tmp_path, monk
         def terminate(self): pass
         def kill(self): pass
 
-    monkeypatch.setattr("scripts.run_sweep.subprocess.Popen", _FakePopen)
+    monkeypatch.setattr("scripts.score.sweep_engine.subprocess.Popen", _FakePopen)
 
     pool = GPUPool(1)
     log_dir = tmp_path / "logs"
@@ -308,12 +308,11 @@ def test_run_sweep_unschedulable_task_exits_with_clear_error(tmp_path) -> None:
 
     REPO_ROOT = Path(__file__).resolve().parents[1]
     proc = _sp.run(
-        [_sys.executable, str(REPO_ROOT / "scripts/run_sweep.py"),
+        [_sys.executable, str(REPO_ROOT / "scripts/score/run_scoring_sweep.py"),
          "--audit", str(audit_path),
          "--n-gpus", "4",
          "--dry-run",
-         "--force",
-         "--mode", "scoring"],
+         "--force"],
         capture_output=True, text=True, cwd=str(REPO_ROOT),
     )
     # Must exit non-zero with the offending hf_id named
@@ -343,12 +342,11 @@ def test_max_gpus_per_model_filters_out_large_models(tmp_path) -> None:
 
     REPO_ROOT = Path(__file__).resolve().parents[1]
     proc = _sp.run(
-        [_sys.executable, str(REPO_ROOT / "scripts/run_sweep.py"),
+        [_sys.executable, str(REPO_ROOT / "scripts/score/run_scoring_sweep.py"),
          "--audit", str(audit_path),
          "--n-gpus", "1",
          "--dry-run",
          "--force",
-         "--mode", "scoring",
          "--max-gpus-per-model", "1"],
         capture_output=True, text=True, cwd=str(REPO_ROOT),
     )

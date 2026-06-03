@@ -88,13 +88,13 @@ see [models/env_routing.md](models/env_routing.md)):
 
 ```bash
 # 1. Parallel scoring across 123 models (workers use --skip-aggregate)
-python scripts/run_sweep.py --mode scoring --audit data/audits/models.json
+python scripts/score/run_scoring_sweep.py --audit data/audits/models.json
 
 # 2. Build V/Vd/D matrices (CPU, after all scoring workers finish)
 python scripts/score/scoring_worker.py --from-audit --strict-aggregate
 
 # 3. Parallel downstream embedding extraction (requires benchmark CSVs)
-python scripts/run_sweep.py --mode embed --audit data/audits/models.json
+python scripts/downstream_tasks/run_embed_sweep.py --audit data/audits/models.json
 
 # 4. Train linear probes and compute AUCs
 python scripts/run_downstream_classify.py

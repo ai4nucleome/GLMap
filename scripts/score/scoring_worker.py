@@ -197,7 +197,7 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--hf-ids", type=str, default=None,
                    help="Comma-separated list of EXACT hf_id strings. Each "
                         "must match the audit (or DEFAULT_MODELS) exactly. "
-                        "Use this from run_sweep.py and other parallel "
+                        "Use this from the sweep engine and other parallel "
                         "drivers to avoid the --only substring collisions.")
     p.add_argument("--skip-aggregate", action="store_true",
                    help="Skip the matrix-build step. Useful when "

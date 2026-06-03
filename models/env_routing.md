@@ -53,7 +53,7 @@ fails with `ValueError: Pointer argument (at 0) cannot be accessed
 from Triton (cpu tensor?)`. Workaround: remap GPU N to cuda:0 via
 `CUDA_VISIBLE_DEVICES=N`. Affects PlantCAD2, HybriDNA, PlantBiMoE,
 Jamba — none of which work with `--device cuda:N` directly.
-`scripts/run_sweep.py --gpu-ids ...` performs this remap per subprocess
+`scripts/score/run_scoring_sweep.py --gpu-ids ...` performs this remap per subprocess
 while still passing `--device cuda:0` to the worker.
 
 ### `LD_LIBRARY_PATH=<CONDA_PREFIX>/envs/PlantCAD/lib`
@@ -144,7 +144,7 @@ HuggingFaceBio/Carbon-*                     -> carbon        -> carbon.CarbonCau
 * (anything else, branch=mlm_or_encoder)    -> hf            -> HFMaskedLMLoader                    see env table above
 ```
 
-The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, which is the source-of-truth Python expression of the table above. The sweep script orchestrates 123 models across the 8 envs onto an N-GPU pool, dispatches each as a subprocess with the right `python` / `CUDA_VISIBLE_DEVICES` / `LD_LIBRARY_PATH` / `HF_HUB_OFFLINE`, and is resume-safe (skips a model when its full-panel `probes.parquet` is already complete). See "Operations: full-roster sweep" below for invocation patterns; the routing table above stays in sync with `route_model` by hand (when you add a model family that needs a non-default env, edit both).
+The env column is selected by **`scripts/score/sweep_engine.py:route_model(hf_id)`**, which is the source-of-truth Python expression of the table above. The sweep script orchestrates 123 models across the 8 envs onto an N-GPU pool, dispatches each as a subprocess with the right `python` / `CUDA_VISIBLE_DEVICES` / `LD_LIBRARY_PATH` / `HF_HUB_OFFLINE`, and is resume-safe (skips a model when its full-panel `probes.parquet` is already complete). See "Operations: full-roster sweep" below for invocation patterns; the routing table above stays in sync with `route_model` by hand (when you add a model family that needs a non-default env, edit both).
 
 ## Adding a new model
 
@@ -171,40 +171,40 @@ The env column is selected by **`scripts/run_sweep.py:route_model(hf_id)`**, whi
 
 ## Operations: full-roster sweep
 
-`scripts/run_sweep.py` is the orchestrator. It reads the audit, routes
+`scripts/score/run_scoring_sweep.py` is the orchestrator. It reads the audit, routes
 each model to its env via `route_model`, schedules onto a GPU pool
 respecting per-task `gpus_needed`, launches `scripts/score/scoring_worker.py`
 as a subprocess per model, aggregates results, and is resume-safe.
 
 ```bash
 # Force-rerun a single family (or any substring match — comma-separated)
-python scripts/run_sweep.py --force --only "PlantCAD2,HybriDNA,Jamba"
+python scripts/score/run_scoring_sweep.py --force --only "PlantCAD2,HybriDNA,Jamba"
 
 # See what would be launched without launching anything
-python scripts/run_sweep.py --force --dry-run
+python scripts/score/run_scoring_sweep.py --force --dry-run
 
 # Full 10,000-probe scoring sweep on the canonical panel.
 # Each subprocess writes its own probes.parquet under results/scores/AR_MLM_scores/;
 # the final aggregate step (no --skip-aggregate) builds the matrices on cpu.
 # --strict-aggregate makes the aggregate fail-fast on any missing/partial model.
-python scripts/run_sweep.py --mode scoring
+python scripts/score/run_scoring_sweep.py
 python scripts/score/scoring_worker.py --from-audit --strict-aggregate  # final L/Q/D aggregate
 
 # Cap the GPU pool (e.g. when sharing the box). Note: the full roster
 # contains two 8-GPU models (evo2_40b, evo2_40b_base), so --n-gpus < 8
 # will fail-fast unless you also use --only to drop them.
-python scripts/run_sweep.py --n-gpus 8                                 # full roster
-python scripts/run_sweep.py --n-gpus 4 --only "evo,nucleotide,DNABERT" # subset that fits
+python scripts/score/run_scoring_sweep.py --n-gpus 8                                 # full roster
+python scripts/score/run_scoring_sweep.py --n-gpus 4 --only "evo,nucleotide,DNABERT" # subset that fits
 
 # Use a non-contiguous physical GPU set (equivalent to setting the outer
 # CUDA_VISIBLE_DEVICES=0,5,6,7). The scheduler allocates from this list and
 # still passes --device cuda:0 inside each masked subprocess.
-python scripts/run_sweep.py --mode scoring --gpu-ids 0,5,6,7 --only "DNABERT"
-CUDA_VISIBLE_DEVICES=0,5,6,7 python scripts/run_sweep.py --mode scoring --only "DNABERT"
+python scripts/score/run_scoring_sweep.py --gpu-ids 0,5,6,7 --only "DNABERT"
+CUDA_VISIBLE_DEVICES=0,5,6,7 python scripts/score/run_scoring_sweep.py --only "DNABERT"
 
 # Run by resource class instead of model-name substring.
-python scripts/run_sweep.py --mode scoring --gpu-ids 0 --max-gpus-per-model 1
-python scripts/run_sweep.py --mode scoring --gpu-ids 0,5,6,7 --max-gpus-per-model 4
+python scripts/score/run_scoring_sweep.py --gpu-ids 0 --max-gpus-per-model 1
+python scripts/score/run_scoring_sweep.py --gpu-ids 0,5,6,7 --max-gpus-per-model 4
 ```
 
 Each subprocess's stdout+stderr lands in `--log-dir` (default

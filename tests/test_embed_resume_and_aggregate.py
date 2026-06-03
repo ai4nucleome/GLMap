@@ -1,6 +1,6 @@
 """Regression tests for the two external-review-driven behaviors:
 
-  1. run_sweep.py --mode embed parent resume calls
+  1. run_embed_sweep.py parent resume calls
      `run_downstream_embed.parquet_complete(path, expected_n)` instead
      of just `path.exists()`. Bug it prevents: a half-written (correct
      row count but mostly-NaN values) or short (truncated mid-write)
@@ -36,7 +36,7 @@ PY = "/nvme-data3/yusen/micomamba/bin/python"
 # ─────────────────────── parquet_complete contract ───────────────────────
 
 def test_parquet_complete_rejects_missing_file(tmp_path: Path) -> None:
-    """run_sweep.py parent calls this for embed resume; missing file must
+    """run_embed_sweep.py parent calls this for embed resume; missing file must
     flip resume back to "re-run"."""
     from scripts.run_downstream_embed import parquet_complete
     assert parquet_complete(tmp_path / "missing.parquet", expected_n=100) is False
@@ -303,7 +303,7 @@ def test_run_sweep_accepts_embed_integrity_kwargs() -> None:
     (rather than relying on main()-local names that don't propagate
     into the run_sweep scope)."""
     import inspect
-    from scripts import run_sweep as rs
+    from scripts.score import sweep_engine as rs
     sig = inspect.signature(rs.run_sweep)
     assert "embed_expected_n" in sig.parameters, list(sig.parameters)
     assert "parquet_complete_fn" in sig.parameters, list(sig.parameters)
