@@ -1,8 +1,8 @@
 # 🧬 🗺️ GLMap: Profiling genomic language models as individuals in a population
 
 > 🌐 Language: **中文** · [English](README.md)
-
-> 📖 **项目主页:[ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
+> 
+> 📖 **项目网站:[ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
 
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
@@ -16,19 +16,14 @@ GLMap 是一个**免训练、与架构无关**的框架,通过基因组语言模
 
 ### 用预计算结果复现论文中的分析
 
-如果你只想**使用我们预计算好的 123 个模型在 10,000 条探针面板上的
-PLL / log-likelihood 响应**,以及预构建的探针面板、V/Vd/D 矩阵和审计元数据,
-并复现全部图/表——下面这套安装就够了。**无需 GPU、无需模型权重、无需打分**;
-它会让 `glmap` 可被 import,只安装轻量、不含 torch 的依赖。
+如果只想**复现论文中的全部图/表**而不是从头计算 123 个模型的 GLMap 表示，请使用下方的安装命令。**无需 GPU、无需模型权重、无需打分**;
+我们推荐 **Python 3.11.9**;分析环境的精确版本已固定在[`pyproject.toml`](pyproject.toml) 中。
 
 ```bash
 git clone https://github.com/ai4nucleome/GLMap.git
 cd GLMap
 pip install -e .
 ```
-
-我们推荐 **Python 3.11.9**;分析栈的精确版本已固定在
-[`pyproject.toml`](pyproject.toml) 中。
 
 > **注意**:`import glmap` 不会触发 `import torch` 或 `import transformers`。
 > 重依赖在 `get_loader()` 内部按需加载,因此即使没有装 GPU 相关包,核心
