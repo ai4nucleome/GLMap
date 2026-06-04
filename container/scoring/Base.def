@@ -1,0 +1,67 @@
+Bootstrap: docker
+From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
+
+# ──────────────────────────────────────────────────────────────────────────
+# Shared base for ALL GLMap scoring images.
+#
+# CUDA 12.8 devel toolchain + micromamba + build tools + a local wheelhouse.
+# Each per-group image (bio-cu118 / bio-cu121 / bio-cu124 / bio-default)
+# bootstraps `From: localimage` THIS .sif and only adds its family micromamba
+# envs on top — so the heavy CUDA/toolchain layer is built once and shared.
+#
+# Why this layout: the 9 scoring envs use mutually incompatible Python
+# (3.8–3.12), torch (1.13–2.9) and CUDA (11.8/12.1/12.4) stacks, so they can
+# never share one interpreter. The container instead holds them as isolated
+# micromamba envs and dispatches per family at run time. See README.md.
+#
+# Build (run from container/scoring/, where ./wheels lives):
+#     apptainer build base-cu128.sif Base.def
+#
+# ./wheels is a LOCAL wheelhouse (gitignored) holding the large, CUDA- and
+# torch-specific wheels each group installs offline (torch, flash-attn,
+# mamba-ssm, causal-conv1d, …). Populate it before building.
+# ──────────────────────────────────────────────────────────────────────────
+
+%files
+    wheels /opt/wheels
+
+%environment
+    export LC_ALL=C
+    export LANG=C
+    export PATH=/opt/micromamba/bin:$PATH
+    export MAMBA_ROOT_PREFIX=/opt/micromamba
+    export CC=/usr/bin/gcc-11
+    export CXX=/usr/bin/g++-11
+    export CUDAHOSTCXX=/usr/bin/g++-11
+    # Build flash-attn / mamba-ssm extensions for the common GPU archs.
+    export TORCH_CUDA_ARCH_LIST="7.0;7.5;8.0;8.6;8.9;9.0+PTX"
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update && apt-get install -y --no-install-recommends \
+        bash ca-certificates curl wget git \
+        build-essential gcc-11 g++-11 pkg-config bzip2 \
+        && rm -rf /var/lib/apt/lists/*
+
+    # micromamba — the per-family env manager used by every scoring image.
+    curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+    mkdir -p /opt/micromamba/bin
+    mv bin/micromamba /opt/micromamba/bin/micromamba
+    rm -rf bin
+
+    mkdir -p /workspace /opt/wheels
+
+%runscript
+    exec /bin/bash "$@"
+
+%labels
+    Project    GLMap
+    Component  scoring-base
+    CUDA       12.8.1-cudnn-devel
+    OS         ubuntu22.04
+    Manager    micromamba
+
+%help
+    Shared CUDA 12.8 + micromamba base for the GLMap per-family scoring
+    images. Not used directly — the bio-* group images bootstrap from the
+    base-cu128.sif this produces. See container/scoring/README.md.
