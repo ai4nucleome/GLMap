@@ -125,11 +125,14 @@
     <img class="paper-figure" src="static/images/notebooklm_overview.png"
          alt="Whimsical illustrated overview of GLMap" style="width: 90%;">
     <p class="figure-caption">
+      <strong>Graphical abstract.</strong>
       <span style="color: #9c36b5; font-weight: 700;">A playful summary of GLMap:</span> scoring every
       model with a fixed 10,000-probe DNA panel, fingerprinting each model's likelihood response, unifying
       AR and MLM models in one space, and the resulting model map that clusters by family and domain and
       predicts downstream performance.
-      <span style="color: #9c36b5; font-weight: 700;">Illustration generated with NotebookLM.</span>
+      <span style="color: #9c36b5; font-weight: 700;">Illustration generated with NotebookLM. </span>
+      <br>
+      <span style="color: #9c36b5; font-weight: 700;">  *This illustration is just for illustration purpose and does not reflect the actual results of GLMap*.</span>
     </p>
   </div>
 </section>
@@ -149,20 +152,21 @@
       <div class="column is-half">
         <div class="key-result">
           <p class="is-size-5"><strong>Probe-robust distances.</strong>
-          Model-pair distances on disjoint halves of the panel agree at r&nbsp;=&nbsp;0.835.</p>
+          Splitting the panel into two halves with entirely different functional elements, the model-pair
+          distances computed independently on each half correlate at Mantel r&nbsp;=&nbsp;0.835.</p>
         </div>
       </div>
       <div class="column is-half">
         <div class="key-result">
           <p class="is-size-5"><strong>Recovers known structure.</strong>
-          Models cluster by family and by training domain, consistent with documented lineages.</p>
+          Models cluster by family and by training domain, consistent with documented relationships.</p>
         </div>
       </div>
       <div class="column is-half">
         <div class="key-result">
           <p class="is-size-5"><strong>Predicts task performance.</strong>
-          For each model, the mean AUC over six downstream tasks predicted from its GLMap signature and the
-          actually observed value correlate at Spearman &rho;&nbsp;=&nbsp;0.705.</p>
+            The mean AUC over six downstream tasks predicted from GLMap signatures and the
+            benchmark scores correlate at Spearman &rho;&nbsp;=&nbsp;0.705.</p>
         </div>
       </div>
     </div>
@@ -194,6 +198,7 @@
     <div class="has-text-centered" style="margin-top: 1.5rem;">
       <img class="paper-figure" src="static/images/Fig1.png" alt="GLMap overview" style="width: 68%;">
       <p class="figure-caption">
+        <strong>Fig. 1.</strong>
         GLMap probes every genomic language model with the same fixed panel of DNA sequences and records
         its likelihood responses, producing a functional marker matrix over models and probes, a
         task-independent way to place heterogeneous models in a common space.
@@ -219,9 +224,10 @@
     <div class="has-text-centered" style="margin-top: 1.5rem;">
       <img class="paper-figure" src="static/images/Fig2.png" alt="GLMap representation matrix" style="width: 78%;">
       <p class="figure-caption">
+        <strong>Fig. 2.</strong>
         The GLMap representation matrix V<sub>d</sub> shows coherent block structure by model family.
         The split-half distance geometry is stable across element-disjoint probe partitions
-        (Mantel/Pearson r&nbsp;=&nbsp;0.835), and the AR/MLM scoring distinction explains only 1.9% of the
+        (Mantel r&nbsp;=&nbsp;0.835), and the AR/MLM scoring distinction explains only 1.9% of the
         variance, far less than model family (53.8%).
       </p>
     </div>
@@ -242,6 +248,7 @@
     <div class="has-text-centered" style="margin-top: 1.5rem;">
       <img class="paper-figure" src="static/images/Fig3.png" alt="GLMap model map and downstream prediction" style="width: 78%;">
       <p class="figure-caption">
+        <strong>Fig. 3.</strong>
         Model map of the 123-model population and prediction of downstream task performance. Predicted
         vs. observed mean AUC across six tasks correlates at Spearman &rho;&nbsp;=&nbsp;0.705 under random
         <em>K</em>-fold cross-validation.

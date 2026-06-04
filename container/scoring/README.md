@@ -1,8 +1,10 @@
 # GLMap scoring containers (Apptainer / Singularity)
 
 Containers for **running the 123 genomic language models** to recompute their
-likelihood responses. Separate from the small, torch-free analysis image
-(`container/analysis.def`) — these carry GPU model-runtime environments.
+likelihood responses — they carry the GPU model-runtime environments. For
+analysis only (using the precomputed results, reproducing figures/tables) no
+container is needed: `pip install -e .` gives the torch-free analysis stack
+(see the top-level README).
 
 ## Why per-group images (not one mega-image)
 
