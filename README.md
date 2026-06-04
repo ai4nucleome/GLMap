@@ -48,8 +48,8 @@ the source repository. No GPU, no model download, no scoring required.
 ```python
 import glmap
 
-# Load the 10,000-probe panel.
-# - From a repo checkout: read locally.
+# Load the 10,000-probe panel (on disk: data/panels/main_panel.parquet).
+# - From a repo checkout / $GLMAP_DATA_DIR: read locally.
 # - From a pip install (no checkout): auto-downloaded from the GLMap
 #   HuggingFace Dataset (Tim419/GLMap-panels) and cached.
 panel = glmap.load_panel()       # (10000, 11) DataFrame
@@ -57,9 +57,12 @@ panel = glmap.load_panel()       # (10000, 11) DataFrame
 # Or load your own custom panel built with scripts/panel_build/
 # panel = glmap.load_panel(path="my_panel.parquet")
 
-# Load precomputed matrices (these live in the repo / $GLMAP_DATA_DIR)
-V_AR  = glmap.load_matrix("V_AR")    # (64, 10000) raw AR responses
-Vd_AR = glmap.load_matrix("Vd_AR")   # (64, 10000) double-centered
+# Load precomputed matrices by name. They resolve from the repo checkout
+# (or $GLMAP_DATA_DIR), on disk at results/scores/matrices/<file>.npy:
+#   V_AR->V_AR.npy   Vd_AR->V_d_AR.npy   D_AR->D_AR.npy   (+ the _MLM trio)
+V_AR  = glmap.load_matrix("V_AR")    # (64, 10000)  raw AR responses   (MLM: 59 models)
+Vd_AR = glmap.load_matrix("Vd_AR")   # (64, 10000)  double-centered
+D_AR  = glmap.load_matrix("D_AR")    # (64, 64)     pairwise model distances
 
 # Recompute the matrix pipeline from raw scores
 info = glmap.fit_matrix(V_AR, clip_q=0.02)

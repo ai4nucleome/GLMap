@@ -2,7 +2,7 @@
 
 > 🌐 Language: **中文** · [English](README.md)
 > 
-> 📖 **项目网站:[ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
+> 📖 **项目网站: [ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
 
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
@@ -17,7 +17,7 @@ GLMap 是一个**免训练、与架构无关**的框架,通过基因组语言模
 ### 用预计算结果复现论文中的分析
 
 如果只想**复现论文中的全部图/表**而不是从头计算 123 个模型的 GLMap 表示，请使用下方的安装命令。**无需 GPU、无需模型权重、无需打分**;
-我们推荐 **Python 3.11.9**;分析环境的精确版本已固定在[`pyproject.toml`](pyproject.toml) 中。
+我们推荐 **Python 3.11.9**;分析环境所需的 pip包 的精确版本已固定在[`pyproject.toml`](pyproject.toml) 中。
 
 ```bash
 git clone https://github.com/ai4nucleome/GLMap.git
@@ -25,9 +25,7 @@ cd GLMap
 pip install -e .
 ```
 
-> **注意**:`import glmap` 不会触发 `import torch` 或 `import transformers`。
-> 重依赖在 `get_loader()` 内部按需加载,因此即使没有装 GPU 相关包,核心
-> 安装也足以用于分析和画图。
+> **注意**:`这套命令不会安装 `torch` 或 `transformers`，即没有装 GPU 相关包,这些安装足以用于分析和画图。
 
 ### 重新计算 123 个模型的分数
 
@@ -44,18 +42,20 @@ PyTorch / CUDA 版本各不相同)。我们正在把这些环境打包成容器�
 ```python
 import glmap
 
-# 加载 10,000 条探针面板。
-# - 从仓库 checkout:本地读取。
-# - 从 pip 安装(无 checkout):自动从 GLMap HuggingFace
-#   Dataset(Tim419/GLMap-panels)下载并缓存。
+# 两种加载 10,000 条探针面板的方式(磁盘上:data/panels/main_panel.parquet)。
+# - 本地读取。
+# - 或自动从 HuggingFace (Tim419/GLMap-panels) 下载。
 panel = glmap.load_panel()       # (10000, 11) DataFrame
 
-# 或加载你用 scripts/panel_build/ 自建的面板
+# 或你可以自己构建你想要的数据面板
 # panel = glmap.load_panel(path="my_panel.parquet")
 
-# 加载预计算矩阵(它们位于仓库 / $GLMAP_DATA_DIR)
-V_AR  = glmap.load_matrix("V_AR")    # (64, 10000) 原始 AR 响应
-Vd_AR = glmap.load_matrix("Vd_AR")   # (64, 10000) 双中心后
+# 按名字加载预计算矩阵。从仓库 checkout(或 $GLMAP_DATA_DIR)解析,
+# 磁盘位置为 results/scores/matrices/<文件>.npy:
+#   V_AR->V_AR.npy   Vd_AR->V_d_AR.npy   D_AR->D_AR.npy  (+ 对应的 _MLM 三个)
+V_AR  = glmap.load_matrix("V_AR")    # (64, 10000)  原始 AR 响应   (MLM: 59 个模型)
+Vd_AR = glmap.load_matrix("Vd_AR")   # (64, 10000)  双中心后
+D_AR  = glmap.load_matrix("D_AR")    # (64, 64)     模型两两距离
 
 # 从原始分数重新运行矩阵流水线
 info = glmap.fit_matrix(V_AR, clip_q=0.02)
@@ -71,8 +71,7 @@ specs = glmap.specs_from_audit() # 123 个 ModelSpec 对象的列表
 
 > 面板以 HuggingFace Dataset 形式发布于
 > [`Tim419/GLMap-panels`](https://huggingface.co/datasets/Tim419/GLMap-panels)
-> (CC-BY-NC-SA-4.0)。`load_matrix` 和 `load_audit` 从仓库 checkout 或
-> `$GLMAP_DATA_DIR` 读取(不会自动下载)。
+> (CC-BY-NC-SA-4.0)。
 
 ---
 
