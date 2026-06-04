@@ -4,101 +4,68 @@ From: base-cu128.sif
 # ──────────────────────────────────────────────────────────────────────────
 # GLMap scoring image — evo group (cu124).
 #
-#   evo1   Python 3.11  torch 2.7.1   evo-model, flash-attn 2.7.4
-#   evo2   Python 3.12  torch 2.7.1   evo2,      flash-attn 2.8.0
+#   evo    Python 3.11  torch 2.6.0+cu124   evo-model  (evo-1 / evo-1.5 models)
+#   evo2   Python 3.12  torch 2.6.0+cu124   evo2       (evo2 7b models)
 #
-# This group is built by re-creating the envs with pip (torch + flash-attn
-# from the local wheelhouse, the rest from PyPI/Tsinghua) rather than by
-# conda-pack — it is the original recipe that produced bio-evo.sif. The other
-# groups (cu118/cu121/default) instead ship conda-pack / plain tarballs of the
-# already-working host envs; see README.md.
+# Both envs are shipped as PLAIN directory tarballs of the working host envs
+# (`tar czf evo.tar.gz evo`), not conda-pack: the host evo/evo2 envs each have
+# ~20 packages installed by BOTH conda and pip (numpy, triton, …) with
+# mismatched versions, which makes conda-pack frankenstein them. A plain tar
+# copies the on-disk files exactly (the versions that actually work), so the
+# container env is a faithful copy of the host env — including pyarrow and
+# everything the GLMap scoring worker needs.
+#
+# NB: evo2_1b_base needs transformer_engine (FP8), which is NOT installed on
+# the host either — score evo2 with the 7b models (evo2_7b / evo2_7b_base).
 #
 # Build (from container/, on HPC `module load apptainer-1.4.5`):
 #     apptainer build --fakeroot bio-evo.sif bio-evo.def
 # Run:
 #     GLMAP_ENV=evo2 apptainer run --nv --bind "$PWD":/work --pwd /work \
-#         bio-evo.sif scripts/score/scoring_worker.py --from-audit --hf-ids ...
-#
-# NB: the %post below used a 127.0.0.1:7890 tunnel for PyPI when bio-evo.sif
-# was first built; if that tunnel is down, drop the proxy exports and rely on
-# the Tsinghua index + the local wheelhouse.
+#         bio-evo.sif scripts/score/scoring_worker.py --from-audit --hf-ids arcinstitute/evo2_7b_base
 # ──────────────────────────────────────────────────────────────────────────
 
 %files
-    wheels/flash_attn-2.7.4.post1+cu12torch2.7cxx11abiTRUE-cp311-cp311-linux_x86_64.whl /opt/wheels/
-    wheels/flash_attn-2.8.0.post2+cu12torch2.7cxx11abiTRUE-cp311-cp311-linux_x86_64.whl /opt/wheels/
+    packed/evo.tar.gz   /opt/packed/evo.tar.gz
+    packed/evo2.tar.gz  /opt/packed/evo2.tar.gz
+
+%post
+    set -eu
+    mkdir -p /opt/micromamba/envs /workspace
+    for e in evo evo2; do
+        echo ">>> unpacking env: $e (plain tar; top-level $e/)"
+        # Plain tar carries a top-level <env>/ dir → extract into envs/.
+        # python relocates by its own location, so no conda-unpack is needed.
+        tar xzf "/opt/packed/$e.tar.gz" -C /opt/micromamba/envs
+        rm -f "/opt/packed/$e.tar.gz"
+    done
 
 %environment
     export LC_ALL=C
     export LANG=C
-    export PATH=/opt/micromamba/bin:$PATH
     export MAMBA_ROOT_PREFIX=/opt/micromamba
+    export MPLBACKEND=Agg
     export HF_HOME=/workspace/.cache/huggingface
-    export TRANSFORMERS_CACHE=/workspace/.cache/huggingface
-    export TORCH_CUDA_ARCH_LIST="7.0;7.5;8.0;8.6;8.9;9.0+PTX"
-    export CC=/usr/bin/gcc-11
-    export CXX=/usr/bin/g++-11
-    export CUDAHOSTCXX=/usr/bin/g++-11
-
-%post
-    export MAMBA_ROOT_PREFIX=/opt/micromamba
-    WHEELHOUSE=/opt/wheels
-
-    cat > /root/.mambarc << 'MAMBARC'
-channels:
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
-channel_priority: strict
-ssl_verify: false
-MAMBARC
-
-    # Proxy used when bio-evo.sif was first built; drop these if the tunnel
-    # is down (Tsinghua index + the wheelhouse cover most of it).
-    export http_proxy=http://127.0.0.1:7890  https_proxy=http://127.0.0.1:7890
-    export HTTP_PROXY=http://127.0.0.1:7890  HTTPS_PROXY=http://127.0.0.1:7890
-
-    /opt/micromamba/bin/micromamba create -y -n evo1 python=3.11 pip setuptools wheel ninja
-    /opt/micromamba/bin/micromamba create -y -n evo2 python=3.11 pip setuptools wheel ninja
-    /opt/micromamba/bin/micromamba clean --all --yes
-
-    /opt/micromamba/bin/micromamba run -n evo1 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-    /opt/micromamba/bin/micromamba run -n evo2 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-
-    # torch from the local wheelhouse (large, CUDA-specific).
-    /opt/micromamba/bin/micromamba run -n evo1 pip install --no-index --find-links="$WHEELHOUSE" \
-        torch==2.7.1 torchvision torchaudio
-    /opt/micromamba/bin/micromamba run -n evo2 pip install --no-index --find-links="$WHEELHOUSE" \
-        torch==2.7.1 torchvision torchaudio
-
-    # flash-attention from the local wheel files.
-    /opt/micromamba/bin/micromamba run -n evo1 pip install --no-build-isolation \
-        "$WHEELHOUSE/flash_attn-2.7.4.post1+cu12torch2.7cxx11abiTRUE-cp311-cp311-linux_x86_64.whl"
-    /opt/micromamba/bin/micromamba run -n evo2 pip install --no-build-isolation \
-        "$WHEELHOUSE/flash_attn-2.8.0.post2+cu12torch2.7cxx11abiTRUE-cp311-cp311-linux_x86_64.whl"
-
-    # the rest: wheelhouse first, fall back to the (Tsinghua) index.
-    /opt/micromamba/bin/micromamba run -n evo1 pip install --find-links="$WHEELHOUSE" \
-        evo-model packaging psutil \
-        transformers huggingface_hub safetensors sentencepiece einops \
-        biopython bcbio-gff tqdm six scipy scikit-learn pandas matplotlib
-
-    /opt/micromamba/bin/micromamba run -n evo2 pip install --find-links="$WHEELHOUSE" \
-        evo2 packaging psutil \
-        transformers huggingface_hub safetensors sentencepiece einops \
-        biopython bcbio-gff tqdm six scipy scikit-learn pandas matplotlib
-
-    mkdir -p /workspace/.cache/huggingface
 
 %runscript
-    # GLMAP_ENV ∈ {evo1, evo2}; EVO_ENV kept for the originally-built image.
-    ENV_NAME="${GLMAP_ENV:-${EVO_ENV:-evo2}}"
-    exec /opt/micromamba/bin/micromamba run -n "$ENV_NAME" python "$@"
+    # Dispatch to the right family env: GLMAP_ENV ∈ {evo, evo2}.
+    ENV_NAME="${GLMAP_ENV:-evo2}"
+    ENV_PREFIX="/opt/micromamba/envs/${ENV_NAME}"
+    if [ ! -x "${ENV_PREFIX}/bin/python" ]; then
+        echo "unknown GLMAP_ENV=${ENV_NAME} (have: evo evo2)" >&2
+        exit 2
+    fi
+    # evo2 needs its own lib + torch lib on LD_LIBRARY_PATH (per env_routing.md).
+    TORCH_LIB="$(echo ${ENV_PREFIX}/lib/python*/site-packages/torch/lib)"
+    export LD_LIBRARY_PATH="${ENV_PREFIX}/lib:${TORCH_LIB}:${LD_LIBRARY_PATH:-}"
+    exec "${ENV_PREFIX}/bin/python" "$@"
 
 %labels
     Project   GLMap
     Component scoring-evo-cu124
-    Envs      evo1,evo2
+    Envs      evo,evo2
 
 %help
-    GLMap evo scoring image (evo1 / evo2, cu124). Select the env with
-    GLMAP_ENV; bind your GLMap checkout for data / weights.
+    GLMap evo scoring image (evo / evo2, cu124), plain-tar copies of the host
+    envs. Select the env with GLMAP_ENV (default evo2); bind your GLMap
+    checkout for data / weights. Use the 7b evo2 models (1b needs FP8 TE).
