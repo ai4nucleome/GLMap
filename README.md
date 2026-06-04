@@ -26,16 +26,8 @@ cd GLMap
 pip install -e .
 ```
 
-We recommend **Python 3.11.9**. The analysis stack was developed and tested
-with these pinned versions:
-
-| package | version | | package | version |
-|---|---|---|---|---|
-| numpy | 2.2.6 | | seaborn | 0.13.2 |
-| pandas | 2.3.3 | | umap-learn | 0.5.9.post2 |
-| pyarrow | 23.0.1 | | scikit-learn | 1.8.0 |
-| scipy | 1.17.1 | | PyYAML | 6.0.3 |
-| matplotlib | 3.10.8 | | huggingface_hub | 0.36.2 |
+We recommend **Python 3.11.9**; the exact analysis-stack versions are pinned
+in [`pyproject.toml`](pyproject.toml).
 
 > **Note**: `import glmap` does not trigger `import torch` or
 > `import transformers`. Heavy dependencies are loaded on demand inside

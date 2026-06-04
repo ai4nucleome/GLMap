@@ -25,15 +25,8 @@ cd GLMap
 pip install -e .
 ```
 
-我们推荐 **Python 3.11.9**。分析栈在以下固定版本下开发并测试通过:
-
-| 包 | 版本 | | 包 | 版本 |
-|---|---|---|---|---|
-| numpy | 2.2.6 | | seaborn | 0.13.2 |
-| pandas | 2.3.3 | | umap-learn | 0.5.9.post2 |
-| pyarrow | 23.0.1 | | scikit-learn | 1.8.0 |
-| scipy | 1.17.1 | | PyYAML | 6.0.3 |
-| matplotlib | 3.10.8 | | huggingface_hub | 0.36.2 |
+我们推荐 **Python 3.11.9**;分析栈的精确版本已固定在
+[`pyproject.toml`](pyproject.toml) 中。
 
 > **注意**:`import glmap` 不会触发 `import torch` 或 `import transformers`。
 > 重依赖在 `get_loader()` 内部按需加载,因此即使没有装 GPU 相关包,核心
