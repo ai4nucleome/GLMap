@@ -190,9 +190,9 @@
         act as a phenotype matrix, but the genotype-derived <em>marker matrix</em> that reveals population
         structure has no counterpart for GLMs. A model's internal constitution (architecture,
         weights, tokenizer, objective, data) is non-aligned across models and cannot be compared directly.
-        We propose <strong>GLMap, a standardized, task-agnostic framework (Fig. 1c):</strong> we score a
-        fixed panel of DNA probes with every frozen model and record its likelihood responses, assembling a
-        functional marker matrix over models and probes.
+        We propose <strong>GLMap, a standardized, model-agnostic framework (Fig. 1c):</strong> we score a
+        fixed panel of DNA probes with every frozen model and record its (pseudo-)log-likelihood responses, 
+        assembling a functional marker matrix over models and probes.
       </p>
     </div>
     <div class="has-text-centered" style="margin-top: 1.5rem;">
@@ -217,18 +217,29 @@
         <strong>V</strong>. A ModelMap-style pipeline (lower-tail <em>clipping</em> of outliers,
         row-then-column <em>double-centering</em>, and pairwise <em>squared-Euclidean distances</em>)
         turns it into the centered signature matrix <strong>V<sub>d</sub></strong> and a model&times;model
-        distance matrix <strong>D</strong>. Double-centering absorbs the systematic offset between AR
-        log-likelihood and MLM pseudo-log-likelihood, so both paradigms live in one comparable space.
+        distance matrix <strong>D</strong>. Double-centering removes each model's overall score level and
+        each probe's intrinsic difficulty, leaving only functional differences between models. The
+        AR-vs-MLM scoring difference turns out to be minor: it is comparable in scale even in the raw
+        scores and explains just 1.9% of the variance in V<sub>d</sub>, so both paradigms can be analyzed
+        in one common space.
       </p>
     </div>
     <div class="has-text-centered" style="margin-top: 1.5rem;">
       <img class="paper-figure" src="static/images/Fig2.png" alt="GLMap representation matrix" style="width: 78%;">
       <p class="figure-caption">
         <strong>Fig. 2.</strong>
-        The GLMap representation matrix V<sub>d</sub> shows coherent block structure by model family.
-        The split-half distance geometry is stable across element-disjoint probe partitions
-        (Mantel r&nbsp;=&nbsp;0.835), and the AR/MLM scoring distinction explains only 1.9% of the
-        variance, far less than model family (53.8%).
+        The GLMap probe panel and the resulting model representation.
+        <strong>(a)</strong> UMAP of the <em>k</em>-mer composition of all 10,000 probes, colored by
+        biological category.
+        <strong>(b)</strong> Variance in V<sub>d</sub> explained by three model metadata labels
+        (&eta;<sup>2</sup>); the AR/MLM branch explains only 1.9%, far less than model family (53.8%).
+        <strong>(c)</strong> Mantel test comparing model-to-model distances computed independently on two
+        element-disjoint halves of the panel (r&nbsp;=&nbsp;0.835).
+        <strong>(d)</strong> The GLMap representation matrix V<sub>d</sub> across all 123 models: rows are
+        models, grouped by family and labeled AR or MLM; columns are probes, grouped by functional element
+        and biological category.
+        <strong>(e)</strong> Hierarchical clustering of models by GLMap distance, with leaves colored by
+        family.
       </p>
     </div>
   </div>
@@ -257,37 +268,26 @@
   </div>
 </section>
 
-<!-- ============================== DISCLAIMERS ============================== -->
+<!-- ============================== FUTURE DIRECTIONS ============================== -->
 <section class="section has-background-light">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Disclaimers</h2>
+    <h2 class="title is-3 has-text-centered">Future directions</h2>
     <div class="content is-size-5 has-text-justified">
       <ul>
         <li>
-          GLMap is a <strong>descriptive</strong> tool. The distances it reports measure similarity of
-          likelihood responses over a probe panel; they are not statements about shared architecture,
-          training data, or causal lineage, even when the geometry happens to agree with documented
-          relationships.
+          <strong>Broader, multi-species panels.</strong> Extending the probe panel to additional species
+          and element classes would test whether the model geometry is stable out of sample and reveal
+          domain-specific structure beyond the current coverage.
         </li>
         <li>
-          AR log-likelihood and MLM pseudo-log-likelihood are <strong>not absolutely comparable</strong>.
-          We place both in a common space only after double-centering, and the resulting comparability is
-          an <em>empirical</em> finding on our panel, not a guarantee that holds for every model
-          or probe set.
+          <strong>A living atlas of models.</strong> Because new models can be projected into an existing
+          V<sub>d</sub> space without recomputing prior signatures, GLMap can grow into a continuously
+          updated map that tracks the GLM population as it evolves.
         </li>
         <li>
-          All conclusions are conditioned on the <strong>fixed 10,000-probe panel</strong> and its
-          biological coverage. A different panel (e.g. one targeting other species or element
-          classes) may reorder models.
-        </li>
-        <li>
-          Downstream-performance prediction (&rho;&nbsp;=&nbsp;0.705) is <strong>correlational</strong>
-          and is meant as evidence that the representation is informative, not as a replacement for
-          actually benchmarking a model on a task of interest.
-        </li>
-        <li>
-          Inclusion of a model in the 123-model population is <strong>not an endorsement</strong>. Model
-          weights and data remain under their own upstream licenses.
+          <strong>From description to selection.</strong> Explore whether GLMap signatures can guide
+          practical model selection and ensembling, choosing or combining models for a new task without
+          exhaustive fine-tuning.
         </li>
       </ul>
     </div>
@@ -315,16 +315,19 @@
     <h2 class="title is-3 has-text-centered">Acknowledgements</h2>
     <div class="content is-size-5 has-text-justified">
       <p>
-        GLMap builds on the ideas and infrastructure of several outstanding open-source projects.
+        GLMap builds on the ideas of several outstanding open-source projects.
+        <br>
+        <br>
         The clip + double-center pipeline applied to log-likelihood vectors originates from
         <a href="https://github.com/shimo-lab/modelmap"><strong>ModelMap</strong></a>
-        (Oyama et al., ACL 2025), which profiled 1,000+ natural-language language models. The suite of
+        (Oyama et al., ACL 2025), which is a really solid and nice work! 
+        <br>
+        The suite of
         binary classification tasks used in our downstream evaluation comes from the
         <a href="https://github.com/ChongWuLab/dna_foundation_benchmark"><strong>DNA Foundation
         Benchmark</strong></a> (Feng et al., Nat. Commun. 2025).
-      </p>
-      <p>
-        We also thank the authors and maintainers of the 123 genomic language models audited in this
+        <br>
+        We also thank the authors and maintainers of the <span style="color: #9c36b5; font-weight: 700;"> 123 genomic language models</span> audited in this
         work for releasing their weights and code publicly, which made this study possible.
       </p>
     </div>
