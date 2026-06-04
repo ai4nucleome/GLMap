@@ -12,21 +12,18 @@ GLMap 是一个**免训练、与架构无关**的框架,通过基因组语言模
 
 ## 安装
 
-GLMap 是一个研究仓库,而非已发布的软件包——请克隆它并以可编辑模式安装。
+### 用预计算结果复现论文中的分析
+
+如果你只想**使用我们预计算好的 123 个模型在 10,000 条探针面板上的
+PLL / log-likelihood 响应**,以及预构建的探针面板、V/Vd/D 矩阵和审计元数据,
+并复现全部图/表——下面这套安装就够了。**无需 GPU、无需模型权重、无需打分**;
+它会让 `glmap` 可被 import,只安装轻量、不含 torch 的依赖。
 
 ```bash
 git clone https://github.com/ai4nucleome/GLMap.git
 cd GLMap
 pip install -e .
 ```
-
-### 只想用我们预计算好的结果?这套核心安装就够了。
-
-如果你只是想**使用我们预计算好的 123 个模型在 10,000 条探针面板上的
-PLL / log-likelihood 响应**,以及预构建的 DNA 探针面板、V/Vd/D 矩阵、审计
-元数据,并复现全部图/表——那么 `pip install -e .` 就足够了。**无需 GPU、
-无需模型权重、无需打分。** 它会让 `glmap` 可被 import,并只安装轻量的
-分析/画图依赖(不含 torch)。
 
 我们推荐 **Python 3.11.9**。分析栈在以下固定版本下开发并测试通过:
 
@@ -40,19 +37,8 @@ PLL / log-likelihood 响应**,以及预构建的 DNA 探针面板、V/Vd/D 矩�
 
 > **注意**:`import glmap` 不会触发 `import torch` 或 `import transformers`。
 > 重依赖在 `get_loader()` 内部按需加载,因此即使没有装 GPU 相关包,核心
-> 安装也足以用于分析和画图。
-
-### 要自己重新打分或开发加载器?
-
-自己跑 GLM 来重算似然响应(或新增模型加载器)需要 `torch` + `transformers`,
-而且很多家族还需各自固定的环境。请安装 scoring extra,并参阅
-**[models/README.md](models/README.md)**(以及
-[models/env_routing.md](models/env_routing.md))了解各家族的环境配置:
-
-```bash
-pip install -e .[scoring]   # 额外:torch + transformers，用于模型打分
-pip install -e .[dev]       # 额外:pytest(用于跑测试套件)
-```
+> 安装也足以用于分析和画图。如需自己重新打分或开发加载器,见
+> [models/README.md](models/README.md)。
 
 ---
 

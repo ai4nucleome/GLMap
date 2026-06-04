@@ -12,8 +12,13 @@ GLMap is a training-free, architecture-agnostic framework for representing and c
 
 ## Installation
 
-GLMap is a research repository, not a published package — clone it and
-install in editable mode.
+### Reproduce analysis in paper via precomputed results
+
+To use our precomputed 123-model PLL / log-likelihood responses over the
+10,000-probe panel — plus the prebuilt panel, the V/Vd/D matrices and audit
+metadata — and reproduce every figure/table, the install below is all you
+need. **No GPU, no model weights, no scoring**; it makes `glmap` importable
+with only lightweight, torch-free dependencies.
 
 ```bash
 git clone https://github.com/ai4nucleome/GLMap.git
@@ -21,17 +26,8 @@ cd GLMap
 pip install -e .
 ```
 
-### Just using the precomputed results? This core install is all you need.
-
-If you only want to **use our precomputed PLL / log-likelihood responses of
-the 123 models over the 10,000-probe panel**, together with the prebuilt
-DNA probe panel, the V/Vd/D matrices, the audit metadata, and to reproduce
-every figure/table — then `pip install -e .` is enough. **No GPU, no model
-weights, no scoring required.** It makes `glmap` importable and installs
-only the lightweight analysis/figure dependencies (no torch).
-
-We recommend **Python 3.11.9**. The analysis stack was developed and
-tested with these pinned versions:
+We recommend **Python 3.11.9**. The analysis stack was developed and tested
+with these pinned versions:
 
 | package | version | | package | version |
 |---|---|---|---|---|
@@ -44,20 +40,8 @@ tested with these pinned versions:
 > **Note**: `import glmap` does not trigger `import torch` or
 > `import transformers`. Heavy dependencies are loaded on demand inside
 > `get_loader()`, so the core install is usable for analysis and figures
-> even without GPU packages installed.
-
-### Re-scoring models or developing loaders?
-
-Running the GLMs yourself to recompute the likelihood responses (or adding
-a new model loader) needs `torch` + `transformers` and, for many families,
-their own pinned environments. Install the scoring extra and see
-**[models/README.md](models/README.md)** (plus
-[models/env_routing.md](models/env_routing.md)) for the per-family setup:
-
-```bash
-pip install -e .[scoring]   # adds torch + transformers for model scoring
-pip install -e .[dev]       # adds pytest (to run the test suite)
-```
+> even without GPU packages installed. To re-score models yourself or
+> develop loaders, see [models/README.md](models/README.md).
 
 ---
 
