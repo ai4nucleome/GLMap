@@ -4,7 +4,7 @@
 # runtime knobs are documented in models/env_routing.md. Adjust those for a
 # new machine before running.
 #
-# Step 0 of the GLMap reproduction: score all AR + MLM models on the
+# Step 1 of the GLMap reproduction: score all AR + MLM models on the
 # 10,000-probe panel and build the per-branch GLMap matrices. Produces the
 # entire results/scores/ tree:
 #
