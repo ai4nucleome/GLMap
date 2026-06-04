@@ -258,29 +258,36 @@ def load_panel(name: str = "main", path=None):
 
 
 def load_matrix(name: str):
-    """Load a pre-built matrix by name.
+    """Load a pre-built matrix by registered name or by ``.npy`` path.
 
     Parameters
     ----------
     name : str
-        One of ``"V_AR"``, ``"Vd_AR"``, ``"D_AR"``, ``"V_MLM"``,
-        ``"Vd_MLM"``, ``"D_MLM"``. On-disk the double-centered matrix is
-        stored as ``V_d_AR.npy`` / ``V_d_MLM.npy``; the public ``Vd``
-        names are transparently mapped to those files here.
+        Either a registered name — ``"V_AR"``, ``"Vd_AR"``, ``"D_AR"``,
+        ``"V_MLM"``, ``"Vd_MLM"``, ``"D_MLM"`` — or a path to a ``.npy``
+        file (relative to the repo root / ``$GLMAP_DATA_DIR``, or absolute).
+        On disk the double-centered matrix is stored as ``V_d_AR.npy`` /
+        ``V_d_MLM.npy``; the registered ``Vd`` names map to those files.
 
     Returns
     -------
     np.ndarray
     """
+    import os
     import numpy as np
     from glmap._data_resolver import resolve_data_path
-    try:
-        rel = _MATRIX_PATHS[name]
-    except KeyError:
-        raise ValueError(
-            f"Unknown matrix name {name!r}; expected one of {list(_MATRIX_PATHS)}"
-        )
-    return np.load(resolve_data_path(rel))
+    if name in _MATRIX_PATHS:
+        return np.load(resolve_data_path(_MATRIX_PATHS[name]))
+    if str(name).endswith(".npy"):
+        # An explicit path: absolute / already-present, else resolve it
+        # relative to the repo root or $GLMAP_DATA_DIR.
+        if os.path.isabs(name) or os.path.exists(name):
+            return np.load(name)
+        return np.load(resolve_data_path(name))
+    raise ValueError(
+        f"Unknown matrix {name!r}; expected one of {list(_MATRIX_PATHS)} "
+        "or a path to a .npy file"
+    )
 
 
 def load_audit() -> list[dict]:

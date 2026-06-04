@@ -25,13 +25,15 @@ cd GLMap
 pip install -e .
 ```
 
-> **注意**:`这套命令不会安装 `torch` 或 `transformers`，即没有装 GPU 相关包,这些安装足以用于分析和画图。
+> **注意**: 这套命令不会安装 `torch`  或 `transformers`，即没有装 GPU 相关包,这些安装足以用于分析和画图。
 
 ### 重新计算 123 个模型的分数
 
 这 123 个模型分属**多套互不兼容的运行环境**(不同模型家族的 Python /
-PyTorch / CUDA 版本各不相同)。我们正在把这些环境打包成容器镜像,以便对
-任意模型方便地重新计算其似然响应。**敬请期待。**
+PyTorch / CUDA 版本各不相同)。我们**正在把这些环境打包成容器镜像**,以便对
+任意模型方便地重新计算其似然响应。
+
+**敬请期待。**
 
 ---
 
@@ -50,16 +52,13 @@ panel = glmap.load_panel()       # (10000, 11) DataFrame
 # 或你可以自己构建你想要的数据面板
 # panel = glmap.load_panel(path="my_panel.parquet")
 
-# 按名字加载预计算矩阵。从仓库 checkout(或 $GLMAP_DATA_DIR)解析,
-# 磁盘位置为 results/scores/matrices/<文件>.npy:
-#   V_AR->V_AR.npy   Vd_AR->V_d_AR.npy   D_AR->D_AR.npy  (+ 对应的 _MLM 三个)
-V_AR  = glmap.load_matrix("V_AR")    # (64, 10000)  原始 AR 响应   (MLM: 59 个模型)
-Vd_AR = glmap.load_matrix("Vd_AR")   # (64, 10000)  双中心后
-D_AR  = glmap.load_matrix("D_AR")    # (64, 64)     模型两两距离
+# 按名字("V_AR")或路径加载预计算矩阵。
+V_AR  = glmap.load_matrix("results/scores/matrices/V_AR.npy")    # (64, 10000)  原始 AR 响应   (MLM: 59 个模型)
+Vd_AR = glmap.load_matrix("results/scores/matrices/V_d_AR.npy")   # (64, 10000)  双中心后
+D_AR  = glmap.load_matrix("results/scores/matrices/D_AR.npy")    # (64, 64)     模型两两距离
 
 # 从原始分数重新运行矩阵流水线
 info = glmap.fit_matrix(V_AR, clip_q=0.02)
-# info["Vd"], info["D"], info["clip_threshold"], ...
 
 # 将一个新模型投影到已有的 Vd 空间
 Vd_new = glmap.project(new_model_scores, info)
@@ -79,7 +78,7 @@ specs = glmap.specs_from_audit() # 123 个 ModelSpec 对象的列表
 
 ```
 GLMap/
-├── glmap/                  Python 包(可 import;`pip install -e .`)
+├── glmap/                  Python 包
 │   ├── loaders/            各家族模型加载器(HF, evo, genslm, ...)+ 分发
 │   ├── scoring/            AR 对数似然 + MLM stride PLL
 │   ├── matrices/           clip + 双中心 + 成对距离
@@ -90,7 +89,6 @@ GLMap/
 │   ├── tables/             每个论文表一个脚本
 │   ├── audits/             模型审计脚本 + context overrides
 │   └── 0_*.sh … 7_*.sh     编号流水线驱动(审计 → … → 模型图)
-├── tests/                  pytest 测试套件
 ├── data/
 │   ├── audits/             123 模型审计(models.json)
 │   ├── downstream_tasks/   下游任务元数据
@@ -105,11 +103,10 @@ GLMap/
 │   │   │   ├── all_model_AUC_6tasks/         聚合 (123×6) AUC 矩阵
 │   │   │   └── phenotype_prediction/         用 GLMap 指纹预测下游 AUC
 │   │   ├── model_map/      Fig3 的 t-SNE / MDS 嵌入
-│   │   └── MLM_stride-PLL_vs_true-PLL_1000samples/  k=1 vs k=6 PLL 消融(Fig S3)
+│   │   └── MLM_stride-PLL_vs_true-PLL_1000samples/  true PLL vs Stride PLL 消融(k=6, Fig S3)
 │   ├── figures/            论文图 PDF
 │   └── tables/             论文表 LaTeX 源
 └── models/                 模型下载清单、配置脚本、
-                            各家族环境路由(env_routing.md)
 ```
 
 ---
@@ -118,15 +115,15 @@ GLMap/
 
 用预计算结果复现论文分析所需的一切都已随仓库提供——无需模型权重、无需打分:
 
-| 产物 | 体积 |
-|---|---|
-| 探针面板(10,000 探针) | 8 MB |
-| AR + MLM 的 V/Vd/D 矩阵 | 20 MB |
-| 每模型似然响应,精简版 | 48 MB |
-| 下游 AUC 结果 | 6 MB |
-| 表型预测输出 | 2 MB |
-| t-SNE 模型图嵌入 | — |
-| 论文图(23 个 PDF)与表(12 个 .tex) | — |
+| 产物 | 
+|---|
+| 探针面板(10,000 探针) |
+| AR + MLM 的 V/Vd/D 矩阵  |
+| 每模型似然响应,精简版  |
+| 下游 AUC 结果 |
+| 表型预测输出 |
+| t-SNE 模型图嵌入 |
+| 论文图(23 个 PDF)与表(12 个 .tex) |
 
 ---
 
@@ -153,11 +150,9 @@ Spearman ρ = 0.705)。
 GLMap 建立在若干优秀开源项目的思想与基础设施之上:
 
 - **[ModelMap](https://github.com/shimo-lab/modelmap)**(Oyama et al.,
-  ACL *2025*)——将 clip + 双中心流水线应用于对数似然向量的做法,源自
-  ModelMap 对 1,000+ 自然语言 LM 的画像。
+  ACL *2025*)
 - **[DNA Foundation Benchmark](https://github.com/ChongWuLab/dna_foundation_benchmark)**
-  (Feng et al., Nat. Comm. *2025*)——提供了我们下游评测所用的、经过整理的
-  二分类任务套件。
+  (Feng et al., Nat. Comm. *2025*)
 
 我们也感谢本工作所审计的 **123 个基因组语言模型**的作者与维护者公开发布其权重与代码。
 
