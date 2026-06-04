@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GLMap: Profiling genomic language models as individuals in a population</title>
+  <meta name="description"
+        content="GLMap is a training-free, architecture-agnostic framework for representing and comparing genomic language models by their likelihood responses over a fixed panel of DNA sequences.">
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:title" content="GLMap: Profiling genomic language models as individuals in a population">
+  <meta property="og:description"
+        content="A training-free, architecture-agnostic framework for representing and comparing 123 genomic language models over a 10,000-probe DNA panel.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="static/images/Fig1.png">
+
+  <link rel="icon" href="static/images/Fig1.png">
+
+  <!-- Fonts + frameworks (all via CDN, no build step) -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <style>
+    /* Scale the whole page down a notch. Bulma sizes are rem-based,
+       so shrinking the root font-size scales everything proportionally. */
+    html { font-size: 14px; }
+    body { font-family: 'Noto Sans', sans-serif; }
+    .publication-title { font-family: 'Google Sans', sans-serif; }
+    .hero.is-light { background-color: #fafafa; }
+    .author-block { margin-right: 0.5rem; }
+    .figure-caption { color: #555; font-size: 1rem; margin-top: 0.75rem;
+                      max-width: 80%; margin-left: auto; margin-right: auto; }
+    /* Justify all body/explanatory paragraphs (headings stay centered). */
+    .section .container p { text-align: justify; text-justify: inter-word; }
+    .section { padding: 2.5rem 1.5rem; }
+    pre code { background: transparent; }
+    .bibtex-box { background: #f5f5f5; border-radius: 6px; padding: 1.25rem; overflow-x: auto; }
+    .bibtex-box pre, .bibtex-box code { font-size: 1.05rem; background: transparent; padding: 0; }
+    .stat-number { font-family: 'Google Sans', sans-serif; font-weight: 700; color: #3273dc; }
+    .footer { padding: 2rem 1.5rem 3rem; }
+    .key-result { border-left: 3px solid #3273dc; padding-left: 1rem; margin-bottom: 1.25rem; }
+    img.paper-figure { border: 1px solid #eee; border-radius: 6px; }
+  </style>
+</head>
+
+<body>
+
+<!-- ============================== HERO ============================== -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            GLMap
+          </h1>
+          <h2 class="subtitle is-1 publication-title">
+            Profiling genomic language models as individuals in a population
+          </h2>
+
+          <!-- Authors -->
+          <div class="is-size-4 publication-authors" style="margin-top: 1.5rem;">
+            <span class="author-block">Yusen Hou<sup>1</sup>,</span>
+            <span class="author-block">Weicai Long<sup>1</sup>,</span>
+            <span class="author-block">Houcheng Su<sup>1</sup>,</span>
+            <span class="author-block">Junning Feng<sup>1</sup>,</span>
+            <span class="author-block">Yanlin Zhang<sup>1,2,&#42;</sup></span>
+          </div>
+
+          <!-- Affiliations -->
+          <div class="is-size-5 publication-authors has-text-grey-dark" style="margin-top: 0.75rem;">
+            <span class="author-block"><sup>1</sup>Data Science and Analytics Thrust, The Hong Kong University of Science and Technology (Guangzhou)</span><br>
+            <span class="author-block"><sup>2</sup>The Hong Kong University of Science and Technology, Hong Kong</span><br>
+            <span class="author-block"><sup>&#42;</sup>Corresponding author: yanlinzhang@hkust-gz.edu.cn</span>
+          </div>
+
+          <div class="is-size-5 has-text-grey" style="margin-top: 0.5rem;">
+            In submission, 2026
+          </div>
+
+          <!-- Links -->
+          <div class="publication-links" style="margin-top: 1.5rem;">
+            <span class="link-block">
+              <a href="https://github.com/ai4nucleome/GLMap" class="button is-dark is-rounded">
+                <span class="icon"><i class="fab fa-github"></i></span>
+                <span>Code</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="https://huggingface.co/datasets/Tim419/GLMap-panels" class="button is-warning is-rounded">
+                <span class="icon">🤗</span>
+                <span>Probe panel</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="#bibtex" class="button is-link is-rounded">
+                <span class="icon"><i class="fas fa-quote-left"></i></span>
+                <span>Cite</span>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ONE-LINE SUMMARY ============================== -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop has-text-centered">
+    <h2 class="title is-3">One-line summary</h2>
+    <p class="is-size-4">
+      We profile each genomic language model by its responses to a fixed DNA probe panel and compare them
+      as <em>individuals in a population</em>.
+    </p>
+  </div>
+</section>
+
+<!-- ============================== ILLUSTRATED OVERVIEW ============================== -->
+<section class="section">
+  <div class="container is-max-desktop has-text-centered">
+    <h2 class="title is-3">Illustrated overview</h2>
+    <img class="paper-figure" src="static/images/notebooklm_overview.png"
+         alt="Whimsical illustrated overview of GLMap" style="width: 90%;">
+    <p class="figure-caption">
+      <span style="color: #9c36b5; font-weight: 700;">A playful summary of GLMap:</span> scoring every
+      model with a fixed 10,000-probe DNA panel, fingerprinting each model's likelihood response, unifying
+      AR and MLM models in one space, and the resulting model map that clusters by family and domain and
+      predicts downstream performance.
+      <span style="color: #9c36b5; font-weight: 700;">Illustration generated with NotebookLM.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ============================== KEY RESULTS ============================== -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Key results</h2>
+    <div class="columns is-multiline" style="margin-top: 1rem;">
+      <div class="column is-half">
+        <div class="key-result">
+          <p class="is-size-5"><strong>One common space for AR &amp; MLM.</strong>
+          Scoring paradigm (training paradigm) explains just 1.9% of the variance in V<sub>d</sub>;
+          family explains 53.8%.</p>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="key-result">
+          <p class="is-size-5"><strong>Probe-robust distances.</strong>
+          Model-pair distances on disjoint halves of the panel agree at r&nbsp;=&nbsp;0.835.</p>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="key-result">
+          <p class="is-size-5"><strong>Recovers known structure.</strong>
+          Models cluster by family and by training domain, consistent with documented lineages.</p>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="key-result">
+          <p class="is-size-5"><strong>Predicts task performance.</strong>
+          For each model, the mean AUC over six downstream tasks predicted from its GLMap signature and the
+          actually observed value correlate at Spearman &rho;&nbsp;=&nbsp;0.705.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== MOTIVATION ============================== -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">GLMs are Individuals in a Population</h2>
+    <div class="content is-size-5 has-text-justified">
+      <p>
+        Genomic language models (GLMs) are multiplying fast and differ widely in architecture, training
+        paradigm, and data. Comparing them in a principled way matters for building better models and for
+        picking the right one. Yet today this relies on downstream benchmarks, which are
+        <strong>phenotype-like</strong>: they record how a model behaves on a task, not how models relate
+        to one another.
+      </p>
+      <p>
+        The same gap appears in population genetics <strong>(Fig. 1a, b)</strong>: benchmark scores
+        act as a phenotype matrix, but the genotype-derived <em>marker matrix</em> that reveals population
+        structure has no counterpart for GLMs. A model's internal constitution (architecture,
+        weights, tokenizer, objective, data) is non-aligned across models and cannot be compared directly.
+        We propose <strong>GLMap, a standardized, task-agnostic framework (Fig. 1c):</strong> we score a
+        fixed panel of DNA probes with every frozen model and record its likelihood responses, assembling a
+        functional marker matrix over models and probes.
+      </p>
+    </div>
+    <div class="has-text-centered" style="margin-top: 1.5rem;">
+      <img class="paper-figure" src="static/images/Fig1.png" alt="GLMap overview" style="width: 68%;">
+      <p class="figure-caption">
+        GLMap probes every genomic language model with the same fixed panel of DNA sequences and records
+        its likelihood responses, producing a functional marker matrix over models and probes, a
+        task-independent way to place heterogeneous models in a common space.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== METHOD / REPRESENTATION ============================== -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">The GLMap representation</h2>
+    <div class="content is-size-5 has-text-justified">
+      <p>
+        Every model scores the same 10,000-probe DNA panel, yielding a raw response matrix
+        <strong>V</strong>. A ModelMap-style pipeline (lower-tail <em>clipping</em> of outliers,
+        row-then-column <em>double-centering</em>, and pairwise <em>squared-Euclidean distances</em>)
+        turns it into the centered signature matrix <strong>V<sub>d</sub></strong> and a model&times;model
+        distance matrix <strong>D</strong>. Double-centering absorbs the systematic offset between AR
+        log-likelihood and MLM pseudo-log-likelihood, so both paradigms live in one comparable space.
+      </p>
+    </div>
+    <div class="has-text-centered" style="margin-top: 1.5rem;">
+      <img class="paper-figure" src="static/images/Fig2.png" alt="GLMap representation matrix" style="width: 78%;">
+      <p class="figure-caption">
+        The GLMap representation matrix V<sub>d</sub> shows coherent block structure by model family.
+        The split-half distance geometry is stable across element-disjoint probe partitions
+        (Mantel/Pearson r&nbsp;=&nbsp;0.835), and the AR/MLM scoring distinction explains only 1.9% of the
+        variance, far less than model family (53.8%).
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== MODEL MAP & PREDICTION ============================== -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Model map &amp; downstream prediction</h2>
+    <div class="content is-size-5 has-text-justified">
+      <p>
+        GLMap distances recover documented relationships among models and organize the 123-model
+        population by family, training domain, and scale. The same signatures predict how well a model
+        will perform on held-out downstream classification tasks, without ever fine-tuning it.
+      </p>
+    </div>
+    <div class="has-text-centered" style="margin-top: 1.5rem;">
+      <img class="paper-figure" src="static/images/Fig3.png" alt="GLMap model map and downstream prediction" style="width: 78%;">
+      <p class="figure-caption">
+        Model map of the 123-model population and prediction of downstream task performance. Predicted
+        vs. observed mean AUC across six tasks correlates at Spearman &rho;&nbsp;=&nbsp;0.705 under random
+        <em>K</em>-fold cross-validation.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== DISCLAIMERS ============================== -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Disclaimers</h2>
+    <div class="content is-size-5 has-text-justified">
+      <ul>
+        <li>
+          GLMap is a <strong>descriptive</strong> tool. The distances it reports measure similarity of
+          likelihood responses over a probe panel; they are not statements about shared architecture,
+          training data, or causal lineage, even when the geometry happens to agree with documented
+          relationships.
+        </li>
+        <li>
+          AR log-likelihood and MLM pseudo-log-likelihood are <strong>not absolutely comparable</strong>.
+          We place both in a common space only after double-centering, and the resulting comparability is
+          an <em>empirical</em> finding on our panel, not a guarantee that holds for every model
+          or probe set.
+        </li>
+        <li>
+          All conclusions are conditioned on the <strong>fixed 10,000-probe panel</strong> and its
+          biological coverage. A different panel (e.g. one targeting other species or element
+          classes) may reorder models.
+        </li>
+        <li>
+          Downstream-performance prediction (&rho;&nbsp;=&nbsp;0.705) is <strong>correlational</strong>
+          and is meant as evidence that the representation is informative, not as a replacement for
+          actually benchmarking a model on a task of interest.
+        </li>
+        <li>
+          Inclusion of a model in the 123-model population is <strong>not an endorsement</strong>. Model
+          weights and data remain under their own upstream licenses.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== BIBTEX ============================== -->
+<section class="section" id="bibtex">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Citation</h2>
+    <div class="bibtex-box">
+<pre><code>@article{hou2026glmap,
+  title   = {Profiling genomic language models as individuals in a population},
+  author  = {Hou, Yusen and Long, Weicai and Su, Houcheng and Feng, Junning and Zhang, Yanlin},
+  journal = {In submission},
+  year    = {2026}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ACKNOWLEDGEMENTS ============================== -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Acknowledgements</h2>
+    <div class="content is-size-5 has-text-justified">
+      <p>
+        GLMap builds on the ideas and infrastructure of several outstanding open-source projects.
+        The clip + double-center pipeline applied to log-likelihood vectors originates from
+        <a href="https://github.com/shimo-lab/modelmap"><strong>ModelMap</strong></a>
+        (Oyama et al., ACL 2025), which profiled 1,000+ natural-language language models. The suite of
+        binary classification tasks used in our downstream evaluation comes from the
+        <a href="https://github.com/ChongWuLab/dna_foundation_benchmark"><strong>DNA Foundation
+        Benchmark</strong></a> (Feng et al., Nat. Commun. 2025).
+      </p>
+      <p>
+        We also thank the authors and maintainers of the 123 genomic language models audited in this
+        work for releasing their weights and code publicly, which made this study possible.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="footer">
+  <div class="container is-max-desktop has-text-centered content">
+    <p>
+      Code is released under <strong>Apache-2.0</strong>; data artefacts under
+      <strong>CC-BY-NC-SA-4.0</strong>. GLMap builds on
+      <a href="https://github.com/shimo-lab/modelmap">ModelMap</a> (Oyama et al., ACL 2025) and the
+      <a href="https://github.com/ChongWuLab/dna_foundation_benchmark">DNA Foundation Benchmark</a>
+      (Feng et al., Nat. Commun. 2025).
+    </p>
+    <p class="is-size-7 has-text-grey">
+      Page template adapted from the
+      <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
