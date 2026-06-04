@@ -11,25 +11,31 @@ build-backend = "setuptools.build_meta"
 name = "ai4nucleome-glmap"
 version = "0.1.0"
 requires-python = ">=3.10"
-# Core: matrix loading, analysis, figures (no torch). Scoring (running GLMs
-# to obtain raw likelihood responses) needs the `scoring` extra; many model
-# families also need family-specific deps — see models/env_routing.md.
+# Core: matrix loading, analysis, figures (no torch). Versions are pinned to
+# the tested analysis stack (Python 3.11.9); enough to use the precomputed
+# 123-model results + prebuilt panel and reproduce every figure/table.
+# Scoring (running GLMs to obtain raw likelihood responses) needs the
+# `scoring` extra; many model families also need family-specific, pinned
+# environments — see models/README.md and models/env_routing.md.
 dependencies = [
-    "numpy",
-    "pandas",
-    "pyarrow",
-    "scipy",
-    "scikit-learn",
-    "matplotlib",
-    "seaborn",
-    "umap-learn",
-    "PyYAML",
-    "huggingface_hub",  # panel download fallback (load_panel); lightweight, no torch
+    "numpy==2.2.6",
+    "pandas==2.3.3",
+    "pyarrow==23.0.1",
+    "scipy==1.17.1",
+    "scikit-learn==1.8.0",
+    "matplotlib==3.10.8",
+    "seaborn==0.13.2",
+    "umap-learn==0.5.9.post2",
+    "PyYAML==6.0.3",
+    "huggingface_hub==0.36.2",  # panel download fallback (load_panel); lightweight, no torch
 ]
 
 [project.optional-dependencies]
+# torch / transformers are intentionally left unpinned: each model family is
+# scored under its own pinned micromamba env (see models/env_routing.md), so a
+# single version here would be misleading.
 scoring = ["torch", "transformers"]
-dev = ["pytest"]
+dev = ["pytest==9.0.2"]
 
 [tool.setuptools.packages.find]
 include = ["glmap*"]
