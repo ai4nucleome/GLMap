@@ -4,24 +4,21 @@ From: base-cu128.sif
 # ──────────────────────────────────────────────────────────────────────────
 # GLMap scoring image — cu118 family group.
 #
-# Holds three isolated micromamba envs, each unpacked from a conda-pack
-# tarball of the already-working host env (so the painful flash-attn /
-# mamba-ssm builds are shipped, not recompiled):
-#
 #   caduceus    Python 3.8  torch 2.2.0+cu118   mamba-ssm 1.2, flash-attn 2.5.6   (conda-pack)
 #   gf          Python 3.10 torch 2.1.1+cu118   evo-model, flash-attn 2.7.2       (conda-pack)
-#   hyena-dna   Python 3.9  torch 2.7.1+cu118   (clean rebuild — see note)
+#   hyena-dna   Python 3.9  torch 2.7.1+cu118   transformers + einops             (plain tar)
 #
-# caduceus / gf are unpacked from conda-pack tarballs of the working host
-# envs. hyena-dna's host env is polluted (3 layered torch installs) so it is
-# rebuilt clean: glmap's HyenaDNA loader needs only torch + transformers +
-# einops (the standalone_hyenadna model code comes from the bind-mounted
-# checkout, and flash-attn is not used at scoring time).
+# caduceus / gf ship as conda-pack tarballs of the working host envs (so the
+# painful flash-attn / mamba-ssm builds are shipped, not recompiled).
+# hyena-dna's host env is polluted (two python versions, three torch installs,
+# 14 GB) so we ship a freshly-built CLEAN env instead, as a plain directory
+# tarball: glmap's HyenaDNA loader needs only torch + transformers + einops
+# (the standalone_hyenadna model code comes from the bind-mounted checkout,
+# flash-attn is unused at scoring time), so the clean env is ~4 GB and faithful.
+# Every env is shipped pre-built — no pip / network at build time.
 #
-# Build (run from container/, with base-cu128.sif + packed/*.tar.gz
-# present; on HPC: `module load apptainer-1.4.5`):
+# Build (from container/, on HPC `module load apptainer-1.4.5`):
 #     apptainer build --fakeroot bio-cu118.sif bio-cu118.def
-#
 # Run (pick the env per model family; --nv for GPU, bind the checkout):
 #     GLMAP_ENV=caduceus apptainer run --nv --bind "$PWD":/work --pwd /work \
 #         bio-cu118.sif scripts/score/scoring_worker.py --from-audit --hf-ids ...
@@ -30,36 +27,29 @@ From: base-cu128.sif
 %files
     packed/caduceus.tar.gz   /opt/packed/caduceus.tar.gz
     packed/gf.tar.gz         /opt/packed/gf.tar.gz
+    packed/hyena-dna.tar.gz  /opt/packed/hyena-dna.tar.gz
 
 %post
     set -eu
     mkdir -p /opt/micromamba/envs /workspace
 
-    # ── unpack the two conda-packed envs ──
+    # conda-pack envs: contents are top-level (bin/, lib/, ...) -> extract into
+    # envs/<name>/, then conda-unpack rewrites the build-time prefix.
     for e in caduceus gf; do
-        echo ">>> unpacking env: $e"
+        echo ">>> unpacking conda-pack env: $e"
         mkdir -p "/opt/micromamba/envs/$e"
         tar xzf "/opt/packed/$e.tar.gz" -C "/opt/micromamba/envs/$e"
-        # conda-unpack rewrites the build-time prefix in scripts / records.
         "/opt/micromamba/envs/$e/bin/python" "/opt/micromamba/envs/$e/bin/conda-unpack" || true
         rm -f "/opt/packed/$e.tar.gz"
     done
 
-    # ── rebuild hyena-dna clean (host env is multi-torch polluted) ──
-    # Network as in bio-evo.def: Tsinghua pip mirror (direct)
-    # + 127.0.0.1:7890 tunnel for download.pytorch.org (the cu118 torch wheel).
-    export http_proxy=http://127.0.0.1:7890  https_proxy=http://127.0.0.1:7890
-    export HTTP_PROXY=http://127.0.0.1:7890  HTTPS_PROXY=http://127.0.0.1:7890
-
-    /opt/micromamba/bin/micromamba create -y -n hyena-dna python=3.9 pip
-    /opt/micromamba/bin/micromamba run -n hyena-dna pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-    # torch from the official cu118 index (via proxy); rest from Tsinghua.
-    /opt/micromamba/bin/micromamba run -n hyena-dna pip install --no-cache-dir \
-        torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-    /opt/micromamba/bin/micromamba run -n hyena-dna pip install --no-cache-dir \
-        transformers==4.57.6 tokenizers==0.22.2 safetensors==0.7.0 einops==0.8.2 \
-        numpy==2.0.2 pandas==2.3.3 pyarrow==21.0.0 scipy==1.13.1 scikit-learn==1.6.1
-    /opt/micromamba/bin/micromamba clean --all --yes
+    # plain-tar envs (clean rebuild): a top-level <name>/ dir -> extract into
+    # envs/. python relocates by its own location, so no conda-unpack needed.
+    for e in hyena-dna; do
+        echo ">>> unpacking plain-tar env: $e"
+        tar xzf "/opt/packed/$e.tar.gz" -C /opt/micromamba/envs
+        rm -f "/opt/packed/$e.tar.gz"
+    done
 
 %environment
     export LC_ALL=C
@@ -76,8 +66,9 @@ From: base-cu128.sif
         echo "unknown GLMAP_ENV=${ENV_NAME} (have: caduceus gf hyena-dna)" >&2
         exit 2
     fi
-    # Some envs need their own lib on LD_LIBRARY_PATH (CUDA/runtime libs).
-    export LD_LIBRARY_PATH="${ENV_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+    # Some envs need their own lib + torch lib on LD_LIBRARY_PATH.
+    TORCH_LIB="$(echo ${ENV_PREFIX}/lib/python*/site-packages/torch/lib)"
+    export LD_LIBRARY_PATH="${ENV_PREFIX}/lib:${TORCH_LIB}:${LD_LIBRARY_PATH:-}"
     exec "${ENV_PREFIX}/bin/python" "$@"
 
 %labels
