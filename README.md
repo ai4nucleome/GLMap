@@ -13,22 +13,51 @@ GLMap is a training-free, architecture-agnostic framework for representing and c
 ## Installation
 
 GLMap is a research repository, not a published package — clone it and
-install in editable mode. `pip install -e .` makes the `glmap` library
-importable (and wires up the test/script imports); it is **not** a PyPI
-distribution.
+install in editable mode.
 
 ```bash
 git clone https://github.com/ai4nucleome/GLMap.git
 cd GLMap
-pip install -e .            # core: matrix loading, analysis, figures
-pip install -e .[scoring]   # adds torch + transformers for model scoring
-pip install -e .[dev]       # adds pytest
+pip install -e .
 ```
+
+### Just using the precomputed results? This core install is all you need.
+
+If you only want to **use our precomputed PLL / log-likelihood responses of
+the 123 models over the 10,000-probe panel**, together with the prebuilt
+DNA probe panel, the V/Vd/D matrices, the audit metadata, and to reproduce
+every figure/table — then `pip install -e .` is enough. **No GPU, no model
+weights, no scoring required.** It makes `glmap` importable and installs
+only the lightweight analysis/figure dependencies (no torch).
+
+We recommend **Python 3.11.9**. The analysis stack was developed and
+tested with these pinned versions:
+
+| package | version | | package | version |
+|---|---|---|---|---|
+| numpy | 2.2.6 | | seaborn | 0.13.2 |
+| pandas | 2.3.3 | | umap-learn | 0.5.9.post2 |
+| pyarrow | 23.0.1 | | scikit-learn | 1.8.0 |
+| scipy | 1.17.1 | | PyYAML | 6.0.3 |
+| matplotlib | 3.10.8 | | huggingface_hub | 0.36.2 |
 
 > **Note**: `import glmap` does not trigger `import torch` or
 > `import transformers`. Heavy dependencies are loaded on demand inside
 > `get_loader()`, so the core install is usable for analysis and figures
 > even without GPU packages installed.
+
+### Re-scoring models or developing loaders?
+
+Running the GLMs yourself to recompute the likelihood responses (or adding
+a new model loader) needs `torch` + `transformers` and, for many families,
+their own pinned environments. Install the scoring extra and see
+**[models/README.md](models/README.md)** (plus
+[models/env_routing.md](models/env_routing.md)) for the per-family setup:
+
+```bash
+pip install -e .[scoring]   # adds torch + transformers for model scoring
+pip install -e .[dev]       # adds pytest (to run the test suite)
+```
 
 ---
 
