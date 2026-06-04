@@ -6,8 +6,10 @@ From: base-cu128.sif
 #
 #   PlantCAD   Python 3.11  torch 2.5.1+cu121   mamba-ssm 2.2.4, causal-conv1d 1.5
 #
-# One micromamba env, unpacked from a conda-pack tarball of the working host
-# env. PlantCAD needs its own lib on LD_LIBRARY_PATH (handled in %runscript).
+# One micromamba env, shipped as a plain tarball of the working host env
+# (a conda-pack of this env frankensteins numpy — the host has conda
+# numpy-base 2.4.4 metadata under a pip numpy 1.26.4 — so we tar the on-disk
+# files directly). PlantCAD needs its own lib on LD_LIBRARY_PATH (%runscript).
 #
 # Build (from container/scoring/, on HPC `module load apptainer-1.4.5`):
 #     apptainer build --fakeroot bio-cu121.sif bio-cu121.def
@@ -21,12 +23,12 @@ From: base-cu128.sif
 
 %post
     set -eu
-    mkdir -p /opt/micromamba/envs/PlantCAD
-    echo ">>> unpacking env: PlantCAD"
-    tar xzf /opt/packed/PlantCAD.tar.gz -C /opt/micromamba/envs/PlantCAD
-    /opt/micromamba/envs/PlantCAD/bin/python /opt/micromamba/envs/PlantCAD/bin/conda-unpack || true
+    mkdir -p /opt/micromamba/envs /workspace
+    echo ">>> unpacking env: PlantCAD (plain tar; top-level PlantCAD/)"
+    # Plain tar carries a top-level PlantCAD/ dir → extract into envs/.
+    # python relocates by its own location, so no conda-unpack is needed.
+    tar xzf /opt/packed/PlantCAD.tar.gz -C /opt/micromamba/envs
     rm -f /opt/packed/PlantCAD.tar.gz
-    mkdir -p /workspace
 
 %environment
     export LC_ALL=C
