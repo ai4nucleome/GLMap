@@ -13,7 +13,7 @@ From: base-cu128.sif
 # groups (cu118/cu121/default) instead ship conda-pack / plain tarballs of the
 # already-working host envs; see README.md.
 #
-# Build (from container/scoring/, on HPC `module load apptainer-1.4.5`):
+# Build (from container/, on HPC `module load apptainer-1.4.5`):
 #     apptainer build --fakeroot bio-evo.sif bio-evo.def
 # Run:
 #     GLMAP_ENV=evo2 apptainer run --nv --bind "$PWD":/work --pwd /work \

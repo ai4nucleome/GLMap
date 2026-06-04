@@ -55,7 +55,7 @@ needed per group follow each env's row above + its `env-specs/*.txt`.
 ## Build (on a host with Apptainer; e.g. the HPC)
 
 ```bash
-cd container/scoring          # %files paths + ./wheels are relative to here
+cd container          # %files paths + ./wheels are relative to here
 
 # 1. shared base (once)
 apptainer build base-cu128.sif Base.def

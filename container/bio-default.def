@@ -15,7 +15,7 @@ From: base-cu128.sif
 # versions (the host root env is a polluted daily-driver and not worth
 # packing). `dnabert2` / `megadna` are unpacked from conda-pack tarballs.
 #
-# Build (from container/scoring/, on HPC `module load apptainer-1.4.5`):
+# Build (from container/, on HPC `module load apptainer-1.4.5`):
 #     apptainer build --fakeroot bio-default.sif bio-default.def
 # Run:
 #     GLMAP_ENV=base apptainer run --nv --bind "$PWD":/work --pwd /work \

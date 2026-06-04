@@ -14,7 +14,7 @@ From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 # never share one interpreter. The container instead holds them as isolated
 # micromamba envs and dispatches per family at run time. See README.md.
 #
-# Build (run from container/scoring/, where ./wheels lives):
+# Build (run from container/, where ./wheels lives):
 #     apptainer build base-cu128.sif Base.def
 #
 # ./wheels is a LOCAL wheelhouse (gitignored) holding the large, CUDA- and
@@ -64,4 +64,4 @@ From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 %help
     Shared CUDA 12.8 + micromamba base for the GLMap per-family scoring
     images. Not used directly — the bio-* group images bootstrap from the
-    base-cu128.sif this produces. See container/scoring/README.md.
+    base-cu128.sif this produces. See container/README.md.

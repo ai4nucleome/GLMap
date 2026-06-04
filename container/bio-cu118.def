@@ -18,7 +18,7 @@ From: base-cu128.sif
 # einops (the standalone_hyenadna model code comes from the bind-mounted
 # checkout, and flash-attn is not used at scoring time).
 #
-# Build (run from container/scoring/, with base-cu128.sif + packed/*.tar.gz
+# Build (run from container/, with base-cu128.sif + packed/*.tar.gz
 # present; on HPC: `module load apptainer-1.4.5`):
 #     apptainer build --fakeroot bio-cu118.sif bio-cu118.def
 #
