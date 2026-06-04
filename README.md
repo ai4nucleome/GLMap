@@ -1,5 +1,6 @@
-# 🧬 🗺️ GLMap
-# Profiling genomic language models as individuals in a population
+# 🧬 🗺️ GLMap: Profiling genomic language models as individuals in a population
+
+> 🌐 Language: [中文](README.zh.md) · **English**
 
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
@@ -224,15 +225,15 @@ GLMap builds on the ideas and infrastructure of several outstanding
 open-source projects:
 
 - **[ModelMap](https://github.com/shimo-lab/modelmap)** (Oyama et al.,
-  ACL 2025) — the clip + double-center pipeline applied to
+  ACL *2025*) — the clip + double-center pipeline applied to
   log-likelihood vectors originates from ModelMap's profiling of 1,000+
   natural-language LMs.
 - **[DNA Foundation Benchmark](https://github.com/ChongWuLab/dna_foundation_benchmark)**
-  (Feng et al., 2025) — provides the curated suite of binary
+  (Feng et al., Nat. Comm. *2025*) — provides the curated suite of binary
   classification tasks used in our downstream evaluation.
 
-We also thank the authors and maintainers of the 123 genomic language
-models audited in this work for releasing their weights and code publicly.
+We also thank the authors and maintainers of the **123 genomic language
+models** audited in this work for releasing their weights and code publicly.
 
 ---
 
@@ -253,8 +254,8 @@ models audited in this work for releasing their weights and code publicly.
 
 This repository uses **two licenses**:
 
-- **Source code** (everything under `src/`, `scripts/`, `tests/`,
-  `scripts/panel_build/`, etc.): [Apache-2.0](LICENSE).
+- **Source code** (everything under `glmap/`, `scripts/`, `tests/`,
+  etc.): [Apache-2.0](LICENSE).
 - **Data artefacts** (`data/panels/`, `results/scores/matrices/`,
   `results/scores/AR_MLM_scores/`, `results/analysis/`): [CC-BY-NC-SA-4.0](LICENSE-DATA).
   These artefacts inherit the upstream Plant Genomic Benchmark license

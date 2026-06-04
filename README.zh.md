@@ -1,10 +1,10 @@
-# 🧬 🗺️ GLMap: 将基因组语言模型作为群体中的个体进行画像
+# 🧬 🗺️ GLMap: Profiling genomic language models as individuals in a population
+
+> 🌐 Language: **中文** · [English](README.md)
 
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
 </p>
-
-> 🌐 Language: **中文** · [English](README.md)
 
 GLMap 是一个**免训练、与架构无关**的框架,通过基因组语言模型(genomic language models, GLMs)在一组固定 DNA 序列面板上的**似然响应**来表征并比较这些模型。我们将 GLMap 应用于 **123 个公开可用的 GLM**、在 **10,000 条 DNA 探针**面板上打分,把自回归(AR)模型和掩码语言(MLM)模型放进同一个空间,得到的模型间距离对探针的选择稳定,并能反映模型之间已知的关系。
 
