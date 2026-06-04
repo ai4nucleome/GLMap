@@ -1,0 +1,55 @@
+Bootstrap: localimage
+From: base-cu128.sif
+
+# ──────────────────────────────────────────────────────────────────────────
+# GLMap scoring image — cu121 family group.
+#
+#   PlantCAD   Python 3.11  torch 2.5.1+cu121   mamba-ssm 2.2.4, causal-conv1d 1.5
+#
+# One micromamba env, unpacked from a conda-pack tarball of the working host
+# env. PlantCAD needs its own lib on LD_LIBRARY_PATH (handled in %runscript).
+#
+# Build (from container/scoring/, on HPC `module load apptainer-1.4.5`):
+#     apptainer build --fakeroot bio-cu121.sif bio-cu121.def
+# Run:
+#     GLMAP_ENV=PlantCAD apptainer run --nv --bind "$PWD":/work --pwd /work \
+#         bio-cu121.sif scripts/score/scoring_worker.py --from-audit --hf-ids ...
+# ──────────────────────────────────────────────────────────────────────────
+
+%files
+    packed/PlantCAD.tar.gz   /opt/packed/PlantCAD.tar.gz
+
+%post
+    set -eu
+    mkdir -p /opt/micromamba/envs/PlantCAD
+    echo ">>> unpacking env: PlantCAD"
+    tar xzf /opt/packed/PlantCAD.tar.gz -C /opt/micromamba/envs/PlantCAD
+    /opt/micromamba/envs/PlantCAD/bin/python /opt/micromamba/envs/PlantCAD/bin/conda-unpack || true
+    rm -f /opt/packed/PlantCAD.tar.gz
+    mkdir -p /workspace
+
+%environment
+    export LC_ALL=C
+    export LANG=C
+    export MAMBA_ROOT_PREFIX=/opt/micromamba
+    export MPLBACKEND=Agg
+    export HF_HOME=/workspace/.cache/huggingface
+
+%runscript
+    ENV_NAME="${GLMAP_ENV:-PlantCAD}"
+    ENV_PREFIX="/opt/micromamba/envs/${ENV_NAME}"
+    if [ ! -x "${ENV_PREFIX}/bin/python" ]; then
+        echo "unknown GLMAP_ENV=${ENV_NAME} (have: PlantCAD)" >&2
+        exit 2
+    fi
+    export LD_LIBRARY_PATH="${ENV_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+    exec "${ENV_PREFIX}/bin/python" "$@"
+
+%labels
+    Project   GLMap
+    Component scoring-cu121
+    Envs      PlantCAD
+
+%help
+    GLMap cu121 scoring image (PlantCAD). GLMAP_ENV defaults to PlantCAD.
+    Bind your GLMap checkout for data / weights.

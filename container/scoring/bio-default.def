@@ -1,0 +1,79 @@
+Bootstrap: localimage
+From: base-cu128.sif
+
+# ──────────────────────────────────────────────────────────────────────────
+# GLMap scoring image — default group (the standard HF-route models +
+# torch.load specials).
+#
+#   base       Python 3.11.9 torch 2.8.0   transformers 4.57 — NT / GENA-LM /
+#              ModernBERT / GROVER / Mistral-DNA / NTv3 / … (the majority)
+#   dnabert2   Python 3.8.20 torch 1.13.1  transformers 4.29
+#   megadna    Python 3.10.0 torch 2.9.0   torch.load .pt (megaDNA model code
+#              + weight come from the bind-mounted checkout, not the env)
+#
+# `base` has no compiled exotic deps, so it is rebuilt clean from pinned
+# versions (the host root env is a polluted daily-driver and not worth
+# packing). `dnabert2` / `megadna` are unpacked from conda-pack tarballs.
+#
+# Build (from container/scoring/, on HPC `module load apptainer-1.4.5`):
+#     apptainer build --fakeroot bio-default.sif bio-default.def
+# Run:
+#     GLMAP_ENV=base apptainer run --nv --bind "$PWD":/work --pwd /work \
+#         bio-default.sif scripts/score/scoring_worker.py --from-audit --hf-ids ...
+# ──────────────────────────────────────────────────────────────────────────
+
+%files
+    packed/dnabert2.tar.gz   /opt/packed/dnabert2.tar.gz
+    packed/megadna.tar.gz    /opt/packed/megadna.tar.gz
+
+%post
+    set -eu
+    mkdir -p /opt/micromamba/envs /workspace
+
+    # ── unpack the two conda-packed envs ──
+    for e in dnabert2 megadna; do
+        echo ">>> unpacking env: $e"
+        mkdir -p "/opt/micromamba/envs/$e"
+        tar xzf "/opt/packed/$e.tar.gz" -C "/opt/micromamba/envs/$e"
+        "/opt/micromamba/envs/$e/bin/python" "/opt/micromamba/envs/$e/bin/conda-unpack" || true
+        rm -f "/opt/packed/$e.tar.gz"
+    done
+
+    # ── build the clean `base` env (standard HF stack, pinned to host) ──
+    # If the build node has no direct PyPI access, set a mirror + proxy here
+    # like container/evo2/Apptainer.def does.
+    /opt/micromamba/bin/micromamba create -y -n base python=3.11.9 pip
+    /opt/micromamba/bin/micromamba run -n base pip install --no-cache-dir \
+        torch==2.8.0 \
+        transformers==4.57.6 tokenizers==0.22.2 safetensors==0.7.0 \
+        sentencepiece==0.2.1 accelerate==1.13.0 protobuf==7.34.0 einops==0.8.2 \
+        numpy==2.2.6 pandas==2.3.3 pyarrow==23.0.1 scipy==1.17.1 scikit-learn==1.8.0
+    /opt/micromamba/bin/micromamba clean --all --yes
+
+%environment
+    export LC_ALL=C
+    export LANG=C
+    export MAMBA_ROOT_PREFIX=/opt/micromamba
+    export MPLBACKEND=Agg
+    export HF_HOME=/workspace/.cache/huggingface
+
+%runscript
+    # Dispatch to the right env: GLMAP_ENV ∈ {base, dnabert2, megadna}.
+    ENV_NAME="${GLMAP_ENV:-base}"
+    ENV_PREFIX="/opt/micromamba/envs/${ENV_NAME}"
+    if [ ! -x "${ENV_PREFIX}/bin/python" ]; then
+        echo "unknown GLMAP_ENV=${ENV_NAME} (have: base dnabert2 megadna)" >&2
+        exit 2
+    fi
+    export LD_LIBRARY_PATH="${ENV_PREFIX}/lib:${LD_LIBRARY_PATH:-}"
+    exec "${ENV_PREFIX}/bin/python" "$@"
+
+%labels
+    Project   GLMap
+    Component scoring-default
+    Envs      base,dnabert2,megadna
+
+%help
+    GLMap default scoring image (base / dnabert2 / megadna). GLMAP_ENV selects
+    the env (default base). Bind your GLMap checkout for data, model weights,
+    and the megaDNA model code under models/modelsHFNoInfo/.
