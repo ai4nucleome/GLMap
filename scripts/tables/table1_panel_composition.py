@@ -184,7 +184,7 @@ def main() -> None:
     print("# Table 1 — GLMap probe panel composition (Markdown preview)\n")
     print(md)
     print()
-    print(f"# LaTeX written to: {TEX_OUT.relative_to(REPO_ROOT)}\n")
+    print(f"# LaTeX written to: {TEX_OUT}\n")
 
     TEX_OUT.parent.mkdir(parents=True, exist_ok=True)
     TEX_OUT.write_text(tex)

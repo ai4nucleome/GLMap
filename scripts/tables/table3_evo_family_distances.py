@@ -130,7 +130,7 @@ def main() -> None:
     anchor, rows = _load_csv()
     print(f"[fig4a-table] anchor: {anchor}", flush=True)
     print(f"[fig4a-table] {len(rows)} partner rows from "
-          f"{CSV_PATH.relative_to(REPO_ROOT)}", flush=True)
+          f"{CSV_PATH}", flush=True)
 
     L, hf_ids, branches = _load_all_L()
     print(f"[fig4a-table] combined L matrix: {L.shape}  "
@@ -378,7 +378,7 @@ def main() -> None:
         latex_label="tab:evo_family_distances",
     ))
     print(f"# LaTeX written to:")
-    print(f"#   {TEX_OUT_Q.relative_to(REPO_ROOT)}     "
+    print(f"#   {TEX_OUT_Q}     "
           "(Euclidean distance + Cosine similarity on V_d)")
 
 

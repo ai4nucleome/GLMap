@@ -20,10 +20,10 @@ evo-family-relationship.csv whose anchor column is constant (togethercomputer/
 evo-1-8k-base), the magnitude |diff| is a deterministic function of
 diff and adds no new information, so we use diff only.
 
-The LLaMA-2 sibling script (plot_able_llama2_dist.py) uses the
-concatenation [|diff|, diff] because its CSV mixes multiple anchors
-and the magnitude term is anchor-invariant. Re-introduce the concat
-form here if you extend evo-family-relationship.csv to multi-anchor data.
+A multi-anchor variant would instead use the concatenation [|diff|, diff],
+because once the CSV mixes multiple anchors the magnitude term becomes
+anchor-invariant and adds information. Re-introduce the concat form here
+if you extend evo-family-relationship.csv to multi-anchor data.
 
 Inputs
 ------
@@ -55,7 +55,7 @@ Methodology rationale
 ---------------------
   - Pair-feature = diff (signed): with a single fixed anchor, the
     magnitude |diff| is a deterministic function of diff, so the
-    concatenation [|diff|, diff] used in the LLaMA-2 multi-anchor
+    concatenation [|diff|, diff] used in a multi-anchor
     script does not add information here. We use diff only — the
     most parsimonious encoding (10000-D, half the size).
   - LOO CV (not k-fold): with M=8 pairs, k-fold would drop too many
@@ -156,7 +156,7 @@ def _load_pair_features(
     Returns (F, y, partner_names, common_anchor). All rows must share
     the same anchor; under that constraint, |diff| is a deterministic
     function of diff and adds no information — so we use diff only
-    (vs. the [|diff|, diff] concat used in the LLaMA-2 sibling script
+    (vs. the [|diff|, diff] concat a multi-anchor variant would use
     where multiple anchors made |diff| anchor-invariant).
     """
     cache: dict[str, np.ndarray] = {}

@@ -68,6 +68,16 @@ import pyarrow.parquet as pq
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
+def _rel(p: Path) -> str:
+    """Repo-relative path string when possible, else the absolute path.
+    Avoids ``Path.relative_to`` raising when --panel / --out point outside
+    the repo (e.g. a /tmp smoke run)."""
+    try:
+        return str(p.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(p)
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description=__doc__,
@@ -104,7 +114,7 @@ def main() -> None:
     table = pq.read_table(args.panel)
     df = table.to_pandas()
     print(f"[ablation-subset] source panel: {len(df)} probes from "
-          f"{args.panel.relative_to(REPO_ROOT)}", flush=True)
+          f"{_rel(args.panel)}", flush=True)
 
     # Per-element allocation, proportional to full panel composition.
     elements = sorted(df["functional_element"].unique())
@@ -148,7 +158,7 @@ def main() -> None:
     # Write parquet (same schema as source).
     args.out_parquet.parent.mkdir(parents=True, exist_ok=True)
     subset_df.to_parquet(args.out_parquet, index=False)
-    print(f"[ablation-subset] wrote {args.out_parquet.relative_to(REPO_ROOT)}",
+    print(f"[ablation-subset] wrote {_rel(args.out_parquet)}",
           flush=True)
 
     # Write manifest.
@@ -159,7 +169,7 @@ def main() -> None:
             "stratified 1000-probe subset (paper.md Fig S2a)."
         ),
         "branch": "mlm_or_encoder",
-        "source_panel": str(args.panel.relative_to(REPO_ROOT)),
+        "source_panel": _rel(args.panel),
         "source_panel_n_probes": int(N_full),
         "subset_n_probes_target": int(args.n_subset),
         "subset_n_probes_actual": int(len(subset_df)),
@@ -177,7 +187,7 @@ def main() -> None:
     }
     args.out_manifest.parent.mkdir(parents=True, exist_ok=True)
     args.out_manifest.write_text(json.dumps(manifest, indent=2))
-    print(f"[ablation-subset] wrote {args.out_manifest.relative_to(REPO_ROOT)}",
+    print(f"[ablation-subset] wrote {_rel(args.out_manifest)}",
           flush=True)
 
 

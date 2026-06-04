@@ -141,7 +141,7 @@ def main() -> None:
         tex = _make_table(df, feature_set, split)
         out_path = TABLE_DIR / OUT_NAME[(feature_set, split)]
         out_path.write_text(tex)
-        print(f"[done] wrote {out_path.relative_to(REPO_ROOT)}")
+        print(f"[done] wrote {out_path}")
 
 
 if __name__ == "__main__":

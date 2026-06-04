@@ -132,7 +132,7 @@ def _tex_escape(s: str) -> str:
 
 
 def main() -> None:
-    print(f"[table2] source: {BENCH_ROOT.relative_to(REPO_ROOT)}", flush=True)
+    print(f"[table2] source: {BENCH_ROOT}", flush=True)
     rows = []
     for t in TASKS:
         train_stats = _split_stats(_read_split(t["task_id"], "train"))
@@ -207,7 +207,7 @@ def main() -> None:
 
     TEX_OUT.parent.mkdir(parents=True, exist_ok=True)
     TEX_OUT.write_text(tex)
-    print(f"# LaTeX written to: {TEX_OUT.relative_to(REPO_ROOT)}")
+    print(f"# LaTeX written to: {TEX_OUT}")
 
 
 if __name__ == "__main__":

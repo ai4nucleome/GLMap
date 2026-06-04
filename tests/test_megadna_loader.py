@@ -59,7 +59,18 @@ def test_score_record_requires_non_empty_sequence(tmp_path) -> None:
         loader.score_record("")
 
 
-def test_load_raises_when_weight_file_missing(tmp_path) -> None:
+def test_load_raises_when_weight_file_missing(tmp_path, monkeypatch) -> None:
+    # When the weight is absent, load() first tries to auto-download it from
+    # HF. Force that fallback to fail so we deterministically exercise the
+    # "weight file missing" path regardless of cache / network / whether the
+    # megaDNA package is installed (otherwise a machine that can fetch the
+    # weight would proceed to the package-import step instead).
+    import huggingface_hub
+
+    def _no_download(*args, **kwargs):
+        raise RuntimeError("download disabled for test")
+
+    monkeypatch.setattr(huggingface_hub, "hf_hub_download", _no_download)
     loader = MegaDNALoader(weight_path=tmp_path / "absent.pt")
     with pytest.raises(FileNotFoundError, match="weight file missing"):
         loader.load()
