@@ -2,6 +2,8 @@
 
 > 🌐 Language: [中文](README.zh.md) · **English**
 
+> 📖 **Project page: [ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
+
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
 </p>
@@ -29,11 +31,12 @@ pip install -e .
 We recommend **Python 3.11.9**; the exact analysis-stack versions are pinned
 in [`pyproject.toml`](pyproject.toml).
 
-> **Note**: `import glmap` does not trigger `import torch` or
-> `import transformers`. Heavy dependencies are loaded on demand inside
-> `get_loader()`, so the core install is usable for analysis and figures
-> even without GPU packages installed. To re-score models yourself or
-> develop loaders, see [models/README.md](models/README.md).
+### Recomputing the 123-model scores
+
+The 123 models span many **mutually incompatible runtime environments** —
+different Python / PyTorch / CUDA versions per model family. We are packaging
+these environments into container images so that recomputing the likelihood
+responses for any model will be straightforward. **Coming soon.**
 
 ---
 
@@ -77,45 +80,6 @@ specs = glmap.specs_from_audit() # list of 123 ModelSpec objects
 
 ---
 
-## Re-run scoring and downstream evaluation
-
-Reproducing the full pipeline from scratch requires GPUs, model weights,
-and benchmark data. See the sections below for setup.
-
-**Quick example** (single model, single GPU):
-
-```bash
-python scripts/score/scoring_worker.py --from-audit \
-    --hf-ids zhihan1996/DNABERT-2-117M --device cuda:0
-```
-
-**Full 123-model reproduction** (requires multiple environments + GPUs;
-see [models/env_routing.md](models/env_routing.md)):
-
-```bash
-# 1. Parallel scoring across 123 models (workers use --skip-aggregate)
-python scripts/score/run_scoring_sweep.py --audit data/audits/models.json
-
-# 2. Build V/Vd/D matrices (CPU, after all scoring workers finish)
-python scripts/score/scoring_worker.py --from-audit --strict-aggregate
-
-# 3. Parallel downstream embedding extraction (requires benchmark CSVs)
-python scripts/downstream_tasks/run_embed_sweep.py --audit data/audits/models.json
-
-# 4. Train linear probes and compute AUCs
-python scripts/downstream_tasks/run_downstream_classify.py
-
-# 5. Generate paper figures
-python scripts/figures/fig2c_split_half_consistency.py --seed 123
-python scripts/figures/fig3a_model_map_family.py
-# ... (see scripts/figures/ for all figure scripts)
-```
-
-See [models/env_routing.md](models/env_routing.md) for per-family environment
-setup required by the parallel sweep.
-
----
-
 ## Repository layout
 
 ```
@@ -155,52 +119,20 @@ GLMap/
 
 ---
 
-## Pre-built artefacts vs user-downloaded data
+## Pre-built artefacts included in this repository
 
-| Included in this repository | User must download separately |
+Everything needed to reproduce the paper's analysis from precomputed results
+ships with the repo — no model weights, no scoring required:
+
+| Artefact | Size |
 |---|---|
-| Probe panel (10,000 probes, 8 MB) | HF model weights (~119 models via `hf download`) |
-| V/Vd/D matrices for AR + MLM (20 MB) | 8 external model repos (`setup_external_models.sh`) |
-| Per-model scores, slimmed (48 MB) | GenSLM pretrained weights (manual) |
-| Downstream AUC results (6 MB) | Benchmark task CSVs from [DNA Foundation Benchmark](https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset) |
-| Phenotype prediction outputs (2 MB) | |
-| t-SNE model map embeddings | |
-| Paper figures (23 PDFs) and tables (12 .tex) | |
-
----
-
-## Model setup
-
-**HuggingFace models** (119 of 123):
-
-```bash
-bash scripts/0_download_models_from_list.sh
-```
-
-**External models** (8 repos with custom loaders):
-
-```bash
-bash models/setup_external_models.sh
-```
-
-See [models/README.md](models/README.md) for details on megaDNA, GenSLM,
-and other special cases. Model weights follow their own upstream licenses.
-
----
-
-## Downstream benchmark setup
-
-The 6 downstream classification tasks are from the
-[DNA Foundation Benchmark](https://github.com/ChongWuLab/dna_foundation_benchmark)
-(Feng et al., 2025). Raw task CSVs are **not** bundled in this repository.
-
-```bash
-huggingface-cli download hfeng3/dna_foundation_benchmark_dataset \
-    --repo-type dataset --local-dir data/dna_foundation_benchmark
-```
-
-See [data/downstream_tasks/README.md](data/downstream_tasks/README.md)
-for expected directory layout and task details.
+| Probe panel (10,000 probes) | 8 MB |
+| V/Vd/D matrices for AR + MLM | 20 MB |
+| Per-model likelihood responses, slimmed | 48 MB |
+| Downstream AUC results | 6 MB |
+| Phenotype prediction outputs | 2 MB |
+| t-SNE model map embeddings | — |
+| Paper figures (23 PDFs) and tables (12 .tex) | — |
 
 ---
 

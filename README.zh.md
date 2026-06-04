@@ -2,6 +2,8 @@
 
 > 🌐 Language: **中文** · [English](README.md)
 
+> 📖 **项目主页:[ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
+
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
 </p>
@@ -30,8 +32,13 @@ pip install -e .
 
 > **注意**:`import glmap` 不会触发 `import torch` 或 `import transformers`。
 > 重依赖在 `get_loader()` 内部按需加载,因此即使没有装 GPU 相关包,核心
-> 安装也足以用于分析和画图。如需自己重新打分或开发加载器,见
-> [models/README.md](models/README.md)。
+> 安装也足以用于分析和画图。
+
+### 重新计算 123 个模型的分数
+
+这 123 个模型分属**多套互不兼容的运行环境**(不同模型家族的 Python /
+PyTorch / CUDA 版本各不相同)。我们正在把这些环境打包成容器镜像,以便对
+任意模型方便地重新计算其似然响应。**敬请期待。**
 
 ---
 
@@ -74,46 +81,6 @@ specs = glmap.specs_from_audit() # 123 个 ModelSpec 对象的列表
 
 ---
 
-## 重新运行打分与下游评测
-
-从零复现完整流水线需要 GPU、模型权重和基准数据。环境配置见下文各节。
-
-**快速示例**(单模型、单 GPU):
-
-```bash
-python scripts/score/scoring_worker.py --from-audit \
-    --hf-ids zhihan1996/DNABERT-2-117M --device cuda:0
-```
-
-**完整 123 模型复现**(需多个环境 + 多 GPU,见
-[models/env_routing.md](models/env_routing.md)):
-
-```bash
-# 1. 跨 123 模型并行打分(worker 使用 --skip-aggregate)
-python scripts/score/run_scoring_sweep.py --audit data/audits/models.json
-
-# 2. 构建 V/Vd/D 矩阵(CPU,在所有打分 worker 完成后)
-python scripts/score/scoring_worker.py --from-audit --strict-aggregate
-
-# 3. 并行提取下游 embedding(需要基准 CSV)
-python scripts/downstream_tasks/run_embed_sweep.py --audit data/audits/models.json
-
-# 4. 训练线性探针并计算 AUC
-python scripts/downstream_tasks/run_downstream_classify.py
-
-# 5. 生成论文图
-python scripts/figures/fig2c_split_half_consistency.py --seed 123
-python scripts/figures/fig3a_model_map_family.py
-# ...(全部图脚本见 scripts/figures/)
-```
-
-并行 sweep 所需的各家族环境配置见
-[models/env_routing.md](models/env_routing.md)。
-
-> 💡 顶层另有一组编号驱动脚本(`scripts/0_*.sh … 7_*.sh`),把上述步骤串成可顺序执行的流水线(模型审计 → 下载权重 → 建面板 → 打分 → MLM 稳定性/消融 → 下游 embedding/AUC → 表型预测 → 模型图)。
-
----
-
 ## 仓库结构
 
 ```
@@ -153,52 +120,19 @@ GLMap/
 
 ---
 
-## 仓库自带产物 vs 用户自行下载的数据
+## 仓库自带产物
 
-| 本仓库已包含 | 用户需另行下载 |
+用预计算结果复现论文分析所需的一切都已随仓库提供——无需模型权重、无需打分:
+
+| 产物 | 体积 |
 |---|---|
-| 探针面板(10,000 探针,8 MB) | HF 模型权重(约 119 个,经 `hf download`) |
-| AR + MLM 的 V/Vd/D 矩阵(20 MB) | 8 个外部模型仓库(`setup_external_models.sh`) |
-| 每模型分数,精简版(48 MB) | GenSLM 预训练权重(手动) |
-| 下游 AUC 结果(6 MB) | [DNA Foundation Benchmark](https://huggingface.co/datasets/hfeng3/dna_foundation_benchmark_dataset) 的基准任务 CSV |
-| 表型预测输出(2 MB) | |
-| t-SNE 模型图嵌入 | |
-| 论文图(23 个 PDF)与表(12 个 .tex) | |
-
----
-
-## 模型配置
-
-**HuggingFace 模型**(123 中的 119 个):
-
-```bash
-bash scripts/0_download_models_from_list.sh
-```
-
-**外部模型**(8 个带自定义加载器的仓库):
-
-```bash
-bash models/setup_external_models.sh
-```
-
-megaDNA、GenSLM 等特殊情况的细节见
-[models/README.md](models/README.md)。模型权重遵循其各自上游许可证。
-
----
-
-## 下游基准配置
-
-6 个下游分类任务来自
-[DNA Foundation Benchmark](https://github.com/ChongWuLab/dna_foundation_benchmark)
-(Feng et al., 2025)。原始任务 CSV **不**随本仓库一起分发。
-
-```bash
-huggingface-cli download hfeng3/dna_foundation_benchmark_dataset \
-    --repo-type dataset --local-dir data/dna_foundation_benchmark
-```
-
-期望的目录布局与任务细节见
-[data/downstream_tasks/README.md](data/downstream_tasks/README.md)。
+| 探针面板(10,000 探针) | 8 MB |
+| AR + MLM 的 V/Vd/D 矩阵 | 20 MB |
+| 每模型似然响应,精简版 | 48 MB |
+| 下游 AUC 结果 | 6 MB |
+| 表型预测输出 | 2 MB |
+| t-SNE 模型图嵌入 | — |
+| 论文图(23 个 PDF)与表(12 个 .tex) | — |
 
 ---
 
