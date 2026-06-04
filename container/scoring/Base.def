@@ -5,7 +5,7 @@ From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 # Shared base for ALL GLMap scoring images.
 #
 # CUDA 12.8 devel toolchain + micromamba + build tools + a local wheelhouse.
-# Each per-group image (bio-cu118 / bio-cu121 / bio-cu124 / bio-default)
+# Each per-group image (bio-cu118 / bio-cu121 / bio-evo / bio-default)
 # bootstraps `From: localimage` THIS .sif and only adds its family micromamba
 # envs on top — so the heavy CUDA/toolchain layer is built once and shared.
 #

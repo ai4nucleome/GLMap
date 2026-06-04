@@ -46,7 +46,7 @@ From: base-cu128.sif
     done
 
     # ── rebuild hyena-dna clean (host env is multi-torch polluted) ──
-    # Network as in container/evo2/Apptainer.def: Tsinghua pip mirror (direct)
+    # Network as in bio-evo.def: Tsinghua pip mirror (direct)
     # + 127.0.0.1:7890 tunnel for download.pytorch.org (the cu118 torch wheel).
     export http_proxy=http://127.0.0.1:7890  https_proxy=http://127.0.0.1:7890
     export HTTP_PROXY=http://127.0.0.1:7890  HTTPS_PROXY=http://127.0.0.1:7890

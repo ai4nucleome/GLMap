@@ -37,11 +37,11 @@ Base.def ──► base-cu128.sif         CUDA 12.8 devel + micromamba + wheelho
                   ├─► bio-default.sif   envs: base, dnabert2, megadna
                   ├─► bio-cu118.sif     envs: caduceus, gf, hyena-dna
                   ├─► bio-cu121.sif     envs: PlantCAD
-                  └─► bio-cu124.sif     envs: evo, evo2   (= container/evo2/bio-evo.sif)
+                  └─► bio-evo.sif       envs: evo1, evo2
 ```
 
-> The evo/evo2 group is already built in `container/evo2/` (`Apptainer.def`
-> → `bio-evo.sif`); it is the reference implementation of the pattern.
+> The evo/evo2 group def is `bio-evo.def` (built artifact: `bio-evo.sif`).
+> It is the original pip-recipe build; the other groups ship packed envs.
 
 ## Wheelhouse
 
@@ -62,7 +62,7 @@ apptainer build base-cu128.sif Base.def
 apptainer build bio-default.sif bio-default.def
 apptainer build bio-cu118.sif   bio-cu118.def
 apptainer build bio-cu121.sif   bio-cu121.def
-# evo/evo2: container/evo2/Apptainer.def  ->  bio-evo.sif
+apptainer build --fakeroot bio-evo.sif      bio-evo.def
 ```
 
 `.sif` images are huge (10–20 GB each) and are **gitignored** — distribute via

@@ -40,7 +40,7 @@ From: base-cu128.sif
     done
 
     # ── build the clean `base` env (standard HF stack, pinned to host) ──
-    # Network as in container/evo2/Apptainer.def: Tsinghua pip mirror (direct)
+    # Network as in bio-evo.def: Tsinghua pip mirror (direct)
     # + 127.0.0.1:7890 tunnel as a fallback for any slow direct PyPI access.
     export http_proxy=http://127.0.0.1:7890  https_proxy=http://127.0.0.1:7890
     export HTTP_PROXY=http://127.0.0.1:7890  HTTPS_PROXY=http://127.0.0.1:7890
