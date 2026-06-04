@@ -46,9 +46,14 @@ From: base-cu128.sif
     done
 
     # ── rebuild hyena-dna clean (host env is multi-torch polluted) ──
-    # If the build node has no direct PyPI access, set a mirror + proxy here
-    # like container/evo2/Apptainer.def does.
+    # Network as in container/evo2/Apptainer.def: Tsinghua pip mirror (direct)
+    # + 127.0.0.1:7890 tunnel for download.pytorch.org (the cu118 torch wheel).
+    export http_proxy=http://127.0.0.1:7890  https_proxy=http://127.0.0.1:7890
+    export HTTP_PROXY=http://127.0.0.1:7890  HTTPS_PROXY=http://127.0.0.1:7890
+
     /opt/micromamba/bin/micromamba create -y -n hyena-dna python=3.9 pip
+    /opt/micromamba/bin/micromamba run -n hyena-dna pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+    # torch from the official cu118 index (via proxy); rest from Tsinghua.
     /opt/micromamba/bin/micromamba run -n hyena-dna pip install --no-cache-dir \
         torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
     /opt/micromamba/bin/micromamba run -n hyena-dna pip install --no-cache-dir \

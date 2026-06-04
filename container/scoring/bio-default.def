@@ -40,9 +40,13 @@ From: base-cu128.sif
     done
 
     # ── build the clean `base` env (standard HF stack, pinned to host) ──
-    # If the build node has no direct PyPI access, set a mirror + proxy here
-    # like container/evo2/Apptainer.def does.
+    # Network as in container/evo2/Apptainer.def: Tsinghua pip mirror (direct)
+    # + 127.0.0.1:7890 tunnel as a fallback for any slow direct PyPI access.
+    export http_proxy=http://127.0.0.1:7890  https_proxy=http://127.0.0.1:7890
+    export HTTP_PROXY=http://127.0.0.1:7890  HTTPS_PROXY=http://127.0.0.1:7890
+
     /opt/micromamba/bin/micromamba create -y -n base python=3.11.9 pip
+    /opt/micromamba/bin/micromamba run -n base pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
     /opt/micromamba/bin/micromamba run -n base pip install --no-cache-dir \
         torch==2.8.0 \
         transformers==4.57.6 tokenizers==0.22.2 safetensors==0.7.0 \
