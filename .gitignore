@@ -97,3 +97,4 @@ CLAUDE.md
 
 # Singularity / Apptainer images (huge; build on HPC, distribute via registry/Zenodo)
 *.sif
+container/push_to_hf.sh
