@@ -11,24 +11,12 @@ container is needed: `pip install -e .` gives the torch-free analysis stack
 
 The scoring environments are mutually incompatible, different Python,
 torch and CUDA, so they can never share one interpreter and are kept as
-isolated micromamba envs:
-
-| micromamba env | Python | torch | CUDA | family signature |
-|---|---|---|---|---|
-| base       | 3.11.9  | 2.8.0        | 12.x  | transformers (NT / GENA-LM / ModernBERT / …) |
-| dnabert2   | 3.8.20  | 1.13.1       | 11.7  | transformers 4.29 |
-| megadna    | 3.10.0  | 2.9.0        | 12.x  | torch.load .pt |
-| caduceus   | 3.8.0   | 2.2.0        | 11.8  | mamba-ssm 1.2, flash-attn 2.5.6 |
-| gf         | 3.10.0  | 2.1.1        | 11.8  | evo-model, flash-attn 2.7.2 |
-| hyena-dna  | 3.9.0   | 2.7.1        | 12.x  | pytorch-lightning, timm (standalone code, no flash-attn) |
-| PlantCAD   | 3.11.14 | 2.5.1        | 12.1  | mamba-ssm 2.2.4 |
-| evo        | 3.11.0  | 2.6.0        | 12.4  | evo-model, flash-attn 2.7.4 |
-| evo2       | 3.12.0  | 2.6.0        | 12.4  | evo2 |
+isolated envs.
 
 The exact package manifest of each env is captured under
 [`../models/env-specs/`](../models/env-specs/) (`pip freeze` per env) as the build reference.
 
-## Layered design
+## 🪞 Containers!
 
 A single shared base, then one image per CUDA-compatibility group. Each group
 image holds its env(s) as isolated micromamba envs and dispatches per family
@@ -42,12 +30,6 @@ Base.def ──► base-cu128.sif         CUDA 12.8 devel + micromamba + build t
                   ├─► bio-cu121.sif     envs: PlantCAD
                   └─► bio-evo.sif       envs: evo, evo2
 ```
-
-> Every group ships its envs **pre-built** as `packed/*.tar.gz` (conda-pack of
-> the clean host envs, or a plain directory tarball for the conda/pip-polluted
-> ones); the build only unpacks them, so no pip / network is needed at build
-> time (a couple of envs add one small wheel — pyarrow, torchvision — from the
-> Tsinghua mirror). All four group images are built and validated end-to-end.
 
 ## Download the prebuilt images (Hugging Face)
 
@@ -79,7 +61,7 @@ model → env routing.
 
 ## Build from source (maintainers)
 
-On a host with Apptainer; e.g. the HPC:
+On a host with Apptainer:
 
 ```bash
 cd container          # %files paths + packed/ are relative to here
@@ -112,3 +94,25 @@ GLMAP_ENV=caduceus apptainer run --nv \
 `--nv` exposes the host GPU; `--bind $PWD:/work` mounts the GLMap checkout
 (data, results, model weights). Map each model family → env via
 [`../../models/env_routing.md`](../../models/env_routing.md).
+
+## Full 123-model sweep — two backends
+
+The scoring sweep runs the same way whether you built your own envs or use
+these images; pick a backend:
+
+```bash
+# (A) your own micromamba envs (edit env_paths.yaml for your machine)
+python scripts/score/run_scoring_sweep.py
+
+# (B) the prebuilt images — no env setup, just point at the .sif directory
+python scripts/score/run_scoring_sweep.py \
+    --backend container --image-dir container \
+    --hf-cache "$HF_HOME"
+```
+
+Backend (B) routes every model to its group image automatically (the
+`ENV_IMAGE` map in `scripts/score/sweep_engine.py`), binds the checkout at
+`/work` and the HF cache, and runs each via `apptainer run --nv` (use
+`--container-runtime singularity` on compute nodes without user namespaces).
+Both backends write the same `results/scores/AR_MLM_scores/<slug>/probes.parquet`
+and accept the same flags (`--only`, `--hf-ids`, `--gpu-ids`, `--force`, …).
