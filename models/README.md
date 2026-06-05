@@ -6,8 +6,8 @@ few families) their custom loading code.
 
 ## 1. Clone custom loading code
 
-8 families cannot be loaded via standard HuggingFace `transformers` — they
-need their own model code. Clone all of them:
+Several families cannot be loaded via standard HuggingFace `transformers` —
+they need their own model code. Clone them:
 
 ```bash
 bash models/setup_external_models.sh
@@ -20,11 +20,15 @@ This places each repo under `models/modelsHFNoInfo/<name>/`
 | Evo 1.x | [evo-design/evo](https://github.com/evo-design/evo) | `evo1` |
 | Evo 2 | [ArcInstitute/evo2](https://github.com/ArcInstitute/evo2) | `evo2` |
 | GenSLM | [ramanathanlab/genslm](https://github.com/ramanathanlab/genslm) | `genslm` |
-| HyenaDNA | [HazyResearch/hyena-dna](https://github.com/HazyResearch/hyena-dna) | `hyenadna` |
 | megaDNA | [lingxusb/megaDNA](https://github.com/lingxusb/megaDNA) | `megadna` |
 | AIDO.DNA | [genbio-ai/ModelGenerator](https://github.com/genbio-ai/ModelGenerator) | `aido` |
 | PlantBiMoE | [HUST-Keep-Lin/PlantBiMoE](https://github.com/HUST-Keep-Lin/PlantBiMoE) | `plantbimoe` |
 | PlantCAD2 | [kuleshov-group/PlantCaduceus](https://github.com/kuleshov-group/PlantCaduceus) | `plantcad2` |
+
+> **HyenaDNA** needs no clone: its single self-contained loader module
+> (`standalone_hyenadna.py`, Apache-2.0) is **vendored** in-repo under
+> `models/modelsHFNoInfo/hyena-dna/` (see its `LICENSE` / `NOTICE`). Weights
+> still come from the HF Hub (`LongSafari/hyenadna-*`).
 
 ## 2. Download model weights
 
@@ -41,7 +45,12 @@ Two special cases are handled by the script:
 
 - **GenSLM** (3 entries): these are local weight names, not HF repos, so
   the script skips them. Download the 3 checkpoints manually (see below).
-- **megaDNA**: the audit keeps `lingxusb/megaDNA` as the canonical id but the weight (`megaDNA_phage_145M.pt`) is fetched from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated) instead.
+- **megaDNA**: only the **loader code** needs cloning (section 1) — the
+  upstream GitHub repo carries no license, so it cannot be vendored. The
+  **weight is fully automatic**: the loader downloads `megaDNA_phage_145M.pt`
+  from [`lingxusb/megaDNA_updated`](https://huggingface.co/lingxusb/megaDNA_updated)
+  into the HF cache on first use (the audit's `lingxusb/megaDNA` id is stale;
+  the old repo is no longer public). No manual weight placement is needed.
 
 ### GenSLM weights (manual)
 
@@ -64,7 +73,10 @@ download links.
 - `evo-family-relationship.csv` — ground-truth Evo lineage labels as
   `(anchor, partner, label)` pairs (`1` = partner is a direct descendant /
   fine-tune of the anchor, `0` = unrelated); used by Table 3 / Fig 4a.
-- `setup_external_models.sh` — clones the 8 upstream repos at pinned SHAs.
+- `setup_external_models.sh` — clones the 7 upstream code repos at pinned SHAs
+  (HyenaDNA is vendored, so it is not cloned).
+- `modelsHFNoInfo/hyena-dna/` — vendored HyenaDNA loader module
+  (`standalone_hyenadna.py`, Apache-2.0) + its `LICENSE` / `NOTICE`.
 
 ## Upstream licenses
 

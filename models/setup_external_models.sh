@@ -59,7 +59,8 @@ clone_at() {
 clone_at evo           https://github.com/evo-design/evo.git               6856bba
 clone_at evo2          https://github.com/ArcInstitute/evo2.git            3a4d1d0
 clone_at genslm        https://github.com/ramanathanlab/genslm.git         6622c47
-clone_at hyena-dna     https://github.com/HazyResearch/hyena-dna.git       d553021
+# hyena-dna: NOT cloned — standalone_hyenadna.py (Apache-2.0) is vendored in
+# models/modelsHFNoInfo/hyena-dna/ (see its LICENSE / NOTICE).
 clone_at megaDNA        https://github.com/lingxusb/megaDNA.git              cb2f5ab
 clone_at ModelGenerator https://github.com/genbio-ai/ModelGenerator.git     c562a20
 clone_at PlantBiMoE     https://github.com/HUST-Keep-Lin/PlantBiMoE.git     e3b6d53
