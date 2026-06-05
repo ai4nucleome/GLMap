@@ -38,12 +38,14 @@ _AUDIT_BRANCH_TO_SCORE_BRANCH = {
 }
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True)
 class ModelSpec:
     """Minimal config for one scorable model.
 
-    All fields are keyword-only to prevent positional-argument confusion
-    (e.g. swapping ``branch`` and ``loader_kind`` silently).
+    Always construct with keyword arguments to avoid positional-argument
+    confusion (e.g. swapping ``branch`` and ``loader_kind`` silently). The
+    fields are ordered non-default-first so the dataclass also builds on the
+    Python 3.8 / 3.9 scoring environments (``kw_only`` needs 3.10+).
 
 
     Attributes
