@@ -25,7 +25,7 @@ isolated micromamba envs:
 | evo2       | 3.12.0  | 2.6.0        | 12.4  | evo2 |
 
 The exact package manifest of each env is captured under
-[`env-specs/`](env-specs/) (`pip freeze` per env) as the build reference.
+[`../models/env-specs/`](../models/env-specs/) (`pip freeze` per env) as the build reference.
 
 ## Layered design
 
