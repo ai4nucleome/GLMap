@@ -19,7 +19,7 @@ isolated micromamba envs:
 | megadna    | 3.10.0  | 2.9.0        | 12.x  | torch.load .pt |
 | caduceus   | 3.8.0   | 2.2.0        | 11.8  | mamba-ssm 1.2, flash-attn 2.5.6 |
 | gf         | 3.10.0  | 2.1.1        | 11.8  | evo-model, flash-attn 2.7.2 |
-| hyena-dna  | 3.9.0   | 2.7.1        | 11.8  | flash-attn 1.0.7 |
+| hyena-dna  | 3.9.0   | 2.7.1        | 12.x  | pytorch-lightning, timm (standalone code, no flash-attn) |
 | PlantCAD   | 3.11.14 | 2.5.1        | 12.1  | mamba-ssm 2.2.4 |
 | evo        | 3.11.0  | 2.6.0        | 12.4  | evo-model, flash-attn 2.7.4 |
 | evo2       | 3.12.0  | 2.6.0        | 12.4  | evo2 |
