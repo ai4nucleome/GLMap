@@ -34,11 +34,20 @@ pip install -e .
 ### Recomputing the 123-model scores
 
 The 123 models span many **mutually incompatible runtime environments**
-(different Python / PyTorch / CUDA versions per model family). We are
-**packaging these environments into container images** so that recomputing the
-likelihood responses for any model will be straightforward.
+(different Python / PyTorch / CUDA per family). You can recompute the
+likelihood responses **two ways**:
 
-**Coming soon.**
+- **Configure the environments yourself** — set up the per-family micromamba
+  envs ([`models/env_routing.md`](models/env_routing.md)) and run
+  `python scripts/score/run_scoring_sweep.py`.
+- **Use our prebuilt container images** — four Apptainer/Singularity images
+  cover all 123 models' environments, distributed as the HuggingFace dataset
+  [`Tim419/GLMap-containers`](https://huggingface.co/datasets/Tim419/GLMap-containers).
+  Run the same sweep with `--backend container` — no env setup needed.
+
+See [`container/README.md`](container/README.md) for image download + the
+model→image map, and [`models/README.md`](models/README.md) for model weights
+and external loader code.
 
 ---
 

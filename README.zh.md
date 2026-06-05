@@ -30,10 +30,18 @@ pip install -e .
 ### 重新计算 123 个模型的分数
 
 这 123 个模型分属**多套互不兼容的运行环境**(不同模型家族的 Python /
-PyTorch / CUDA 版本各不相同)。我们**正在把这些环境打包成容器镜像**,以便对
-任意模型方便地重新计算其似然响应。
+PyTorch / CUDA 版本各不相同)。重新计算似然响应有**两种方式**:
 
-**敬请期待。**
+- **自己配置环境** —— 按家族建好各 micromamba 环境
+  (见 [`models/env_routing.md`](models/env_routing.md)),然后跑
+  `python scripts/score/run_scoring_sweep.py`。
+- **用我们预构建的容器镜像** —— 4 个 Apptainer/Singularity 镜像覆盖全部
+  123 个模型的环境,以 HuggingFace dataset 形式发布于
+  [`Tim419/GLMap-containers`](https://huggingface.co/datasets/Tim419/GLMap-containers)。
+  同一条 sweep 加 `--backend container` 即可,**无需配置环境**。
+
+镜像下载 + 模型→镜像对照见 [`container/README.md`](container/README.md);
+模型权重和外部加载代码见 [`models/README.md`](models/README.md)。
 
 ---
 
