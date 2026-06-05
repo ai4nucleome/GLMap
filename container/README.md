@@ -48,7 +48,32 @@ Base.def ──► base-cu128.sif         CUDA 12.8 devel + micromamba + build t
 > time (a couple of envs add one small wheel — pyarrow, torchvision — from the
 > Tsinghua mirror). All four group images are built and validated end-to-end.
 
-## Build (on a host with Apptainer; e.g. the HPC)
+## Download the prebuilt images (GHCR)
+
+The four group images are published to the GitHub Container Registry. Pull only
+the one(s) for the model families you want to score — each is **self-contained**
+(the shared base is already inside; `base-cu128.sif` is build-only):
+
+```bash
+apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-default:v1   # 16 GB
+apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-cu118:v1     # 19 GB
+apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-cu121:v1     # 15 GB
+apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-evo:v1       # 23 GB
+```
+
+| image | env(s) | model families |
+|---|---|---|
+| `glmap-bio-default` | base / dnabert2 / megadna | NT, GENA-LM, ModernBERT, GROVER, Mistral-DNA, NTv3, … (most); DNABERT-2 / DNABERT-S; megaDNA |
+| `glmap-bio-cu118`   | caduceus / gf / hyena-dna | Caduceus; GenomeOcean; HyenaDNA |
+| `glmap-bio-cu121`   | PlantCAD                  | PlantCAD2 |
+| `glmap-bio-evo`     | evo / evo2                | Evo-1 / Evo-1.5; Evo-2 (7B) |
+
+See [`../../models/env_routing.md`](../../models/env_routing.md) for the full
+model → env routing.
+
+## Build from source (maintainers)
+
+On a host with Apptainer; e.g. the HPC:
 
 ```bash
 cd container          # %files paths + packed/ are relative to here
