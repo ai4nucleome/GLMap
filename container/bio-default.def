@@ -49,6 +49,14 @@ From: base-cu128.sif
         rm -f "/opt/packed/$e.tar.gz"
     done
 
+    # megadna's host env never had pyarrow, which the GLMap scoring worker
+    # needs for the panel / probes parquet I/O. Add just that one wheel.
+    echo ">>> adding pyarrow to megadna"
+    # call pip via python -m (the conda-pack pip script's shebang points at the
+    # build-time prefix and may not be relocated).
+    /opt/micromamba/envs/megadna/bin/python -m pip install --no-cache-dir \
+        -i https://pypi.tuna.tsinghua.edu.cn/simple pyarrow==18.1.0
+
 %environment
     export LC_ALL=C
     export LANG=C
