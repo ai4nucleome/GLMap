@@ -1,15 +1,16 @@
 # GLMap scoring containers (Apptainer / Singularity)
 
 Containers for **running the 123 genomic language models** to recompute their
-likelihood responses — they carry the GPU model-runtime environments. For
-analysis only (using the precomputed results, reproducing figures/tables) no
+likelihood responses. 
+
+For analysis only (using precomputed results, reproducing figures/tables) no
 container is needed: `pip install -e .` gives the torch-free analysis stack
-(see the top-level README).
+(see the [top-level README](../README.md)).
 
-## Why per-group images (not one mega-image)
+## Why per-group images
 
-The 9 scoring environments are mutually incompatible — different Python,
-torch and CUDA — so they can never share one interpreter and are kept as
+The scoring environments are mutually incompatible, different Python,
+torch and CUDA, so they can never share one interpreter and are kept as
 isolated micromamba envs:
 
 | micromamba env | Python | torch | CUDA | family signature |
@@ -48,25 +49,30 @@ Base.def ──► base-cu128.sif         CUDA 12.8 devel + micromamba + build t
 > time (a couple of envs add one small wheel — pyarrow, torchvision — from the
 > Tsinghua mirror). All four group images are built and validated end-to-end.
 
-## Download the prebuilt images (GHCR)
+## Download the prebuilt images (Hugging Face)
 
-The four group images are published to the GitHub Container Registry. Pull only
-the one(s) for the model families you want to score — each is **self-contained**
-(the shared base is already inside; `base-cu128.sif` is build-only):
+The four group images are published as a HuggingFace **dataset**,
+[`Tim419/GLMap-containers`](https://huggingface.co/datasets/Tim419/GLMap-containers).
+Download only the one(s) for the model families you want to score — each is
+**self-contained** (the shared base is already inside; `base-cu128.sif` is
+build-only):
 
 ```bash
-apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-default:v1   # 16 GB
-apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-cu118:v1     # 19 GB
-apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-cu121:v1     # 15 GB
-apptainer pull oras://ghcr.io/ai4nucleome/glmap-bio-evo:v1       # 23 GB
+hf download Tim419/GLMap-containers bio-default.sif --repo-type dataset --local-dir .   # 16 GB
+hf download Tim419/GLMap-containers bio-cu118.sif   --repo-type dataset --local-dir .   # 19 GB
+hf download Tim419/GLMap-containers bio-cu121.sif   --repo-type dataset --local-dir .   # 15 GB
+hf download Tim419/GLMap-containers bio-evo.sif     --repo-type dataset --local-dir .   # 23 GB
 ```
+
+Then run with `apptainer run --nv` (or `singularity run --nv` on nodes without
+user namespaces) — see **Run** below.
 
 | image | env(s) | model families |
 |---|---|---|
-| `glmap-bio-default` | base / dnabert2 / megadna | NT, GENA-LM, ModernBERT, GROVER, Mistral-DNA, NTv3, … (most); DNABERT-2 / DNABERT-S; megaDNA |
-| `glmap-bio-cu118`   | caduceus / gf / hyena-dna | Caduceus; GenomeOcean; HyenaDNA |
-| `glmap-bio-cu121`   | PlantCAD                  | PlantCAD2 |
-| `glmap-bio-evo`     | evo / evo2                | Evo-1 / Evo-1.5; Evo-2 (7B) |
+| `bio-default.sif` | base / dnabert2 / megadna | NT, GENA-LM, ModernBERT, GROVER, Mistral-DNA, NTv3, … (most); DNABERT-2 / DNABERT-S; megaDNA |
+| `bio-cu118.sif`   | caduceus / gf / hyena-dna | Caduceus; GenomeOcean; HyenaDNA |
+| `bio-cu121.sif`   | PlantCAD                  | PlantCAD2 |
+| `bio-evo.sif`     | evo / evo2                | Evo-1 / Evo-1.5; Evo-2 (7B) |
 
 See [`../../models/env_routing.md`](../../models/env_routing.md) for the full
 model → env routing.
