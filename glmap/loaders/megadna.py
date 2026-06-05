@@ -118,10 +118,12 @@ class MegaDNALoader:
         if not self.weight_path.exists():
             try:
                 from huggingface_hub import hf_hub_download
+                # No local_dir: resolve via the standard HF cache, so this
+                # works both online (downloads once) and offline / in a
+                # container with the HF cache bound (HF_HUB_OFFLINE=1).
                 downloaded = hf_hub_download(
                     "lingxusb/megaDNA_updated",
                     "megaDNA_phage_145M.pt",
-                    local_dir=str(self.weight_path.parent),
                 )
                 self.weight_path = Path(downloaded)
             except Exception:
