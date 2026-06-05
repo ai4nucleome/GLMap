@@ -95,6 +95,17 @@ _PLANTCAD_LIB    = _env_cfg["ld_library_path"]["plantcad"]
 _EVO2_LIB        = _env_cfg["ld_library_path"]["evo2"]
 _EVO2_TORCH_LIB  = _env_cfg["ld_library_path"]["evo2_torch"]
 
+# Which prebuilt container image holds each env — used only by the
+# `--backend container` path (see container/README.md). The image dispatches
+# to the env's python via the GLMAP_ENV variable, so no per-machine env_paths
+# config is needed in that mode.
+ENV_IMAGE: dict[str, str] = {
+    "base": "bio-default.sif", "dnabert2": "bio-default.sif", "megadna": "bio-default.sif",
+    "caduceus": "bio-cu118.sif", "gf": "bio-cu118.sif", "hyena-dna": "bio-cu118.sif",
+    "PlantCAD": "bio-cu121.sif",
+    "evo": "bio-evo.sif", "evo2": "bio-evo.sif",
+}
+
 
 @dataclass
 class RouteSpec:
@@ -369,8 +380,17 @@ def build_command(
     scores_subdir: str = "AR_MLM_scores",
     audit_path: str | None = None,
     benchmark_dir: str | None = None,
+    backend: str = "host",
+    image_dir: str | None = None,
+    container_runtime: str = "apptainer",
+    hf_cache: str | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     """Construct argv + env for subprocess.Popen.
+
+    backend='host' (default) runs the env's python directly (env_paths.yaml).
+    backend='container' wraps the same worker invocation in
+    ``<runtime> run --nv <image-for-env>`` with GLMAP_ENV set, so the prebuilt
+    images are used instead of per-machine micromamba envs.
 
     mode='scoring' (default) — dispatches to scripts/score/scoring_worker.py with
         --from-audit + --hf-ids=<hf_id> + --skip-aggregate so each parallel
@@ -474,6 +494,27 @@ def build_command(
     env.setdefault("TRANSFORMERS_OFFLINE", "1")
     for k, v in route.extra_env.items():
         env[k] = v
+
+    if backend == "container":
+        # Replace the host python (args[0]) with `<runtime> run --nv <image>`;
+        # keep the worker script + flags (args[1:]). The image's runscript
+        # dispatches to the env's python via GLMAP_ENV. The GLMap checkout is
+        # bound at /work (carries code, panel, audit, weights, the cloned
+        # external model code); the HF cache is bound for downloaded weights.
+        # CUDA_VISIBLE_DEVICES stays in `env` — apptainer --nv honours it.
+        image = str(Path(image_dir) / ENV_IMAGE[route.env])
+        cargs = [
+            container_runtime, "run", "--nv",
+            "--bind", f"{REPO_ROOT}:/work", "--pwd", "/work",
+            "--env", f"GLMAP_ENV={route.env}",
+            "--env", "HF_HUB_OFFLINE=1", "--env", "TRANSFORMERS_OFFLINE=1",
+        ]
+        if hf_cache:
+            cargs += ["--bind", f"{hf_cache}:/hfcache", "--env", "HF_HOME=/hfcache"]
+        for k, v in route.extra_env.items():
+            cargs += ["--env", f"{k}={v}"]
+        cargs += [image, *args[1:]]
+        args = cargs
     return args, env
 
 
@@ -538,6 +579,10 @@ def run_sweep(
     parquet_complete_fn=None,
     audit_path: str | None = None,
     benchmark_dir: str | None = None,
+    backend: str = "host",
+    image_dir: str | None = None,
+    container_runtime: str = "apptainer",
+    hf_cache: str | None = None,
 ) -> list[tuple[str, str, int, float]]:
     """Drive the parallel sweep. Returns list of (hf_id, status, rc, elapsed_sec).
 
@@ -681,7 +726,10 @@ def run_sweep(
                                       stride=stride, method=method, out_dir=out_dir,
                                       scores_subdir=scores_subdir,
                                       audit_path=audit_path,
-                                      benchmark_dir=benchmark_dir)
+                                      benchmark_dir=benchmark_dir,
+                                      backend=backend, image_dir=image_dir,
+                                      container_runtime=container_runtime,
+                                      hf_cache=hf_cache)
             slug = hf_id.replace("/", "__")
             log_path = log_dir / f"{slug}.log"
             log_path.write_text("")  # truncate
@@ -805,11 +853,36 @@ def build_arg_parser(mode: str) -> argparse.ArgumentParser:
                    help="Schedule single-GPU tasks first (default) so 8-way "
                    "parallelism kicks in immediately, or multi-GPU tasks first "
                    "to avoid pushing their latency to the end.")
+    # ── backend: host micromamba envs (default) vs prebuilt containers ──
+    p.add_argument("--backend", choices=["host", "container"], default="host",
+                   help="'host' (default): run each env's python from "
+                   "env_paths.yaml. 'container': run the prebuilt images via "
+                   "apptainer/singularity (needs --image-dir).")
+    p.add_argument("--image-dir", type=str, default=None,
+                   help="Directory holding bio-*.sif (required for "
+                   "--backend container).")
+    p.add_argument("--container-runtime", choices=["apptainer", "singularity"],
+                   default="apptainer",
+                   help="Container runtime for --backend container. Use "
+                   "'singularity' on compute nodes without user namespaces.")
+    p.add_argument("--hf-cache", type=str, default=None,
+                   help="Host HuggingFace cache dir to bind into the container "
+                   "(default: $HF_HOME, else ~/.cache/huggingface).")
     return p
 
 
 def run(mode: str) -> None:
     args = build_arg_parser(mode).parse_args()
+
+    # Container backend: validate + resolve the HF cache to bind.
+    _hf_cache = None
+    if args.backend == "container":
+        if not args.image_dir:
+            sys.exit("--backend container requires --image-dir <dir with bio-*.sif>")
+        if not Path(args.image_dir).is_dir():
+            sys.exit(f"--image-dir not found: {args.image_dir}")
+        _hf_cache = (args.hf_cache or os.environ.get("HF_HOME")
+                     or str(Path.home() / ".cache/huggingface"))
 
     if not args.audit.exists():
         sys.exit(f"audit not found at {args.audit}")
@@ -1072,6 +1145,10 @@ def run(mode: str) -> None:
         parquet_complete_fn=parquet_complete_fn,
         audit_path=str(args.audit),
         benchmark_dir=str(args.benchmark_dir),
+        backend=args.backend,
+        image_dir=args.image_dir,
+        container_runtime=args.container_runtime,
+        hf_cache=_hf_cache,
     )
     total = time.time() - t0
 
