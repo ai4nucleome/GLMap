@@ -4,7 +4,7 @@ From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 # ──────────────────────────────────────────────────────────────────────────
 # Shared base for ALL GLMap scoring images.
 #
-# CUDA 12.8 devel toolchain + micromamba + build tools + a local wheelhouse.
+# CUDA 12.8 devel toolchain + micromamba + build tools.
 # Each per-group image (bio-cu118 / bio-cu121 / bio-evo / bio-default)
 # bootstraps `From: localimage` THIS .sif and only adds its family micromamba
 # envs on top — so the heavy CUDA/toolchain layer is built once and shared.
@@ -14,16 +14,12 @@ From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 # never share one interpreter. The container instead holds them as isolated
 # micromamba envs and dispatches per family at run time. See README.md.
 #
-# Build (run from container/, where ./wheels lives):
-#     apptainer build base-cu128.sif Base.def
+# The group images ship their envs pre-built (conda-pack / plain tarballs), so
+# the base no longer needs a local wheelhouse.
 #
-# ./wheels is a LOCAL wheelhouse (gitignored) holding the large, CUDA- and
-# torch-specific wheels each group installs offline (torch, flash-attn,
-# mamba-ssm, causal-conv1d, …). Populate it before building.
+# Build (run from container/):
+#     apptainer build base-cu128.sif Base.def
 # ──────────────────────────────────────────────────────────────────────────
-
-%files
-    wheels /opt/wheels
 
 %environment
     export LC_ALL=C
@@ -49,7 +45,7 @@ From: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
     mv bin/micromamba /opt/micromamba/bin/micromamba
     rm -rf bin
 
-    mkdir -p /workspace /opt/wheels
+    mkdir -p /workspace
 
 %runscript
     exec /bin/bash "$@"

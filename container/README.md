@@ -34,28 +34,24 @@ image holds its env(s) as isolated micromamba envs and dispatches per family
 at run time.
 
 ```
-Base.def ──► base-cu128.sif         CUDA 12.8 devel + micromamba + wheelhouse
+Base.def ──► base-cu128.sif         CUDA 12.8 devel + micromamba + build tools
                   │  (localimage bootstrap)
                   ├─► bio-default.sif   envs: base, dnabert2, megadna
                   ├─► bio-cu118.sif     envs: caduceus, gf, hyena-dna
                   ├─► bio-cu121.sif     envs: PlantCAD
-                  └─► bio-evo.sif       envs: evo1, evo2
+                  └─► bio-evo.sif       envs: evo, evo2
 ```
 
-> The evo/evo2 group def is `bio-evo.def` (built artifact: `bio-evo.sif`).
-> It is the original pip-recipe build; the other groups ship packed envs.
-
-## Wheelhouse
-
-`./wheels/` (gitignored) is a local wheelhouse with the large, CUDA- and
-torch-specific wheels installed offline during the build (torch, flash-attn,
-mamba-ssm, causal-conv1d, …). Populate it before building; the exact wheels
-needed per group follow each env's row above + its `env-specs/*.txt`.
+> Every group ships its envs **pre-built** as `packed/*.tar.gz` (conda-pack of
+> the clean host envs, or a plain directory tarball for the conda/pip-polluted
+> ones); the build only unpacks them, so no pip / network is needed at build
+> time (a couple of envs add one small wheel — pyarrow, torchvision — from the
+> Tsinghua mirror). All four group images are built and validated end-to-end.
 
 ## Build (on a host with Apptainer; e.g. the HPC)
 
 ```bash
-cd container          # %files paths + ./wheels are relative to here
+cd container          # %files paths + packed/ are relative to here
 
 # 1. shared base (once)
 apptainer build base-cu128.sif Base.def
