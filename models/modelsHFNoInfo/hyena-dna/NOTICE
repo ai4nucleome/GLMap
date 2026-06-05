@@ -1,0 +1,11 @@
+standalone_hyenadna.py is vendored verbatim from the HyenaDNA repository
+(HazyResearch / LongSafari), which is licensed under Apache License 2.0.
+
+  Upstream:  https://github.com/HazyResearch/hyena-dna
+  License:   Apache-2.0 (see ./LICENSE)
+
+GLMap's HyenaDNA loader (glmap/loaders/hyenadna.py) imports this single
+self-contained module so the LongSafari/hyenadna-* checkpoints (which are not
+AutoModel-compatible) can be loaded. No other files from the upstream repo are
+required. Model weights are downloaded separately from the Hugging Face Hub
+(LongSafari/hyenadna-*).
