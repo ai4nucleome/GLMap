@@ -26,10 +26,17 @@ packages are pinned in [`pyproject.toml`](pyproject.toml).
 git clone https://github.com/ai4nucleome/GLMap.git
 cd GLMap
 pip install -e .
+
+# regenerate EVERY paper figure + table from the bundled precomputed results
+bash scripts/8_make_figures_and_tables.sh   # -> results/figures/ , results/tables/
 ```
 
 > **Note:** this install pulls in neither `torch` nor `transformers` (no GPU
-> packages); it is enough for analysis and figures.
+> packages); it is enough for analysis and figures. The precomputed matrices,
+> per-model scores, AUCs and panel ship with the repo, so the figures/tables
+> rebuild with no model weights or scoring. (Table 2's sequence-length columns
+> additionally need the external benchmark CSVs — it says so when they're
+> absent.)
 
 ### Recomputing the 123-model scores
 

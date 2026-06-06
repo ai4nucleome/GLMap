@@ -23,9 +23,15 @@ GLMap 是一个**免训练、与架构无关**的框架,通过基因组语言模
 git clone https://github.com/ai4nucleome/GLMap.git
 cd GLMap
 pip install -e .
+
+# 从仓库自带的预计算结果,一键重生成论文全部图 + 表
+bash scripts/8_make_figures_and_tables.sh   # -> results/figures/ , results/tables/
 ```
 
-> **注意**: 这套命令不会安装 `torch`  或 `transformers`，即没有装 GPU 相关包,这些安装足以用于分析和画图。
+> **注意**: 这套命令不会安装 `torch` 或 `transformers`(没有 GPU 相关包),
+> 足以用于分析和画图。预计算的矩阵、各模型分数、AUC、面板都随仓库提供,所以
+> 图/表无需模型权重或打分即可重建。(Table 2 的序列长度等列还需要外部 benchmark
+> CSV——缺失时脚本会提示如何下载。)
 
 ### 重新计算 123 个模型的分数
 
