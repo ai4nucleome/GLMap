@@ -131,8 +131,23 @@ def _tex_escape(s: str) -> str:
     return s.replace("_", r"\_")
 
 
+def _n(x) -> str:
+    """Thousands-format an int, or '—' when the stat is unavailable (the
+    benchmark CSVs were not downloaded)."""
+    return f"{x:,}" if x else "—"
+
+
 def main() -> None:
     print(f"[table2] source: {BENCH_ROOT}", flush=True)
+    if not BENCH_ROOT.exists():
+        print(
+            f"[table2] NOTE: benchmark CSVs not found at {BENCH_ROOT}. "
+            "The task list / domains still render, but the sequence-length, "
+            "N_train/N_test and class-balance columns need the raw data:\n"
+            "    huggingface-cli download hfeng3/dna_foundation_benchmark_dataset "
+            "--repo-type dataset --local-dir data/dna_foundation_benchmark\n",
+            flush=True,
+        )
     rows = []
     for t in TASKS:
         train_stats = _split_stats(_read_split(t["task_id"], "train"))
@@ -156,7 +171,7 @@ def main() -> None:
     for r in rows:
         print(
             f"| `{r['task_id']}` | "
-            f"{r['seq_len_str']} | {r['n_train']:,} | {r['n_test']:,} | "
+            f"{r['seq_len_str']} | {_n(r['n_train'])} | {_n(r['n_test'])} | "
             f"{r['class_balance'].replace(chr(92) + chr(37), '%')} |"
         )
     print()
@@ -196,8 +211,8 @@ def main() -> None:
         lines.append(
             f"    \\texttt{{{_tex_escape(r['task_id'])}}} & "
             f"{r['seq_len_str']} & "
-            f"{r['n_train']:,} & "
-            f"{r['n_test']:,} & "
+            f"{_n(r['n_train'])} & "
+            f"{_n(r['n_test'])} & "
             f"{r['class_balance']} \\\\"
         )
     lines.append(r"    \bottomrule")
