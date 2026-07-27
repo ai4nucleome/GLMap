@@ -3,6 +3,10 @@
 > 🌐 Language: **中文** · [English](README.md)
 > 
 > 📖 **项目网站: [ai4nucleome.github.io/GLMap](https://ai4nucleome.github.io/GLMap/)**
+>
+> 🎉 **本工作已被 [iscbAI 2026](https://www.iscb-cn.org.cn/web/64/list.html) 接收为口头报告（Oral Presentation）。**
+>
+> 📄 **论文：[GLMap（PDF）](paper/GLMap-iscbAI-2026.pdf)**
 
 <p align="center">
   <img src="assets/Fig1.png" alt="GLMap overview" width="80%"/>
